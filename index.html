@@ -161,6 +161,20 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 .save{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:6px 12px;border-radius:999px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none}
 .save.show{opacity:.9}
 @media (prefers-reduced-motion:reduce){.save{transition:none}}
+/* save dialog */
+.savebar{display:flex;justify-content:flex-end;margin-top:12px}
+#saveDlg{width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 48px);border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:18px 20px}
+#saveDlg::backdrop{background:rgba(0,0,0,.45)}
+#saveDlg .dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+#saveDlg h4{margin:0 0 6px;font-size:18px}
+#dlgClose{flex:none;width:34px;height:34px;border:1px solid var(--line);background:var(--paper);border-radius:8px;cursor:pointer;font-size:18px;line-height:1}
+.dlg-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.dlg-opt{text-align:left;border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:14px;cursor:pointer}
+.dlg-opt:hover{border-color:var(--forest)}
+.dlg-opt b{display:block;font-size:16px;margin-bottom:4px;color:var(--forest)}
+.dlg-opt span{font-size:13px;color:var(--muted)}
+#mdOut{min-height:min(50vh,420px);font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:13px;line-height:1.55}
+#report{display:none}
 @media (max-width:760px){
   .hero-grid,.grid2,.grid3,.mapout{grid-template-columns:1fr}
   .grid4,.timeline{grid-template-columns:1fr 1fr}
@@ -171,8 +185,46 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
   .gloss,.src{columns:1}
   .mine{grid-template-columns:1fr}
   .bar{grid-template-columns:1fr auto;}.bar .track{grid-column:1/-1;grid-row:2}
+  .dlg-opts{grid-template-columns:1fr}
 }
-@media print{.nav,.save,.btns,.tool .btn{display:none!important}.area{break-inside:auto}.tool{break-inside:avoid-page}body{background:#fff}textarea{overflow:hidden;resize:none}}
+@media print{.nav,.save,.btns,.savebar,.tool .btn{display:none!important}.area{break-inside:auto}.tool{break-inside:avoid-page}body{background:#fff}textarea{overflow:hidden;resize:none}}
+/* PDF用レポート:印刷時だけ表示し、ダークモードでも白い用紙向けの配色にする */
+@media print{
+  @page{size:A4;margin:14mm 12mm}
+  body.reporting>*:not(#report){display:none!important}
+  body.reporting #report{display:block}
+  #report{--paper:#F3F6F5;--card:#FFFFFF;--ink:#1B2733;--muted:#5B6975;--line:#D3DDDA;--tint:#E5EEEB;
+    --forest:#2E6B62;--forest-soft:#CFE3DE;--signal:#E0A01C;--signal-soft:#FBEFCF;--hazard:#C23B2A;--hazard-soft:#F8DEDA;--sky:#3D6FA8;--sky-soft:#DCE7F4;
+    --on-accent:#FFFFFF;--gold:#8A6410;color:var(--ink);background:#fff;font-size:12.5px;line-height:1.6}
+  #report,#report *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #report .rp-head{border-bottom:2px solid var(--forest);padding-bottom:6px;margin-bottom:12px}
+  #report h1{font-family:var(--serif);font-size:22px;margin:0 0 2px}
+  #report h2{font-family:var(--serif);font-size:18px;margin:0 0 8px;padding:6px 10px;background:var(--forest);color:#fff;border-radius:8px}
+  #report .rp-sec+.rp-sec{break-before:page}
+  #report h3{font-size:14px;margin:16px 0 6px;padding-left:8px;border-left:4px solid var(--forest);break-after:avoid}
+  #report h4{font-size:13px;margin:0 0 4px}
+  #report .small{font-size:11px}
+  #report .panel,#report .verdict,#report .bar,#report tr,#report .rp-2>*,#report .rp-3>*{break-inside:avoid}
+  #report .panel{padding:8px 10px;border-radius:10px}
+  #report .rp-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+  #report .rp-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start}
+  #report .tbl{overflow:visible;margin:6px 0}
+  #report .tbl table{min-width:0;font-size:11.5px}
+  #report .tbl th,#report .tbl td{padding:4px 6px}
+  #report .bars{gap:6px}
+  #report .bar{grid-template-columns:minmax(110px,34%) 1fr auto;font-size:12px}
+  #report .bar .track{grid-column:auto;grid-row:auto;height:11px}
+  #report .rp-txt{margin:2px 0 6px}
+  #report .rp-empty{color:var(--muted)}
+  #report .rp-chk{list-style:none;padding:0;margin:0}
+  #report .rp-chk li{padding:3px 0;border-bottom:1px dashed var(--line)}
+  #report .rp-chk li.on{color:var(--hazard);font-weight:700}
+  #report .rp-chk li.off{color:var(--muted)}
+  #report .rp-chip{display:inline-block;padding:0 8px;border-radius:999px;font-size:11px;font-weight:700}
+  #report .pill{font-size:11px}
+  #report svg{max-width:250px!important}
+  #report .verdict{margin:8px 0;padding:8px 12px}
+}
 </style>
 </head>
 <body>
@@ -192,6 +244,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <a href="#p3"><b>第3部 選ぶ</b><span>探す・確かめる・決める</span></a>
 </div>
 <div class="promise"><span>入力内容はこの端末のブラウザに自動保存</span><span>文系・理系どちらにも対応</span><span>詳しい解説は解説&実践ブック版へ</span></div>
+<div class="btns" style="margin-top:14px"><button type="button" class="btn" data-save="all">全章の入力内容を保存</button></div>
 </div>
 <div id="heroWheel" aria-hidden="true"></div>
 </div></header>
@@ -326,7 +379,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <div class="tool" id="mapTool">
 <h4>価値観マップ・メーカー</h4>
 <p class="hint">入力はこの端末に自動保存されます。記入例を見たいときは「Aさんの例を読み込む」を押してください(今の入力は上書きされます)。</p>
-<div class="btns"><button class="btn ghost" id="loadSample">Aさんの例を読み込む</button><button class="btn warn" id="resetAll">すべて消去</button></div>
+<div class="btns"><button class="btn ghost" id="loadSample">Aさんの例を読み込む</button><button class="btn warn" id="resetAll">すべて消去</button><button type="button" class="btn ghost" data-save="map">この章を保存</button></div>
 
 <div class="stepbox"><h5><i>Step 0</i>準備 10分</h5>
 <div class="flow"><span class="st">正解を探さない</span><span class="st">「なぜ」より「何を」</span><span class="st">60分でいったん終了</span></div></div>
@@ -373,7 +426,8 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <div class="stepbox"><h5><i>Step 8</i>他者に聞いて完成 1-2週間後</h5>
 <p class="small">第3章のメッセージを2-3人に送り、返ってきた価値を書く。一致=確定、他者だけ=候補に追加して Step 4 へ、自分だけ=行動実験で確かめる。</p>
 <textarea data-k="feedback" placeholder="例)ゼミの友人:納得いかないと引かない、調べ物になると止まらない"></textarea>
-<div class="btns"><button class="btn" id="printMap">価値観マップを印刷・PDF保存</button></div></div>
+</div>
+<div class="savebar"><button type="button" class="btn" data-save="map">価値観マップを保存(テキスト/PDF)</button></div>
 </div>
 </section>
 
@@ -396,7 +450,8 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <text x="229" y="86" font-size="11" fill="var(--muted)">固定残業代が45hを超える求人も要注意</text></svg></div>
 
 <div class="tool" id="redFlags"><h4>レッドフラッグ・チェック</h4><p class="hint">気になる会社を思い浮かべてチェック。1つでも強く当てはまれば第9章で詳しく検証。</p>
-<div id="flagList"></div><div class="verdict ok" id="flagVerdict">チェックなし</div></div>
+<div id="flagList"></div><div class="verdict ok" id="flagVerdict">チェックなし</div>
+<div class="savebar"><button type="button" class="btn" data-save="flags">チェック結果を保存(テキスト/PDF)</button></div></div>
 </section>
 
 <section class="area" id="c6">
@@ -504,6 +559,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <tr><td>A 芸術的</td><td>創造・刺激</td><td>広告・編集・企画</td><td>デザイン、UI/UX、ゲーム</td></tr>
 <tr><td>R 現実的</td><td>安全・秩序</td><td>物流・生産管理</td><td>生産技術、設備、施工管理</td></tr></table></div>
 <label style="display:block;margin-top:8px"><b>私の興味コード(上位3つ)と、調べる職種の候補</b><span class="small"> job tag の職業興味検査で測れる</span><input type="text" data-k="riasec" placeholder="例)ISE:経営企画、マーケティングリサーチ、コンサル、人事(制度設計)、公務"></label>
+<div class="savebar"><button type="button" class="btn" data-save="cond">職場の条件(A1〜A3)を保存(テキスト/PDF)</button></div>
 
 <h4 style="margin-top:22px">A4 働き方の条件</h4>
 <div class="grid3">
@@ -540,7 +596,8 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <div class="tool" id="scoreTool"><h4>企業スコアカード</h4>
 <p class="hint">評価軸は価値観マップのトップ5(重み5〜3)+共通3軸(重み3)。点数は1-5、根拠がなければ3。NG・必須を満たさない会社は点数に関係なく「除外」になります。</p>
 <div class="score"><table id="scoreTable"></table></div>
-<div id="scoreVerdict"></div></div>
+<div id="scoreVerdict"></div>
+<div class="savebar"><button type="button" class="btn" data-save="score">スコアカードを保存(テキスト/PDF)</button></div></div>
 
 <h4 style="margin-top:22px">A9 経験でマップを更新する</h4>
 <div class="flow"><span class="st">インターン・訪問</span><span class="ar">→</span><span class="st">発見(意外に楽しかった/強い抵抗)</span><span class="ar">→</span><span class="st">順位を入れ替える</span><span class="ar">→</span><span class="st">条件と重みを見直す</span><span class="ar">↺</span></div>
@@ -592,6 +649,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <div class="stepbox"><h5><i>B6</i>親友がこの結果を持って相談してきたら、何と言う?</h5>
 <textarea data-k="v_friend" placeholder="三人称だと判断が賢明になる"></textarea></div>
 <div class="verdict ok" id="verifyVerdict"></div>
+<div class="savebar"><button type="button" class="btn" data-save="verify">検証シートを保存(テキスト/PDF)</button></div>
 </div>
 </section>
 
@@ -658,6 +716,21 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 </main>
 <footer class="wrap">価値観マップ 実践ガイド(ビジュアル版)― 解説&実践ブックの姉妹版。入力内容はこのブラウザにのみ保存され、共有されません。</footer>
 <div class="save" id="saveToast">保存しました</div>
+<dialog id="saveDlg" aria-labelledby="saveTitle">
+<div class="dlg-head"><h4 id="saveTitle">保存</h4><button type="button" class="mini" id="dlgClose" aria-label="閉じる">×</button></div>
+<div id="saveChoose">
+<p class="small">保存する形式を選んでください。入力内容がこの端末の外に送られることはありません。</p>
+<div class="dlg-opts">
+<button type="button" class="dlg-opt" id="optText"><b>テキスト(Markdown)</b><span>見返す・AIに読み込ませる用。表示された文章をコピー、または .md ファイルで保存します。</span></button>
+<button type="button" class="dlg-opt" id="optPdf"><b>PDF(図・グラフつき)</b><span>人が見返す用。印刷画面が開くので、送信先(プリンター)で「PDFに保存」を選んでください。</span></button>
+</div></div>
+<div id="saveText" hidden>
+<textarea id="mdOut" readonly spellcheck="false" aria-label="保存するテキスト(Markdown)"></textarea>
+<div class="btns"><button type="button" class="btn" id="mdCopy">コピー</button><button type="button" class="btn ghost" id="mdDl">.mdファイルで保存</button><button type="button" class="btn ghost" id="mdBack">形式の選択に戻る</button></div>
+<p class="small" id="mdMsg" role="status"></p>
+</div>
+</dialog>
+<div id="report" aria-hidden="true"></div>
 <script>
 (function(){
 "use strict";
@@ -686,7 +759,8 @@ S.custom=(Array.isArray(S.custom)?S.custom:[]).filter(c=>typeof c==="string"&&!b
 let tmr=null;function save(){clearTimeout(tmr);tmr=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));const t=$("#saveToast");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),900);}catch(e){}},400);}
 
 /* ---------- generic bars ---------- */
-function bars(el,rows,max){el.innerHTML=rows.map(r=>`<div class="bar"><div>${r.l}${r.e?` <span class="ev ${r.ec||""}">${r.e}</span>`:""}</div><div class="track"><div class="fill ${r.c||""}" style="width:${Math.max(2,Math.min(100,(r.x/max)*100))}%"></div></div><div class="v">${r.v}</div></div>`).join("");}
+function bars(el,rows,max){el.innerHTML=barsHTML(rows,max);}
+function barsHTML(rows,max){return rows.map(r=>`<div class="bar"><div>${r.l}${r.e?` <span class="ev ${r.ec||""}">${r.e}</span>`:""}</div><div class="track"><div class="fill ${r.c||""}" style="width:${Math.max(2,Math.min(100,(r.x/max)*100))}%"></div></div><div class="v">${r.v}</div></div>`).join("");}
 bars($("#evLadder"),[{l:"メタ分析・系統的レビュー",x:5,v:"最も高い",ec:"meta",e:""},{l:"RCT・大規模コホート",x:4,v:"高い"},{l:"自然実験",x:3,v:"中〜高"},{l:"横断研究",x:2,v:"中",c:"s"},{l:"書籍・解説記事",x:1,v:"補助",c:"s"}].map(r=>(delete r.e,r)),5);
 bars($("#benefitBars"),[
  {l:"ACT(価値の明確化が中核の心理療法)の症状改善",x:.57,v:"g≈0.57",e:"メタ分析",ec:"meta"},
@@ -742,7 +816,8 @@ $("#mineCards").innerHTML=MINES.map((m,i)=>`<div class="panel"><h4 style="color:
 const FLAGS=["月平均残業が45hを超える/固定残業代が45h超","3年以内離職率が明らかに高い、または開示を拒む","有給取得が年5日程度にとどまる","若手の仕事の進め方を上司がすべて細かく決める","評価基準が非公開でフィードバックがない","「やりがい」を強調し、給与・昇給の説明があいまい","選考中に人格否定や威圧的な言動がある","社員同士や応募者への態度が無礼","ハラスメント窓口が形だけで社外窓口がない","リストラが繰り返される、業績が長期低迷"];
 function renderFlags(){$("#flagList").innerHTML=FLAGS.map((f,i)=>`<label class="chk"><input type="checkbox" data-fi="${i}" ${S.flags.includes(i)?"checked":""}><span>${f}</span></label>`).join("");
  $$("#flagList input").forEach(c=>c.addEventListener("change",()=>{const i=+c.dataset.fi;S.flags=S.flags.filter(x=>x!==i);if(c.checked)S.flags.push(i);flagV();save();}));flagV();}
-function flagV(){const n=S.flags.length,v=$("#flagVerdict");v.className="verdict "+(n===0?"ok":n<3?"mid":"ng");v.textContent=n===0?"チェックなし:次は第6章の良い職場の条件へ":n<3?`${n}個該当:第9章で事実を確認してから判断`:`${n}個該当:候補から外すことを強く検討`;}
+function flagResult(){const n=S.flags.length;return{cls:n===0?"ok":n<3?"mid":"ng",text:n===0?"チェックなし:次は第6章の良い職場の条件へ":n<3?`${n}個該当:第9章で事実を確認してから判断`:`${n}個該当:候補から外すことを強く検討`};}
+function flagV(){const r=flagResult(),v=$("#flagVerdict");v.className="verdict "+r.cls;v.textContent=r.text;}
 renderFlags();
 
 /* ---------- RIASEC hexagon ---------- */
@@ -810,26 +885,35 @@ function renderTop5Dependent(){const t=top5();
  $$("[data-hold]").forEach(x=>x.onchange=()=>{const c=x.dataset.hold;S.ev[c]=Object.assign(S.ev[c]||{},{hold:x.checked});renderRank();save();});
  const nHeld=t.filter(held).length;if(nHeld)$("#evidenceRows").insertAdjacentHTML("beforeend",`<p class="small" style="color:var(--hazard)">保留中の価値が${nHeld}つトップ5に残っています。Step 2で「非常に重要」の候補を増やすと、次点と入れ替わります。</p>`);
  // Step5
- const hl={};t.forEach((c,i)=>{const cat=CAT[c];if(cat&&!hl[cat])hl[cat]=String(i+1);else if(cat)hl[cat]+=","+(i+1);});
- $("#myWheel").innerHTML=wheelSVG({hl});
- const cnt={open:0,enh:0,cons:0,trans:0};t.forEach((c,i)=>{const v=VALS.find(v=>v.n===CAT[c]);if(!v)return;const w=5-i;if(v.q==="hed"){cnt.open+=w/2;cnt.enh+=w/2;}else cnt[v.q]+=w;});
- let read="";if(!t.length)read=empty;else{const mx=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);const zero=Object.keys(cnt).filter(k=>cnt[k]===0);
-  const conf=[];if(cnt.open&&cnt.cons)conf.push("開放性 ⇄ 保守(挑戦と安定)");if(cnt.enh&&cnt.trans)conf.push("自己高揚 ⇄ 自己超越(成果・報酬と貢献)");
-  const other=t.filter(c=>!CAT[c]);
-  read=`<h4>あなたのマップの読み方</h4><p><b>重心:</b>${QN[mx[0]]}${cnt[mx[1]]>0&&cnt[mx[1]]>=cnt[mx[0]]*0.6?" と "+QN[mx[1]]:""}</p><p><b>空白の象限:</b>${zero.length?zero.map(k=>QN[k]).join("、"):"なし(バランス型)"}</p><p><b>葛藤軸:</b>${conf.length?conf.join("<br>"):"大きな対立なし"}</p>${other.length?`<p class="small">円環外の価値:${other.map(esc).join("、")}</p>`:""}<p class="small">葛藤軸は欠点ではなく設計情報。両方を満たす職場(例:挑戦できるが雇用は安定)を探す手がかりになる。</p>`;}
- $("#mapReading").innerHTML=read;
+ const A=mapAnalysis();
+ $("#myWheel").innerHTML=wheelSVG({hl:A.hl});
+ $("#mapReading").innerHTML=t.length?mapReadingHTML(A):empty;
  // Step6
  $("#defRows").innerHTML=t.length?t.map(c=>{const d=S.def[c]||{};return `<div class="row5"><div class="nm">${esc(c)}</div><div class="grid2" style="gap:8px"><input type="text" data-dm="${esc(c)}" value="${esc(d.m||"")}" placeholder="私にとっての意味(1文)"><input type="text" data-ds="${esc(c)}" value="${esc(d.s||"")}" placeholder="満たされているときの具体的な状態"></div></div>`;}).join(""):empty;
  $$("[data-dm]").forEach(x=>x.oninput=()=>{const c=x.dataset.dm;S.def[c]=Object.assign(S.def[c]||{},{m:x.value});save();renderConds();});
  $$("[data-ds]").forEach(x=>x.oninput=()=>{const c=x.dataset.ds;S.def[c]=Object.assign(S.def[c]||{},{s:x.value});save();renderConds();});
  // Step7
  $("#gapRows").innerHTML=t.length?`<div class="slider small"><span class="nm"></span><span>大切さ</span><span>今の実現度</span><span class="gapv">差</span></div>`+t.map(c=>{const g=S.gap[c]||[8,5];return `<div class="slider"><span class="nm"><b>${esc(c)}</b></span><input type="range" min="0" max="10" value="${g[0]}" data-gi="${esc(c)}" aria-label="${esc(c)}の大切さ"><input type="range" min="0" max="10" value="${g[1]}" data-ga="${esc(c)}" aria-label="${esc(c)}の実現度"><span class="gapv" id="gv-${t.indexOf(c)}">${g[0]-g[1]}</span></div><input type="text" data-act="${esc(c)}" value="${esc((S.gap[c]&&S.gap[c][2])||"")}" placeholder="今週できる小さな行動" style="margin:0 0 8px">`;}).join(""):empty;
- const upd=(c)=>{const g=S.gap[c]||[8,5,""];const i=t.indexOf(c);const el=$("#gv-"+i);if(el){const d=g[0]-g[1];el.textContent=d;el.style.color=d>=4?"var(--hazard)":d>=2?"#A57A10":"var(--forest)";}};
+ const upd=(c)=>{const g=gapOf(c);const i=t.indexOf(c);const el=$("#gv-"+i);if(el){const d=g[0]-g[1];el.textContent=d;el.style.color=gapColor(d);}};
  $$("[data-gi]").forEach(x=>x.oninput=()=>{const c=x.dataset.gi;S.gap[c]=S.gap[c]||[8,5,""];S.gap[c][0]=+x.value;upd(c);save();});
  $$("[data-ga]").forEach(x=>x.oninput=()=>{const c=x.dataset.ga;S.gap[c]=S.gap[c]||[8,5,""];S.gap[c][1]=+x.value;upd(c);save();});
  $$("[data-act]").forEach(x=>x.oninput=()=>{const c=x.dataset.act;S.gap[c]=S.gap[c]||[8,5,""];S.gap[c][2]=x.value;save();});
  t.forEach(upd);
  renderConds();renderScore();renderVerify();}
+
+/* ---------- 分析(画面・テキスト保存・PDF保存で共用) ---------- */
+const gapOf=c=>S.gap[c]||[8,5,""];
+const gapColor=d=>d>=4?"var(--hazard)":d>=2?"var(--gold)":"var(--forest)";
+const diffColor=d=>d<=-2?"var(--hazard)":d>=2?"var(--gold)":"var(--forest)";
+function mapAnalysis(){const t=top5();
+ const hl={};t.forEach((c,i)=>{const cat=CAT[c];if(cat&&!hl[cat])hl[cat]=String(i+1);else if(cat)hl[cat]+=","+(i+1);});
+ const cnt={open:0,enh:0,cons:0,trans:0};t.forEach((c,i)=>{const v=VALS.find(v=>v.n===CAT[c]);if(!v)return;const w=5-i;if(v.q==="hed"){cnt.open+=w/2;cnt.enh+=w/2;}else cnt[v.q]+=w;});
+ const mx=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
+ const center=!cnt[mx[0]]?"判定なし(トップ5が円環外の価値のみ)":QN[mx[0]]+(cnt[mx[1]]>0&&cnt[mx[1]]>=cnt[mx[0]]*0.6?" と "+QN[mx[1]]:"");
+ const zero=Object.keys(cnt).filter(k=>cnt[k]===0).map(k=>QN[k]);
+ const conf=[];if(cnt.open&&cnt.cons)conf.push("開放性 ⇄ 保守(挑戦と安定)");if(cnt.enh&&cnt.trans)conf.push("自己高揚 ⇄ 自己超越(成果・報酬と貢献)");
+ return{t,hl,center,zero,conf,other:t.filter(c=>!CAT[c])};}
+function mapReadingHTML(a){return `<h4>あなたのマップの読み方</h4><p><b>重心:</b>${esc(a.center)}</p><p><b>空白の象限:</b>${a.zero.length?a.zero.join("、"):"なし(バランス型)"}</p><p><b>葛藤軸:</b>${a.conf.length?a.conf.join("<br>"):"大きな対立なし"}</p>${a.other.length?`<p class="small">円環外の価値:${a.other.map(esc).join("、")}</p>`:""}<p class="small">葛藤軸は欠点ではなく設計情報。両方を満たす職場(例:挑戦できるが雇用は安定)を探す手がかりになる。</p>`;}
 
 function renderConds(){const t=top5();$("#myConditions").innerHTML=`<h4>あなたのトップ5 → 条件</h4>`+(t.length?`<div class="tbl"><table><tr><th>順位</th><th>価値</th><th>満たされている状態(Step 6)</th><th>Schwartz</th></tr>${t.map((c,i)=>`<tr><td>${i+1}</td><td><b>${esc(c)}</b></td><td>${esc((S.def[c]&&S.def[c].s)||"—(Step 6で記入)")}</td><td>${esc(CAT[c]||"その他")}</td></tr>`).join("")}</table></div><p class="small">上の辞書を使って「確かめる事実」に落とし込み、A2の必須・歓迎条件に書き写す。</p>`:`<p class="small">第4章の価値観マップ・メーカーでトップ5を決めると表示されます。</p>`);}
 
@@ -842,7 +926,7 @@ function scoreAxes(){const t=top5();const base=t.length?t:["価値1","価値2","
 function renderScore(){const ax=scoreAxes(),co=S.sc.co;
  const opt=v=>[1,2,3,4,5].map(n=>`<option ${n===v?"selected":""}>${n}</option>`).join("");
  let h=`<thead><tr><th>評価軸</th><th>重み</th>${co.map((c,j)=>`<th><input type="text" data-cn="${j}" value="${esc(c.n)}" placeholder="会社${j+1}"></th>`).join("")}</tr></thead><tbody>`;
- ax.forEach(a=>{const w=S.sc.w[a.k]!=null?S.sc.w[a.k]:a.w;h+=`<tr><td>${esc(a.l)}</td><td><input class="w" type="number" min="0" max="5" data-wt="${esc(a.k)}" value="${w}" aria-label="${esc(a.l)}の重み"></td>${co.map((c,j)=>`<td><select data-sc="${j}|${esc(a.k)}" aria-label="${esc(a.l)} 会社${j+1}">${opt(c.s[a.k]||3)}</select></td>`).join("")}</tr>`;});
+ ax.forEach(a=>{const w=wOf(a);h+=`<tr><td>${esc(a.l)}</td><td><input class="w" type="number" min="0" max="5" data-wt="${esc(a.k)}" value="${w}" aria-label="${esc(a.l)}の重み"></td>${co.map((c,j)=>`<td><select data-sc="${j}|${esc(a.k)}" aria-label="${esc(a.l)} 会社${j+1}">${opt(c.s[a.k]||3)}</select></td>`).join("")}</tr>`;});
  h+=`<tr><td style="color:var(--hazard)">NG条件に該当</td><td></td>${co.map((c,j)=>`<td><input type="checkbox" data-ng="${j}" ${c.ng?"checked":""} aria-label="会社${j+1}はNGに該当"></td>`).join("")}</tr>`;
  h+=`<tr><td style="color:var(--forest)">必須条件をすべて満たす</td><td></td>${co.map((c,j)=>`<td><input type="checkbox" data-mu="${j}" ${c.must?"checked":""} aria-label="会社${j+1}は必須を満たす"></td>`).join("")}</tr></tbody><tfoot><tr><td>合計(重み×点数)</td><td></td>${co.map((c,j)=>`<td id="tot${j}"></td>`).join("")}</tr></tfoot>`;
  $("#scoreTable").innerHTML=h;
@@ -852,15 +936,18 @@ function renderScore(){const ax=scoreAxes(),co=S.sc.co;
  $$("#scoreTable [data-ng]").forEach(x=>x.onchange=()=>{co[+x.dataset.ng].ng=x.checked;calcScore();save();});
  $$("#scoreTable [data-mu]").forEach(x=>x.onchange=()=>{co[+x.dataset.mu].must=x.checked;calcScore();save();});
  calcScore();}
-function calcScore(){const ax=scoreAxes(),co=S.sc.co;const res=co.map((c,j)=>{let s=0,m=0;ax.forEach(a=>{const w=S.sc.w[a.k]!=null?S.sc.w[a.k]:a.w;s+=w*(c.s[a.k]||3);m+=w*5;});return{n:c.n||`会社${j+1}`,s,m,ok:!c.ng&&c.must,c};});
- res.forEach((r,j)=>{const el=$("#tot"+j);el.innerHTML=`${r.s}<div class="small">/${r.m}</div>`;el.style.color=r.c.ng?"var(--hazard)":"";});
- const ok=res.filter(r=>r.ok).sort((a,b)=>b.s-a.s);const out=res.filter(r=>r.c.ng);const nm=res.filter(r=>!r.c.ng&&!r.c.must);
- let v=`<div class="bars" style="margin-top:12px">${res.map(r=>({l:esc(r.n),x:r.s,v:r.c.ng?"除外":r.s,c:r.c.ng?"h":r.ok?"":"s"})).map(r=>`<div class="bar"><div>${r.l}</div><div class="track"><div class="fill ${r.c}" style="width:${res[0].m?Math.max(2,r.x/res[0].m*100):0}%"></div></div><div class="v">${r.v}</div></div>`).join("")}</div>`;
- let msg,cls;if(ok.length){msg=`有力候補:${esc(ok[0].n)}(${ok[0].s}点)`+(ok[1]&&ok[0].s-ok[1].s<=5?`。${esc(ok[1].n)}と僅差なので、トップ1-2の価値の点数が高い方を優先し、方法Bで両方を検証。`:"。次は方法Bで検証。");cls="ok";}
+const wOf=a=>S.sc.w[a.k]!=null?S.sc.w[a.k]:a.w;
+function scoreResults(){const ax=scoreAxes(),co=S.sc.co;const res=co.map((c,j)=>{let s=0,m=0;ax.forEach(a=>{const w=wOf(a);s+=w*(c.s[a.k]||3);m+=w*5;});return{n:c.n||`会社${j+1}`,s,m,ng:!!c.ng,must:!!c.must,ok:!c.ng&&!!c.must,c,used:!!(c.n||c.ng||c.must||Object.keys(c.s).length)};});
+ const ok=res.filter(r=>r.ok).sort((a,b)=>b.s-a.s);const out=res.filter(r=>r.ng);
+ let msg,cls;if(ok.length){msg=`有力候補:${ok[0].n}(${ok[0].s}点)`+(ok[1]&&ok[0].s-ok[1].s<=5?`。${ok[1].n}と僅差なので、トップ1-2の価値の点数が高い方を優先し、方法Bで両方を検証。`:"。次は方法Bで検証。");cls="ok";}
  else if(out.length===res.length){msg="すべてNGに該当。A5に戻って母集団を広げる。";cls="ng";}
  else{msg="「必須条件をすべて満たす」会社がまだない。情報が足りなければA7で確認、足りていれば必須条件を見直す(3個以内)。";cls="mid";}
- if(out.length&&cls!=="ng")msg+=` NG該当(除外):${out.map(r=>esc(r.n)).join("、")}。`;
- $("#scoreVerdict").innerHTML=v+`<div class="verdict ${cls}">${msg}</div>`;}
+ if(out.length&&cls!=="ng")msg+=` NG該当(除外):${out.map(r=>r.n).join("、")}。`;
+ return{ax,res,cls,msg};}
+function scoreBarsHTML(res){return `<div class="bars" style="margin-top:12px">${res.map(r=>`<div class="bar"><div>${esc(r.n)}</div><div class="track"><div class="fill ${r.ng?"h":r.ok?"":"s"}" style="width:${r.m?Math.max(2,r.s/r.m*100):0}%"></div></div><div class="v">${r.ng?"除外":r.s}</div></div>`).join("")}</div>`;}
+function calcScore(){const R=scoreResults();
+ R.res.forEach((r,j)=>{const el=$("#tot"+j);el.innerHTML=`${r.s}<div class="small">/${r.m}</div>`;el.style.color=r.ng?"var(--hazard)":"";});
+ $("#scoreVerdict").innerHTML=scoreBarsHTML(R.res)+`<div class="verdict ${R.cls}">${esc(R.msg)}</div>`;}
 
 /* ---------- verify tool ---------- */
 const B0=[["知名度・ブランド","有名企業に入れる","初任給が高い","オフィスがきれい"],["面接官が感じよかった","選考が早かった・高く評価された"],["仕事内容に興味がある","社員同士が支え合っていた","若手に裁量がある","残業が少ない"]];
@@ -875,12 +962,14 @@ function renderVerify(){["#b0a","#b0b","#b0c"].forEach((id,gi)=>{$(id).innerHTML
  $$("[data-b3t]").forEach(x=>x.oninput=()=>{const c=x.dataset.b3t;S.b3[c]=Object.assign(S.b3[c]||{},{t:x.value});save();});
  $$("[data-b3]").forEach(x=>x.onchange=()=>{const c=x.dataset.b3;S.b3[c]=Object.assign(S.b3[c]||{},{ok:x.checked});verify();save();});
  const imp=selfImp();
- $("#b4rows").innerHTML=VALS.map(v=>{const me=imp[v.n],co=S.b4[v.n]||3,d=co-me;return `<div class="mine" style="grid-template-columns:7em 1fr 90px 3em"><b>${v.n}</b><span class="small">自分 ${"●".repeat(me)}${"○".repeat(5-me)}</span><select data-b4="${v.n}" aria-label="${v.n}の職場の実態">${[1,2,3,4,5].map(n=>`<option ${n===co?"selected":""}>${n}</option>`).join("")}</select><span id="d-${v.n}" style="font-weight:700;color:${d<=-2?"var(--hazard)":d>=2?"#A57A10":"var(--forest)"}">${d>0?"+":""}${d}</span></div>`;}).join("");
+ $("#b4rows").innerHTML=VALS.map(v=>{const me=imp[v.n],co=S.b4[v.n]||3,d=co-me;return `<div class="mine" style="grid-template-columns:7em 1fr 90px 3em"><b>${v.n}</b><span class="small">自分 ${"●".repeat(me)}${"○".repeat(5-me)}</span><select data-b4="${v.n}" aria-label="${v.n}の職場の実態">${[1,2,3,4,5].map(n=>`<option ${n===co?"selected":""}>${n}</option>`).join("")}</select><span id="d-${v.n}" style="font-weight:700;color:${diffColor(d)}">${d>0?"+":""}${d}</span></div>`;}).join("");
  $$("[data-b4]").forEach(x=>x.onchange=()=>{S.b4[x.dataset.b4]=+x.value;renderVerifyDiff();verify();save();});
  verify();}
 function selfImp(){const t=top5();const imp={};VALS.forEach(v=>{let m=1;CARDS[v.n].forEach(c=>{const s=S.cards[c]||0;if(s===2)m=Math.max(m,2);if(s===3)m=Math.max(m,3);});imp[v.n]=m;});t.forEach((c,i)=>{const k=CAT[c];if(k)imp[k]=Math.max(imp[k],i<2?5:4);});return imp;}
-function renderVerifyDiff(){const imp=selfImp();VALS.forEach(v=>{const d=(S.b4[v.n]||3)-imp[v.n];const el=$("#d-"+v.n);if(el){el.textContent=(d>0?"+":"")+d;el.style.color=d<=-2?"var(--hazard)":d>=2?"#A57A10":"var(--forest)";}});}
-function verify(){const el=$("#verifyVerdict");if(!el)return;const t=top5();const name=esc(S.f.v_name||"この会社");
+function renderVerifyDiff(){const imp=selfImp();VALS.forEach(v=>{const d=(S.b4[v.n]||3)-imp[v.n];const el=$("#d-"+v.n);if(el){el.textContent=(d>0?"+":"")+d;el.style.color=diffColor(d);}});}
+function verify(){const el=$("#verifyVerdict");if(!el)return;const R=verifyResult();
+ el.className="verdict "+R.cls;el.innerHTML=esc(R.msg)+(R.notes.length?`<div class="small" style="font-weight:400;margin-top:6px">${R.notes.map(esc).join("<br>")}</div>`:"");}
+function verifyResult(){const t=top5();const name=S.f.v_name||"この会社";
  const mineYes=S.mines.filter(x=>x===2).length,mineUnk=S.mines.filter(x=>x===1||x==null).length;
  const yes=t.filter(c=>S.b3[c]&&S.b3[c].ok).length,top1=t[0]&&S.b3[t[0]]&&S.b3[t[0]].ok;
  const imp=selfImp();const topCats=[...new Set(t.map(c=>CAT[c]).filter(Boolean))].slice(0,3);const worst=topCats.length?Math.min(...topCats.map(k=>(S.b4[k]||3)-imp[k])):0;
@@ -894,7 +983,7 @@ function verify(){const el=$("#verifyVerdict");if(!el)return;const t=top5();cons
  else if(yes>=3&&worst>=-2){cls="mid";msg=`${name}:条件つきで合っている。ずれ(最大 ${worst})と根拠の足りない価値について追加情報を取る。`;}
  else{cls="mid";msg=`${name}:感覚と実態がずれている可能性。根拠を書けた価値は${yes}/5、トップ価値のずれは最大 ${worst}。「良い」と感じる理由(B0)を見直し、他の候補と比べる。`;}
  const notes=[];if(surf>daily)notes.push("惹かれる理由が表面・選考体験に偏っています(焦点化の錯覚・ハロー効果に注意)。");if(unknownAx>=6)notes.push(`12軸のうち${unknownAx}軸が3点(不明/根拠なし)。質問集で情報を取りに行く。`);
- el.className="verdict "+cls;el.innerHTML=msg+(notes.length?`<div class="small" style="font-weight:400;margin-top:6px">${notes.join("<br>")}</div>`:"");}
+ return{cls,msg,notes};}
 
 /* ---------- glossary & sources ---------- */
 const GL=[["価値観","場面を超えて選択を方向づける「大切さ」の順位"],["Schwartzの円環","10の価値。隣は両立、向かいは葛藤"],["価値観アファメーション","大切な価値を短く書く。脅威下の緩衝材"],["自己一致モデル","価値観に沿う目標は続き、達成で幸福が増す"],["内的・外的自己認識","自分の内面の理解/他者からの見え方の理解"],["反芻と内省","不安からの堂々巡り/好奇心からの探究"],["自己距離化","三人称で考えて判断を賢明にする"],["知的謙虚さ","証拠で自分の考えを修正できる性質"],["高ストレイン","要求が高く裁量が低い状態"],["努力-報酬不均衡","努力に見合う給与・承認・安定がない状態"],["職場の無礼","害意があいまいな低強度の失礼な行動"],["職務特性","多様性・完結性・重要性・自律性・フィードバック"],["自己決定理論","自律性・有能感・関係性の3欲求"],["JD-Rモデル","要求は疲れ、資源は熱意を生む"],["心理的安全性","失敗や反対を言っても罰せられない信念"],["P-E適合","個人と仕事・組織・チーム・上司の一致"],["RIASEC","6つの職業興味タイプ"],["満足化","基準を満たせば決める選び方"],["事前検死","失敗した未来を想像して原因を洗い出す"],["ジョブ・クラフティング","仕事のやり方・関係・意味を自分で工夫"]];
@@ -917,14 +1006,122 @@ $("#loadSample").onclick=()=>{if(!confirm("Aさんの記入例を読み込みま
  S.f.v_friend="安定と家族の面は良い。でも一番大事な自律が満たされにくいなら、配属と社内公募を確かめてから決めた方がいい。";
  init();save();};
 $("#resetAll").onclick=()=>{if(!confirm("入力内容をすべて消去します。よろしいですか?"))return;try{localStorage.removeItem(KEY);}catch(e){}location.reload();};
-$("#printMap").onclick=()=>{document.body.classList.add("pm");window.print();};
-// 印刷時はテキストエリアを内容の高さまで広げ、長文が切れないようにする
-window.addEventListener("beforeprint",()=>$$("textarea").forEach(t=>{t.dataset.ph=t.style.height;t.style.height="auto";t.style.height=(t.scrollHeight+24)+"px";}));
-window.addEventListener("afterprint",()=>{$$("textarea").forEach(t=>{t.style.height=t.dataset.ph||"";delete t.dataset.ph;});document.body.classList.remove("pm");});
+
+/* ---------- 保存(テキスト=Markdown / PDF=印刷用レポート) ---------- */
+const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;};
+const LV={3:"非常に重要",2:"重要",1:"重要でない"};
+const MINE_L=["なし","不明","あり"],MINE_C=["var(--forest)","var(--gold)","var(--hazard)"];
+const B0G=["表面的","選考体験","日々の体験"];
+const NO_TOP5="(第4章でトップ5が決まると出力されます)";
+const rankStatus=(c,i)=>(i<5?"トップ5":"準候補")+(held(c)?"(保留)":"");
+// Markdown用:表のセルは1行に、自由記述は引用ブロックにして区切りを明確にする
+const cell=s=>String(s==null?"":s).replace(/\r?\n+/g," / ").replace(/\|/g,"｜").trim()||"(未記入)";
+const one=s=>String(s==null?"":s).replace(/\r?\n+/g," / ").trim()||"(未記入)";
+const quote=s=>{s=String(s||"").trim();return s?s.split(/\r?\n/).map(l=>"> "+l).join("\n"):"> (未記入)";};
+const mdTable=(head,rows)=>[`| ${head.map(cell).join(" | ")} |`,`|${head.map(()=>"---").join("|")}|`,...rows.map(r=>`| ${r.map(cell).join(" | ")} |`)].join("\n");
+
+function mdMap(h){const a=mapAnalysis(),t=a.t,L=[];
+ L.push(`${h(1)} Step 1 感情が動いた出来事`);
+ [["ep_peak","ピーク体験(満たされた価値)"],["ep_anger","怒り・違和感(踏みにじられた価値)"],["ep_envy","羨望(まだ満たされていない価値)"],["ep_pride","誇り(中核にある価値)"]].forEach(([k,l])=>L.push(`${h(2)} ${l}`,quote(S.f[k])));
+ L.push(`${h(1)} Step 2 カードソート`,[3,2,1].map(s=>{const cs=allCards().filter(c=>S.cards[c]===s);return `- ${LV[s]}(${cs.length}枚):${cs.length?cs.join("、"):"なし"}`;}).concat(S.custom.length?[`- 自分で追加したカード:${S.custom.join("、")}`]:[]).join("\n"));
+ L.push(`${h(1)} Step 3 順位`,S.rank.length?mdTable(["順位","価値","Schwartzの分類","状態"],S.rank.map((c,i)=>[i+1,c,CAT[c]||"その他",rankStatus(c,i)])):"(「非常に重要」のカードがまだありません)");
+ L.push(`${h(1)} Step 4 エピソードによる検証`,t.length?t.map((c,i)=>{const e=S.ev[c]||{};return `${i+1}. ${c}${e.hold?"(保留:証拠が見つからない)":""}:${one(e.t)}`;}).join("\n"):NO_TOP5);
+ L.push(`${h(1)} Step 5 円環での読み取り`,t.length?[`- 重心:${a.center}`,`- 空白の象限:${a.zero.length?a.zero.join("、"):"なし(バランス型)"}`,`- 葛藤軸:${a.conf.length?a.conf.join("/"):"大きな対立なし"}`,`- トップ5の分類:${t.map((c,i)=>`${i+1}. ${c}=${CAT[c]||"円環外"}`).join("、")}`].join("\n"):NO_TOP5);
+ L.push(`${h(1)} Step 6 自分の言葉での定義`);
+ if(!t.length)L.push(NO_TOP5);else t.forEach((c,i)=>{const d=S.def[c]||{};L.push(`${h(2)} ${i+1}. ${c}`,`- 私にとっての意味:${one(d.m)}\n- 満たされているときの具体的な状態:${one(d.s)}`);});
+ L.push(`${h(2)} アファメーション文`,quote(S.f.affirm));
+ L.push(`${h(1)} Step 7 ギャップと行動実験`,t.length?mdTable(["価値","大切さ(0-10)","今の実現度(0-10)","差","今週できる小さな行動"],t.map(c=>{const g=gapOf(c);return[c,g[0],g[1],g[0]-g[1],g[2]];})):NO_TOP5);
+ L.push(`${h(1)} Step 8 他者からのフィードバック`,quote(S.f.feedback));
+ return L;}
+function mdFlags(){const r=flagResult();return[FLAGS.map((f,i)=>`- [${S.flags.includes(i)?"x":" "}] ${f}`).join("\n"),`**判定:**${r.text}`];}
+function mdConds(h){const t=top5();return[`${h(1)} A1 トップ5 → 職場の条件`,t.length?mdTable(["順位","価値","満たされている状態(Step 6)","Schwartzの分類"],t.map((c,i)=>[i+1,c,S.def[c]&&S.def[c].s,CAT[c]||"その他"])):NO_TOP5,
+ `${h(1)} A2 条件の3段階`,`${h(2)} NG条件(1つでも該当で除外)`,quote(S.f.cond_ng),`${h(2)} 必須条件(すべて満たす)`,quote(S.f.cond_must),`${h(2)} 歓迎条件(多いほど良い)`,quote(S.f.cond_want),
+ `${h(1)} A3 興味コードと調べる職種`,quote(S.f.riasec)];}
+function mdScore(){const R=scoreResults(),u=R.res.filter(r=>r.used);if(!u.length)return["(まだ会社が入力されていません)"];
+ return[mdTable(["評価軸","重み",...u.map(r=>r.n)],R.ax.map(a=>[a.l,wOf(a),...u.map(r=>r.c.s[a.k]||3)]).concat([["NG条件に該当","—",...u.map(r=>r.ng?"該当(除外)":"—")],["必須条件をすべて満たす","—",...u.map(r=>r.must?"満たす":"未確認")],["合計(重み×点数)","—",...u.map(r=>`${r.s}/${r.m}`)]])),`**判定:**${R.msg}`];}
+function mdVerify(h){const R=verifyResult(),t=top5(),imp=selfImp();
+ return[`- 会社名:${one(S.f.v_name)}`,`**判定:**${R.msg}`+(R.notes.length?"\n\n"+R.notes.map(n=>`- ${n}`).join("\n"):""),
+ `${h(1)} B0 惹かれている理由`,B0.map((g,gi)=>{const on=g.filter((x,ti)=>S.b0.includes(gi+"-"+ti));return `- ${B0G[gi]}:${on.length?on.join("、"):"なし"}`;}).join("\n"),
+ `${h(1)} B1 7つの地雷`,mdTable(["地雷","判定"],MINES.map((m,i)=>[m[0],S.mines[i]==null?"未入力":MINE_L[S.mines[i]]])),
+ `${h(1)} B2 12軸の採点(1-5)`,mdTable(["軸","点数"],AX.map((a,i)=>[`${i+1} ${a}`,S.ax[i]])),
+ `${h(1)} B3 トップ5が満たされる事実`,t.length?t.map((c,i)=>{const o=S.b3[c]||{};return `${i+1}. ${c}(${o.ok?"具体的な事実で書けた":"未確認"}):${one(o.t)}`;}).join("\n"):NO_TOP5,
+ `${h(1)} B4 自分と職場の価値のずれ`,mdTable(["価値","自分の重要度(1-5)","職場の実態(1-5)","差"],VALS.map(v=>{const co=S.b4[v.n]||3,d=co-imp[v.n];return[v.n,imp[v.n],co,(d>0?"+":"")+d];})),
+ `${h(1)} B5 事前検死(3年後に辞めて後悔している理由)`,quote(S.f.v_premortem),`${h(1)} B6 親友が相談してきたら何と言うか`,quote(S.f.v_friend)];}
+
+// PDF用:入力欄ではなく文章と図で組み立てる(長文が切れない)
+const rpText=s=>{s=String(s||"").trim();return s?`<p class="rp-txt">${esc(s).replace(/\n/g,"<br>")}</p>`:`<p class="rp-txt rp-empty">(未記入)</p>`;};
+const rpTable=(head,rows)=>`<div class="tbl"><table><tr>${head.map(x=>`<th>${esc(x)}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</table></div>`;
+const rpNone=`<p class="rp-empty">${NO_TOP5}</p>`;
+const chip=(txt,col)=>`<span class="rp-chip" style="background:${col};color:#fff">${esc(txt)}</span>`;
+function htmlMap(){const a=mapAnalysis(),t=a.t;let h="";
+ h+=`<div class="rp-2"><div>${wheelSVG({hl:a.hl})}</div><div class="panel">${t.length?mapReadingHTML(a):rpNone}</div></div>`;
+ h+=`<h3>順位とエピソードによる検証(Step 3・4)</h3>`+(S.rank.length?rpTable(["順位","価値","分類","状態","裏づけるエピソード"],S.rank.map((c,i)=>[i+1,`<b>${esc(c)}</b>`,esc(CAT[c]||"その他"),esc(rankStatus(c,i)),i<5?esc(one(S.ev[c]&&S.ev[c].t)):"—"])):`<p class="rp-empty">(「非常に重要」のカードがまだありません)</p>`);
+ h+=`<h3>自分の言葉での定義(Step 6)</h3>`+(t.length?rpTable(["価値","私にとっての意味","満たされているときの具体的な状態"],t.map((c,i)=>{const d=S.def[c]||{};return[`<b>${i+1}. ${esc(c)}</b>`,esc(one(d.m)),esc(one(d.s))];})):rpNone);
+ h+=`<div class="panel"><h4>アファメーション文</h4>${rpText(S.f.affirm)}</div>`;
+ h+=`<h3>ギャップと行動実験(Step 7)</h3>`+(t.length?`<div class="bars">${t.map(c=>{const g=gapOf(c),d=g[0]-g[1];return `<div class="bar"><div>${esc(c)}</div><div class="track"><div class="fill" style="width:${g[0]*10}%;background:var(--forest-soft)"></div><div class="fill" style="width:${g[1]*10}%"></div></div><div class="v" style="color:${gapColor(d)}">差 ${d}</div></div>`;}).join("")}</div><p class="small">薄い色=大切さ、濃い色=今の実現度(どちらも0-10)。差が大きい価値は職場選びで最重視。</p>`+rpTable(["価値","大切さ","実現度","今週できる小さな行動"],t.map(c=>{const g=gapOf(c);return[esc(c),g[0],g[1],esc(one(g[2]))];})):rpNone);
+ h+=`<h3>感情が動いた出来事(Step 1)</h3><div class="rp-2">${[["ep_peak","ピーク体験","満たされた価値"],["ep_anger","怒り・違和感","踏みにじられた価値"],["ep_envy","羨望","まだ満たされていない価値"],["ep_pride","誇り","中核にある価値"]].map(([k,l,s])=>`<div class="panel"><h4>${l} <span class="small">${s}</span></h4>${rpText(S.f[k])}</div>`).join("")}</div>`;
+ h+=`<h3>カードソート(Step 2)</h3>`+[3,2,1].map(s=>{const cs=allCards().filter(c=>S.cards[c]===s);return `<p><b>${LV[s]}(${cs.length}枚)</b> ${cs.length?cs.map(c=>`<span class="pill">${esc(c)}</span>`).join(""):`<span class="rp-empty">なし</span>`}</p>`;}).join("");
+ h+=`<h3>他者からのフィードバック(Step 8)</h3>`+rpText(S.f.feedback);
+ return h;}
+function htmlFlags(){const r=flagResult();return `<ul class="rp-chk">${FLAGS.map((f,i)=>S.flags.includes(i)?`<li class="on">☑ ${esc(f)}</li>`:`<li class="off">☐ ${esc(f)}</li>`).join("")}</ul><div class="verdict ${r.cls}">${esc(r.text)}</div>`;}
+function htmlConds(){const t=top5();
+ return `<h3>A1 トップ5 → 職場の条件</h3>`+(t.length?rpTable(["順位","価値","満たされている状態(Step 6)","Schwartzの分類"],t.map((c,i)=>[i+1,`<b>${esc(c)}</b>`,esc(one(S.def[c]&&S.def[c].s)),esc(CAT[c]||"その他")])):rpNone)+
+ `<h3>A2 条件の3段階</h3><div class="rp-3"><div class="panel bad"><h4>NG条件</h4><p class="small">1つでも該当で除外</p>${rpText(S.f.cond_ng)}</div><div class="panel good"><h4>必須条件</h4><p class="small">すべて満たす</p>${rpText(S.f.cond_must)}</div><div class="panel"><h4>歓迎条件</h4><p class="small">多いほど良い</p>${rpText(S.f.cond_want)}</div></div>`+
+ `<h3>A3 興味コードと調べる職種</h3>`+rpText(S.f.riasec);}
+function htmlScore(){const R=scoreResults(),u=R.res.filter(r=>r.used);if(!u.length)return `<p class="rp-empty">(まだ会社が入力されていません)</p>`;
+ return rpTable(["評価軸","重み",...u.map(r=>r.n)],R.ax.map(a=>[esc(a.l),wOf(a),...u.map(r=>r.c.s[a.k]||3)]).concat([["NG条件に該当","",...u.map(r=>r.ng?chip("該当(除外)","var(--hazard)"):"—")],["必須条件をすべて満たす","",...u.map(r=>r.must?chip("満たす","var(--forest)"):"未確認")],["<b>合計(重み×点数)</b>","",...u.map(r=>`<b>${r.s}</b> / ${r.m}`)]]))+
+ `<p class="small">点数は1-5(根拠がなければ3)。NG該当の会社は点数に関係なく除外。</p>`+scoreBarsHTML(u)+`<div class="verdict ${R.cls}">${esc(R.msg)}</div>`;}
+function htmlVerify(){const R=verifyResult(),t=top5(),imp=selfImp();
+ return `<p><b>会社名:</b>${esc(one(S.f.v_name))}</p><div class="verdict ${R.cls}">${esc(R.msg)}${R.notes.length?`<div class="small" style="font-weight:400;margin-top:4px">${R.notes.map(esc).join("<br>")}</div>`:""}</div>`+
+ `<h3>B0 惹かれている理由</h3><div class="rp-3">${B0.map((g,gi)=>`<div class="panel${gi===2?" good":""}"><h4>${B0G[gi]}</h4><ul class="rp-chk">${g.map((x,ti)=>S.b0.includes(gi+"-"+ti)?`<li>☑ ${esc(x)}</li>`:`<li class="off">☐ ${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`+
+ `<h3>B1 7つの地雷</h3>`+rpTable(["地雷","判定"],MINES.map((m,i)=>[esc(m[0]),S.mines[i]==null?`<span class="rp-empty">未入力</span>`:chip(MINE_L[S.mines[i]],MINE_C[S.mines[i]])]))+
+ `<h3>B2 12軸の採点(1-5、根拠がなければ3)</h3><div class="bars">${barsHTML(AX.map((a,i)=>({l:esc(`${i+1} ${a}`),x:S.ax[i],v:S.ax[i]+"点",c:S.ax[i]<=2?"h":S.ax[i]===3?"s":""})),5)}</div>`+
+ `<h3>B3 トップ5が満たされる事実</h3>`+(t.length?rpTable(["価値","事実","確認"],t.map((c,i)=>{const o=S.b3[c]||{};return[`<b>${i+1}. ${esc(c)}</b>`,esc(one(o.t)),o.ok?chip("事実で書けた","var(--forest)"):"未確認"];})):rpNone)+
+ `<h3>B4 自分と職場の価値のずれ</h3>`+rpTable(["価値","自分の重要度","職場の実態","差"],VALS.map(v=>{const me=imp[v.n],co=S.b4[v.n]||3,d=co-me;return[esc(v.n),"●".repeat(me)+"○".repeat(5-me),"●".repeat(co)+"○".repeat(5-co),`<b style="color:${diffColor(d)}">${d>0?"+":""}${d}</b>`];}))+`<p class="small">差=職場−自分。トップ3の価値で-2以下は要注意。</p>`+
+ `<h3>B5 事前検死(3年後に辞めて後悔している理由)</h3>`+rpText(S.f.v_premortem)+`<h3>B6 親友が相談してきたら何と言うか</h3>`+rpText(S.f.v_friend);}
+
+const SEC={
+ map:{title:"価値観マップ(第4章)",file:"価値観マップ",pre:"カードの重要度は「非常に重要/重要/重要でない」の3段階。トップ5は順位の上位5つ。ギャップの大切さ・実現度は0-10。",md:mdMap,html:htmlMap},
+ flags:{title:"レッドフラッグ・チェック(第5章)",file:"レッドフラッグ",pre:"気になる会社について、当てはまる項目に [x] がついています。",md:mdFlags,html:htmlFlags},
+ cond:{title:"職場の条件(第8章 A1〜A3)",file:"職場の条件",pre:"価値観マップのトップ5を、職場で確かめられる条件に翻訳したもの。",md:mdConds,html:htmlConds},
+ score:{title:"企業スコアカード(第8章 A8)",file:"企業スコアカード",pre:"点数は1-5(根拠がなければ3)、重みは0-5。合計=Σ(重み×点数)。NG該当の会社は点数に関係なく除外。",md:mdScore,html:htmlScore},
+ verify:{title:"1社検証シート(第9章)",file:"1社検証",pre:"12軸と職場の実態は1-5(根拠がなければ3)。自分の重要度は価値観マップから自動算出した1-5。差=職場−自分で、-2以下は要注意。",md:mdVerify,html:htmlVerify}};
+const UNITS=Object.keys(SEC);
+const saveTitle=k=>k==="all"?"全章の入力内容まとめ":SEC[k].title;
+const fileBase=k=>((k==="all"?"価値観マップ_全章まとめ":SEC[k].file+(k==="verify"&&S.f.v_name?"_"+S.f.v_name:""))+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
+function buildMD(k){const head=[`# ${k==="all"?"価値観マップ 実践ガイド 入力内容まとめ":SEC[k].title}`,`> 出力日:${today()} / 出典:価値観マップ 実践ガイド`+(k!=="all"?`\n> ${SEC[k].pre}`:"")];
+ const body=k==="all"?UNITS.flatMap(u=>[`## ${SEC[u].title}`,`> ${SEC[u].pre}`,...SEC[u].md(n=>"#".repeat(2+n))]):SEC[k].md(n=>"#".repeat(1+n));
+ return head.concat(body).join("\n\n")+"\n";}
+function buildReport(k){const head=`<header class="rp-head"><h1>${esc(k==="all"?"価値観マップ 実践ガイド 入力内容まとめ":SEC[k].title)}</h1><p class="small">出力日 ${today()} ・ 価値観マップ 実践ガイド</p></header>`;
+ return head+(k==="all"?UNITS.map(u=>`<section class="rp-sec"><h2>${esc(SEC[u].title)}</h2>${SEC[u].html()}</section>`).join(""):`<section class="rp-sec">${SEC[k].html()}</section>`);}
+
+let saveKey="all",reportPending=false,titleBak=null;
+const dlg=$("#saveDlg");
+function openSave(k){saveKey=k;$("#saveTitle").textContent=`「${saveTitle(k)}」を保存`;$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";
+ if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");}
+function closeSave(){if(dlg.close)dlg.close();else dlg.removeAttribute("open");}
+$$("[data-save]").forEach(b=>b.addEventListener("click",()=>openSave(b.dataset.save)));
+$("#dlgClose").onclick=closeSave;
+$("#mdBack").onclick=()=>{$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";};
+$("#optText").onclick=()=>{const ta=$("#mdOut");ta.value=buildMD(saveKey);$("#saveChoose").hidden=true;$("#saveText").hidden=false;ta.scrollTop=0;};
+$("#optPdf").onclick=()=>{closeSave();setTimeout(()=>printReport(saveKey),60);};
+$("#mdCopy").onclick=async()=>{const ta=$("#mdOut");let ok=false;
+ try{await navigator.clipboard.writeText(ta.value);ok=true;}catch(e){try{ta.focus();ta.select();ok=document.execCommand("copy");}catch(e2){}}
+ $("#mdMsg").textContent=ok?"コピーしました。AIやメモアプリに貼り付けられます。":"自動でコピーできませんでした。テキストを長押し(または Ctrl+A)で選択してコピーしてください。";};
+$("#mdDl").onclick=()=>{const name=fileBase(saveKey)+".md";try{const url=URL.createObjectURL(new Blob([$("#mdOut").value],{type:"text/markdown;charset=utf-8"}));
+ const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$("#mdMsg").textContent=`${name} を保存しました。`;}
+ catch(e){$("#mdMsg").textContent="ファイルを保存できませんでした。「コピー」を使ってください。";}};
+function printReport(k){$("#report").innerHTML=buildReport(k);document.body.classList.add("reporting");reportPending=true;
+ titleBak=document.title;document.title=fileBase(k);// Chrome・EdgeではPDFのファイル名の初期値になる
+ window.print();}
+// Ctrl+Pなどの通常印刷ではページ全体を印刷し、テキストエリアを内容の高さまで広げて長文が切れないようにする
+window.addEventListener("beforeprint",()=>{if(reportPending)return;document.body.classList.remove("reporting");
+ $$("textarea").forEach(t=>{t.dataset.ph=t.style.height;t.style.height="auto";t.style.height=(t.scrollHeight+24)+"px";});});
+window.addEventListener("afterprint",()=>{$$("textarea").forEach(t=>{if(t.dataset.ph!=null){t.style.height=t.dataset.ph;delete t.dataset.ph;}});
+ if(reportPending){reportPending=false;document.body.classList.remove("reporting");if(titleBak!=null){document.title=titleBak;titleBak=null;}}});
 
 function init(){bindFields();renderCards();renderRank();renderFlags();}
 init();
 })();
 </script>
-<style>@media print{body.pm .hero,body.pm .part-head,body.pm .area:not(#c4),body.pm footer,body.pm #c4 > .key,body.pm #c4 > .flow{display:none!important}body.pm .tool{border:none}}</style>
 </body></html>
