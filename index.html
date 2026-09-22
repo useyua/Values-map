@@ -188,43 +188,49 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
   .dlg-opts{grid-template-columns:1fr}
 }
 @media print{.nav,.save,.btns,.savebar,.tool .btn{display:none!important}.area{break-inside:auto}.tool{break-inside:avoid-page}body{background:#fff}textarea{overflow:hidden;resize:none}}
-/* PDF用レポート:印刷時だけ表示し、ダークモードでも白い用紙向けの配色にする */
-@media print{
-  @page{size:A4;margin:14mm 12mm}
-  body.reporting>*:not(#report){display:none!important}
-  body.reporting #report{display:block}
-  #report{--paper:#F3F6F5;--card:#FFFFFF;--ink:#1B2733;--muted:#5B6975;--line:#D3DDDA;--tint:#E5EEEB;
-    --forest:#2E6B62;--forest-soft:#CFE3DE;--signal:#E0A01C;--signal-soft:#FBEFCF;--hazard:#C23B2A;--hazard-soft:#F8DEDA;--sky:#3D6FA8;--sky-soft:#DCE7F4;
-    --on-accent:#FFFFFF;--gold:#8A6410;color:var(--ink);background:#fff;font-size:12.5px;line-height:1.6}
-  #report,#report *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  #report .rp-head{border-bottom:2px solid var(--forest);padding-bottom:6px;margin-bottom:12px}
-  #report h1{font-family:var(--serif);font-size:22px;margin:0 0 2px}
-  #report h2{font-family:var(--serif);font-size:18px;margin:0 0 8px;padding:6px 10px;background:var(--forest);color:#fff;border-radius:8px}
-  #report .rp-sec+.rp-sec{break-before:page}
-  #report h3{font-size:14px;margin:16px 0 6px;padding-left:8px;border-left:4px solid var(--forest);break-after:avoid}
-  #report h4{font-size:13px;margin:0 0 4px}
-  #report .small{font-size:11px}
-  #report .panel,#report .verdict,#report .bar,#report tr,#report .rp-2>*,#report .rp-3>*{break-inside:avoid}
-  #report .panel{padding:8px 10px;border-radius:10px}
-  #report .rp-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
-  #report .rp-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start}
-  #report .tbl{overflow:visible;margin:6px 0}
-  #report .tbl table{min-width:0;font-size:11.5px}
-  #report .tbl th,#report .tbl td{padding:4px 6px}
-  #report .bars{gap:6px}
-  #report .bar{grid-template-columns:minmax(110px,34%) 1fr auto;font-size:12px}
-  #report .bar .track{grid-column:auto;grid-row:auto;height:11px}
-  #report .rp-txt{margin:2px 0 6px}
-  #report .rp-empty{color:var(--muted)}
-  #report .rp-chk{list-style:none;padding:0;margin:0}
-  #report .rp-chk li{padding:3px 0;border-bottom:1px dashed var(--line)}
-  #report .rp-chk li.on{color:var(--hazard);font-weight:700}
-  #report .rp-chk li.off{color:var(--muted)}
-  #report .rp-chip{display:inline-block;padding:0 8px;border-radius:999px;font-size:11px;font-weight:700}
-  #report .pill{font-size:11px}
-  #report svg{max-width:250px!important}
-  #report .verdict{margin:8px 0;padding:8px 12px}
-}
+/* PDF用レポート:保存時にプレビューとして画面に表示し、そのまま印刷する。ダークモードでも白い用紙向けの配色にする */
+body.reporting>*:not(#report):not(#rpBar){display:none!important}
+body.reporting{background:#fff}
+body.reporting #report{display:block}
+#report{--paper:#F3F6F5;--card:#FFFFFF;--ink:#1B2733;--muted:#5B6975;--line:#D3DDDA;--tint:#E5EEEB;
+  --forest:#2E6B62;--forest-soft:#CFE3DE;--signal:#E0A01C;--signal-soft:#FBEFCF;--hazard:#C23B2A;--hazard-soft:#F8DEDA;--sky:#3D6FA8;--sky-soft:#DCE7F4;
+  --on-accent:#FFFFFF;--gold:#8A6410;color:var(--ink);background:#fff;font-size:12.5px;line-height:1.6}
+#report,#report *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#report .rp-head{border-bottom:2px solid var(--forest);padding-bottom:6px;margin-bottom:12px}
+#report h1{font-family:var(--serif);font-size:22px;margin:0 0 2px}
+#report h2{font-family:var(--serif);font-size:18px;margin:0 0 8px;padding:6px 10px;background:var(--forest);color:#fff;border-radius:8px}
+#report .rp-sec+.rp-sec{break-before:page}
+#report h3{font-size:14px;margin:16px 0 6px;padding-left:8px;border-left:4px solid var(--forest);break-after:avoid}
+#report h4{font-size:13px;margin:0 0 4px}
+#report .small{font-size:11px}
+#report .panel,#report .verdict,#report .bar,#report tr,#report .rp-2>*,#report .rp-3>*{break-inside:avoid}
+#report .panel{padding:8px 10px;border-radius:10px}
+#report .rp-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+#report .rp-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start}
+#report .tbl{overflow:visible;margin:6px 0}
+#report .tbl table{min-width:0;font-size:11.5px}
+#report .tbl th,#report .tbl td{padding:4px 6px}
+#report .bars{gap:6px}
+#report .bar{grid-template-columns:minmax(110px,34%) 1fr auto;font-size:12px}
+#report .bar .track{grid-column:auto;grid-row:auto;height:11px}
+#report .rp-txt{margin:2px 0 6px}
+#report .rp-empty{color:var(--muted)}
+#report .rp-chk{list-style:none;padding:0;margin:0}
+#report .rp-chk li{padding:3px 0;border-bottom:1px dashed var(--line)}
+#report .rp-chk li.on{color:var(--hazard);font-weight:700}
+#report .rp-chk li.off{color:var(--muted)}
+#report .rp-chip{display:inline-block;padding:0 8px;border-radius:999px;font-size:11px;font-weight:700}
+#report .pill{font-size:11px}
+#report svg{max-width:250px!important}
+#report .verdict{margin:8px 0;padding:8px 12px}
+#rpBar{display:none}
+body.reporting #rpBar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;position:sticky;top:0;z-index:30;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#1B2733;color:#fff;font-size:13px;line-height:1.5}
+#rpBar .btn{background:#2E6B62;border-color:#2E6B62;color:#fff}
+#rpBar .btn.ghost{background:transparent;color:#fff;border-color:#9AA9A6}
+#rpBar p{margin:0;flex:1 1 260px}
+@media screen{#report{max-width:820px;margin:0 auto;padding:20px 16px 48px;font-size:14px}#report .rp-sec+.rp-sec{margin-top:36px}}
+@media screen and (max-width:600px){#report .rp-2,#report .rp-3{grid-template-columns:1fr}#report .tbl{overflow-x:auto}}
+@media print{@page{size:A4;margin:14mm 12mm}#rpBar{display:none!important}}
 </style>
 </head>
 <body>
@@ -722,7 +728,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <p class="small">保存する形式を選んでください。入力内容がこの端末の外に送られることはありません。</p>
 <div class="dlg-opts">
 <button type="button" class="dlg-opt" id="optText"><b>テキスト(Markdown)</b><span>見返す・AIに読み込ませる用。表示された文章をコピー、または .md ファイルで保存します。</span></button>
-<button type="button" class="dlg-opt" id="optPdf"><b>PDF(図・グラフつき)</b><span id="pdfHint">人が見返す用。印刷画面が開くので、送信先(プリンター)で「PDFに保存」を選んでください。</span></button>
+<button type="button" class="dlg-opt" id="optPdf"><b>PDF(図・グラフつき)</b><span>人が見返す用。図・グラフ入りのプレビューを開き、そこから印刷・PDFに保存します。</span></button>
 </div></div>
 <div id="saveText" hidden>
 <textarea id="mdOut" readonly spellcheck="false" aria-label="保存するテキスト(Markdown)"></textarea>
@@ -730,7 +736,8 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <p class="small" id="mdMsg" role="status"></p>
 </div>
 </dialog>
-<div id="report" aria-hidden="true"></div>
+<div id="rpBar" role="toolbar" aria-label="PDF保存のプレビュー"><button type="button" class="btn ghost" id="rpBack">← 戻る</button><button type="button" class="btn" id="rpPrint">印刷・PDFに保存</button><p id="rpHint"></p></div>
+<div id="report"></div>
 <script>
 (function(){
 "use strict";
@@ -1095,11 +1102,14 @@ function buildMD(k){const head=[`# ${k==="all"?"価値観マップ 実践ガイ�
 function buildReport(k){const head=`<header class="rp-head"><h1>${esc(k==="all"?"価値観マップ 実践ガイド 入力内容まとめ":SEC[k].title)}</h1><p class="small">出力日 ${today()} ・ 価値観マップ 実践ガイド</p></header>`;
  return head+(k==="all"?UNITS.map(u=>`<section class="rp-sec"><h2>${esc(SEC[u].title)}</h2>${SEC[u].html()}</section>`).join(""):`<section class="rp-sec">${SEC[k].html()}</section>`);}
 
-let saveKey="all",reportMode=false,reportAt=0,titleBak=null;
+let saveKey="all",reportMode=false,titleBak=null,scrollBak=0;
 const dlg=$("#saveDlg");
-// iPhone・iPadの印刷画面には「PDFに保存」がないため、共有ボタンからの保存を案内する(iPadOSはMacとして名乗る)
-const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-if(isIOS)$("#pdfHint").textContent="人が見返す用。印刷画面(プリントオプション)が開いたら、上部の共有ボタン(□に↑)から「\"ファイル\"に保存」を選んでください。";
+// PDFは、レポートを画面にプレビュー表示してから印刷する。
+// 印刷の瞬間だけ表示を切り替える方式は、iPhoneで切り替えが間に合わなかったり印刷が呼べなかったりしたため
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);// iPadOSはMacとして名乗る
+const RP_HINT=!isIOS?"「印刷・PDFに保存」を押し、送信先(プリンター)で「PDFに保存」を選んでください。"
+ :/CriOS|FxiOS|EdgiOS|GSA\//.test(navigator.userAgent)?"印刷画面が開かないときは、ブラウザの共有ボタン(□に↑)から「プリント」を選んでください。プリントオプション上部の共有ボタンから「\"ファイル\"に保存」でPDFになります。"
+ :"「印刷・PDFに保存」→ プリントオプション上部の共有ボタン(□に↑)→「\"ファイル\"に保存」でPDFになります。";
 function openSave(k){saveKey=k;$("#saveTitle").textContent=`「${saveTitle(k)}」を保存`;$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";
  if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");}
 function closeSave(){if(dlg.close)dlg.close();else dlg.removeAttribute("open");}
@@ -1107,26 +1117,27 @@ $$("[data-save]").forEach(b=>b.addEventListener("click",()=>openSave(b.dataset.s
 $("#dlgClose").onclick=closeSave;
 $("#mdBack").onclick=()=>{$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";};
 $("#optText").onclick=()=>{const ta=$("#mdOut");ta.value=buildMD(saveKey);$("#saveChoose").hidden=true;$("#saveText").hidden=false;ta.scrollTop=0;};
-// iOS Safariはタップ操作から時間をおいた印刷を無視するため、クリック処理の中で直接印刷する
-$("#optPdf").onclick=()=>{closeSave();printReport(saveKey);};
+$("#optPdf").onclick=()=>{closeSave();showReport(saveKey);};
 $("#mdCopy").onclick=async()=>{const ta=$("#mdOut");let ok=false;
  try{await navigator.clipboard.writeText(ta.value);ok=true;}catch(e){try{ta.focus();ta.select();ok=document.execCommand("copy");}catch(e2){}}
  $("#mdMsg").textContent=ok?"コピーしました。AIやメモアプリに貼り付けられます。":"自動でコピーできませんでした。テキストを長押し(または Ctrl+A)で選択してコピーしてください。";};
 $("#mdDl").onclick=()=>{const name=fileBase(saveKey)+".md";try{const url=URL.createObjectURL(new Blob([$("#mdOut").value],{type:"text/markdown;charset=utf-8"}));
  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$("#mdMsg").textContent=`${name} を保存しました。`;}
  catch(e){$("#mdMsg").textContent="ファイルを保存できませんでした。「コピー」を使ってください。";}};
-function printReport(k){$("#report").innerHTML=buildReport(k);document.body.classList.add("reporting");reportMode=true;reportAt=Date.now();
- if(titleBak==null)titleBak=document.title;document.title=fileBase(k);// Chrome・EdgeではPDFのファイル名の初期値になる
- window.print();}
-// iOSでは印刷が非同期で、afterprintが印刷画面を閉じる前に届くことがある。
-// そのためレポート表示は印刷後すぐには戻さず、次にページを操作したときに戻す(画面上には表示されないので残っていても影響はない)
-function endReport(){if(!reportMode)return;reportMode=false;document.body.classList.remove("reporting");if(titleBak!=null){document.title=titleBak;titleBak=null;}}
-["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{if(reportMode&&Date.now()-reportAt>1000)endReport();},true));
+function showReport(k){$("#report").innerHTML=buildReport(k);$("#rpHint").textContent=RP_HINT;
+ if(!reportMode){scrollBak=window.scrollY;titleBak=document.title;try{history.pushState({report:1},"");}catch(e){}}// スマホの「戻る」操作でもプレビューを閉じられるようにする
+ reportMode=true;document.body.classList.add("reporting");
+ document.title=fileBase(k);// Chrome・EdgeではPDFのファイル名の初期値になる
+ window.scrollTo(0,0);$("#rpPrint").focus();}
+function endReport(){if(!reportMode)return;reportMode=false;document.body.classList.remove("reporting");$("#report").innerHTML="";
+ if(titleBak!=null){document.title=titleBak;titleBak=null;}window.scrollTo(0,scrollBak);}
+$("#rpPrint").onclick=()=>window.print();
+$("#rpBack").onclick=()=>{if(history.state&&history.state.report)history.back();else endReport();};
+window.addEventListener("popstate",()=>{if(reportMode)endReport();});
 // Ctrl+Pなどの通常印刷ではページ全体を印刷し、テキストエリアを内容の高さまで広げて長文が切れないようにする
 window.addEventListener("beforeprint",()=>{if(reportMode)return;
  $$("textarea").forEach(t=>{t.dataset.ph=t.style.height;t.style.height="auto";t.style.height=(t.scrollHeight+24)+"px";});});
 window.addEventListener("afterprint",()=>{$$("textarea").forEach(t=>{if(t.dataset.ph!=null){t.style.height=t.dataset.ph;delete t.dataset.ph;}});});
-
 function init(){bindFields();renderCards();renderRank();renderFlags();}
 init();
 })();
