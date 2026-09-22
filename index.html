@@ -722,7 +722,7 @@ footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
 <p class="small">保存する形式を選んでください。入力内容がこの端末の外に送られることはありません。</p>
 <div class="dlg-opts">
 <button type="button" class="dlg-opt" id="optText"><b>テキスト(Markdown)</b><span>見返す・AIに読み込ませる用。表示された文章をコピー、または .md ファイルで保存します。</span></button>
-<button type="button" class="dlg-opt" id="optPdf"><b>PDF(図・グラフつき)</b><span>人が見返す用。印刷画面が開くので、送信先(プリンター)で「PDFに保存」を選んでください。</span></button>
+<button type="button" class="dlg-opt" id="optPdf"><b>PDF(図・グラフつき)</b><span id="pdfHint">人が見返す用。印刷画面が開くので、送信先(プリンター)で「PDFに保存」を選んでください。</span></button>
 </div></div>
 <div id="saveText" hidden>
 <textarea id="mdOut" readonly spellcheck="false" aria-label="保存するテキスト(Markdown)"></textarea>
@@ -1095,8 +1095,11 @@ function buildMD(k){const head=[`# ${k==="all"?"価値観マップ 実践ガイ�
 function buildReport(k){const head=`<header class="rp-head"><h1>${esc(k==="all"?"価値観マップ 実践ガイド 入力内容まとめ":SEC[k].title)}</h1><p class="small">出力日 ${today()} ・ 価値観マップ 実践ガイド</p></header>`;
  return head+(k==="all"?UNITS.map(u=>`<section class="rp-sec"><h2>${esc(SEC[u].title)}</h2>${SEC[u].html()}</section>`).join(""):`<section class="rp-sec">${SEC[k].html()}</section>`);}
 
-let saveKey="all",reportPending=false,titleBak=null;
+let saveKey="all",reportMode=false,reportAt=0,titleBak=null;
 const dlg=$("#saveDlg");
+// iPhone・iPadの印刷画面には「PDFに保存」がないため、共有ボタンからの保存を案内する(iPadOSはMacとして名乗る)
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+if(isIOS)$("#pdfHint").textContent="人が見返す用。印刷画面(プリントオプション)が開いたら、上部の共有ボタン(□に↑)から「\"ファイル\"に保存」を選んでください。";
 function openSave(k){saveKey=k;$("#saveTitle").textContent=`「${saveTitle(k)}」を保存`;$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";
  if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");}
 function closeSave(){if(dlg.close)dlg.close();else dlg.removeAttribute("open");}
@@ -1104,21 +1107,25 @@ $$("[data-save]").forEach(b=>b.addEventListener("click",()=>openSave(b.dataset.s
 $("#dlgClose").onclick=closeSave;
 $("#mdBack").onclick=()=>{$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";};
 $("#optText").onclick=()=>{const ta=$("#mdOut");ta.value=buildMD(saveKey);$("#saveChoose").hidden=true;$("#saveText").hidden=false;ta.scrollTop=0;};
-$("#optPdf").onclick=()=>{closeSave();setTimeout(()=>printReport(saveKey),60);};
+// iOS Safariはタップ操作から時間をおいた印刷を無視するため、クリック処理の中で直接印刷する
+$("#optPdf").onclick=()=>{closeSave();printReport(saveKey);};
 $("#mdCopy").onclick=async()=>{const ta=$("#mdOut");let ok=false;
  try{await navigator.clipboard.writeText(ta.value);ok=true;}catch(e){try{ta.focus();ta.select();ok=document.execCommand("copy");}catch(e2){}}
  $("#mdMsg").textContent=ok?"コピーしました。AIやメモアプリに貼り付けられます。":"自動でコピーできませんでした。テキストを長押し(または Ctrl+A)で選択してコピーしてください。";};
 $("#mdDl").onclick=()=>{const name=fileBase(saveKey)+".md";try{const url=URL.createObjectURL(new Blob([$("#mdOut").value],{type:"text/markdown;charset=utf-8"}));
  const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$("#mdMsg").textContent=`${name} を保存しました。`;}
  catch(e){$("#mdMsg").textContent="ファイルを保存できませんでした。「コピー」を使ってください。";}};
-function printReport(k){$("#report").innerHTML=buildReport(k);document.body.classList.add("reporting");reportPending=true;
- titleBak=document.title;document.title=fileBase(k);// Chrome・EdgeではPDFのファイル名の初期値になる
+function printReport(k){$("#report").innerHTML=buildReport(k);document.body.classList.add("reporting");reportMode=true;reportAt=Date.now();
+ if(titleBak==null)titleBak=document.title;document.title=fileBase(k);// Chrome・EdgeではPDFのファイル名の初期値になる
  window.print();}
+// iOSでは印刷が非同期で、afterprintが印刷画面を閉じる前に届くことがある。
+// そのためレポート表示は印刷後すぐには戻さず、次にページを操作したときに戻す(画面上には表示されないので残っていても影響はない)
+function endReport(){if(!reportMode)return;reportMode=false;document.body.classList.remove("reporting");if(titleBak!=null){document.title=titleBak;titleBak=null;}}
+["pointerdown","keydown"].forEach(ev=>document.addEventListener(ev,()=>{if(reportMode&&Date.now()-reportAt>1000)endReport();},true));
 // Ctrl+Pなどの通常印刷ではページ全体を印刷し、テキストエリアを内容の高さまで広げて長文が切れないようにする
-window.addEventListener("beforeprint",()=>{if(reportPending)return;document.body.classList.remove("reporting");
+window.addEventListener("beforeprint",()=>{if(reportMode)return;
  $$("textarea").forEach(t=>{t.dataset.ph=t.style.height;t.style.height="auto";t.style.height=(t.scrollHeight+24)+"px";});});
-window.addEventListener("afterprint",()=>{$$("textarea").forEach(t=>{if(t.dataset.ph!=null){t.style.height=t.dataset.ph;delete t.dataset.ph;}});
- if(reportPending){reportPending=false;document.body.classList.remove("reporting");if(titleBak!=null){document.title=titleBak;titleBak=null;}}});
+window.addEventListener("afterprint",()=>{$$("textarea").forEach(t=>{if(t.dataset.ph!=null){t.style.height=t.dataset.ph;delete t.dataset.ph;}});});
 
 function init(){bindFields();renderCards();renderRank();renderFlags();}
 init();
