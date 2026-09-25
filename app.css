@@ -310,10 +310,19 @@ details.acc .in{padding:0 16px 14px;font-size:15px}
 .tgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0}
 .tgrid .ay{position:absolute;left:-6px;top:50%;transform:translate(-30%,-50%) rotate(-90deg);font:700 11px/1 var(--round);color:var(--sub);white-space:nowrap}
 .tgrid .axx{grid-column:1/-1;text-align:right;font:700 11px/1.4 var(--round);color:var(--sub)}
-.tcell{border:2px dashed var(--hair);border-radius:14px;padding:10px;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px}
+.tcell{border:2px solid var(--outline);background:var(--card);border-radius:14px;padding:10px;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px}
 .tcell b{font:700 14px/1.3 var(--round)}
 .tcell span{font-size:11.5px;color:var(--sub)}
-.tcell.on{border:2px solid var(--outline);background:var(--lemon-soft);box-shadow:0 3px 0 var(--shadow)}
+.tcell.on{background:var(--lemon-soft);box-shadow:0 3px 0 var(--shadow)}
+.tgrid.res .tcell:not(.on){border-style:dashed;border-color:var(--hair);background:none}
+.tg2{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+.tg2 button{font:700 13.5px/1.4 var(--round);border:2px solid var(--hair);background:var(--ground);color:var(--ink);border-radius:10px;padding:7px 10px;min-height:40px;cursor:pointer}
+.tg2 button::before{content:"";display:inline-block;width:1.1em}
+.tg2.ng button[aria-pressed="true"]{border-color:var(--tomato);background:var(--tomato-soft)}
+.tg2.ng button[aria-pressed="true"]::before{content:"× ";color:var(--tomato)}
+.tg2.mu button[aria-pressed="true"]{border-color:var(--mint);background:var(--mint-soft)}
+.tg2.mu button[aria-pressed="true"]::before{content:"✓ ";color:var(--mint)}
+.tghead{font:700 14px/1.4 var(--round);margin:4px 0 0}
 .sbars{display:flex;flex-direction:column;gap:6px;background:var(--card);border:2px solid var(--outline);border-radius:14px;padding:10px 12px;margin:14px 0}
 .sbars div{display:grid;grid-template-columns:9.5em 1fr 2.2em;gap:8px;align-items:center;font-size:13px}
 .sbars i{display:block;height:12px;border-radius:6px;background:var(--ground);border:1.5px solid var(--outline);overflow:hidden}

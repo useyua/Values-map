@@ -521,7 +521,7 @@ function askMessage(){return "就活の自己分析で、身近な人に聞い�
 function m3Result(){const R=selfScore(),T=SELF_T[R.type];finishMod("m3");
  const cell=(k,label,sub)=>`<div class="tcell ${R.type===k?"on":""}">${R.type===k?myChar(T.e,54,"alive"):""}<b>${label}</b><span>${sub}</span></div>`;
  const h=`<div class="reshead"><p class="kick">自己認識チェックの結果</p>${myChar(T.e,170,"alive")}<h1 style="font-size:32px">${esc(T.n)}</h1><p class="lead2">${esc(T.d)}</p></div>
- <p class="small tlegend">たて:自分の内面の理解(上ほど高い) / よこ:周りからの見え方の理解(右ほど高い)</p><div class="tgrid" role="img" aria-label="4つのタイプのうち、あなたは${esc(T.n)}">
+ <p class="small tlegend">たて:自分の内面の理解(上ほど高い) / よこ:周りからの見え方の理解(右ほど高い)</p><div class="tgrid res" role="img" aria-label="4つのタイプのうち、あなたは${esc(T.n)}">
  ${cell("intro","内省家","自分は分かる")}${cell("aware","自己認識者","両方分かる")}${cell("seek","探索者","探している途中")}${cell("please","迎合者","周りに合わせがち")}</div>
  <div class="sbars"><div><span>自分の内面の理解</span><i><u style="width:${(R.inn-1)/4*100}%"></u></i><em>${R.inn.toFixed(1)}</em></div><div><span>周りからの見え方の理解</span><i><u style="width:${(R.ex-1)/4*100}%"></u></i><em>${R.ex.toFixed(1)}</em></div></div>
  <div class="memo"><h3>ほくとからのアドバイス</h3><p style="margin:0">${esc(T.tip)}</p></div>
@@ -602,7 +602,7 @@ function m5Card(n){const M=MINES[n-1],cur=S.m5.mines[n-1];
  ${n>1?`<button type="button" class="linkb" id="qBack" style="margin-top:16px">← ひとつ前へ</button>`:""}`;
  return{html:h,title:"地雷センサー",bar:progBtn,after(){const f=$("#flip");f.onclick=()=>{const on=f.getAttribute("aria-pressed")!=="true";f.setAttribute("aria-pressed",String(on));};
   let busy=false;$$(".opt").forEach(b=>b.onclick=()=>{if(busy)return;busy=true;$$(".opt").forEach(x=>{x.classList.remove("on");x.setAttribute("aria-pressed","false");});void b.offsetWidth;b.classList.add("on");b.setAttribute("aria-pressed","true");spark(b);
-   const v=+b.dataset.v;S.m5.mines[n-1]=v;save();if(v===0)peek("これは誰の健康にも関わる条件だよ。気にならなくても、確かめてはおこう","think");
+   const v=+b.dataset.v;S.m5.mines[n-1]=v;save();if(v===0)peek("これは、誰にとっても健康に関わる条件だよ。気にならなくても、確かめてはおこう","think");
    later(()=>go(n<7?"m5/card/"+(n+1):"m5/ruler"),v===0?1300:420);});
   const bk=$("#qBack");if(bk)bk.onclick=()=>go("m5/card/"+(n-1));}};}
 const otRuler=sel=>`<div class="ruler" aria-hidden="true"><div class="zones"><i style="flex:20" class="z1"></i><i style="flex:25" class="z2"></i><i style="flex:35" class="z3"></i><i style="flex:20" class="z4"></i></div>
@@ -738,20 +738,24 @@ function m7Home(){const ax=scoreAxes();
  ${addCoHTML()}
  <div class="btns"><a class="b wide" href="#/m7/result" ${S.cos.some(c=>coScore(c).rated)?"":`aria-disabled="true" id="noRes"`}>比べた結果を見る</a><a class="b sec wide" href="#/file">候補ファイルを見る</a></div>`;
  return{html:h,title:"企業マッチ度",bar:progBtn,after(){bindAddCo(c=>go("m7/co/"+c.id));const n=$("#noRes");if(n)n.onclick=e=>{e.preventDefault();toast("まず1社、採点してみよう");};}};}
-function m7Co(c){const ax=scoreAxes(),L=S.done.m6?m6Lists():{must:[],ng:[]},ngs=L.ng.map(C=>C.n).concat(S.done.m5?m5NG():[]);
+function m7Co(c){if(!isObj(c.m7.ngc))c.m7.ngc={};if(!isObj(c.m7.mustc))c.m7.mustc={};const ax=scoreAxes(),L=S.done.m6?m6Lists():{must:[],ng:[]},ngs=L.ng.map(C=>C.n).concat(S.done.m5?m5NG():[]);
  const h=`${modHead("企業マッチ度 ・ 採点",0,0)}<h1 class="q">${esc(c.n)}</h1>
  <p class="small">分かる軸だけでOK。根拠がない軸は「3(分からない)」のままにしよう。</p>
  ${ax.map(x=>{const v=+c.m7.s[x.k]||3;return `<div class="evcard axrow" data-k="${esc(x.k)}"><div class="evh"><b>${esc(x.l)}</b><span class="wt">重み×${x.w}</span></div>${x.h?`<p class="small" style="margin:0 0 6px">${esc(x.h)}</p>`:""}
   ${seg("data-sv",String(v),[["1","1"],["2","2"],["3","3<small>?</small>"],["4","4"],["5","5"]],x.l)}
   <input class="field sm" type="text" data-note="${esc(x.k)}" maxlength="80" placeholder="根拠となる事実(例:2年目から案件の一部を担当)" aria-label="${esc(x.l)}の根拠"></div>`;}).join("")}
- <div class="evcard"><button type="button" class="chk" id="ckNg" aria-pressed="${!!c.m7.ng}"><i></i>NG条件に当てはまる</button>${ngs.length?`<p class="small">あなたのNG:${esc(ngs.join("、"))}</p>`:""}
-  <button type="button" class="chk" id="ckMust" aria-pressed="${!!c.m7.must}"><i></i>必須条件をすべて満たす</button>${L.must.length?`<p class="small">あなたの必須:${esc(L.must.map(C=>C.n).join("、"))}</p>`:""}</div>
+ <div class="evcard">${ngs.length?`<p class="tghead">当てはまるNG条件</p><div class="tg2 ng">${ngs.map(x=>`<button type="button" data-ngc="${esc(x)}" aria-pressed="${!!c.m7.ngc[x]}">${esc(x)}</button>`).join("")}</div>`:`<button type="button" class="chk" id="ckNg" aria-pressed="${!!c.m7.ng}"><i></i>NG条件に当てはまる</button>`}
+  ${L.must.length?`<p class="tghead">満たしている必須条件</p><div class="tg2 mu">${L.must.map(C=>`<button type="button" data-mc="${C.id}" aria-pressed="${!!c.m7.mustc[C.id]}">${esc(C.n)}</button>`).join("")}</div>`:`<button type="button" class="chk" id="ckMust" aria-pressed="${!!c.m7.must}"><i></i>必須条件をすべて満たす</button>`}</div>
  <div class="scorebox"><span>合計</span><b id="tot"></b></div>
  <div class="btns"><a class="b wide" href="#/m7/result">結果を見る</a><a class="b sec wide" href="#/m7">ほかの会社を採点する</a><button type="button" class="linkb" id="delCo">この会社を候補から消す</button></div>`;
  return{html:h,title:"企業マッチ度",bar:progBtn,after(m){const tot=()=>{const r=coScore(c);$("#tot").textContent=`${r.s} / ${r.m}`;};tot();
   $$(".axrow",m).forEach(row=>{const k=row.dataset.k;bindSeg(row,"data-sv",v=>{c.m7.s[k]=+v;save();tot();});});
   $$("[data-note]",m).forEach(el=>{const k=el.dataset.note;el.value=c.m7.note[k]||"";el.addEventListener("input",()=>{c.m7.note[k]=el.value;save();});});
-  const tg=(id,key)=>{const b=$("#"+id);b.onclick=()=>{c.m7[key]=!c.m7[key];b.setAttribute("aria-pressed",String(c.m7[key]));save();};};tg("ckNg","ng");tg("ckMust","must");
+  const tg=(id,key)=>{const b=$("#"+id);if(b)b.onclick=()=>{c.m7[key]=!c.m7[key];b.setAttribute("aria-pressed",String(c.m7[key]));save();};};tg("ckNg","ng");tg("ckMust","must");
+  // 1つでもNGに当てはまれば除外、必須はすべて満たしたときだけ「必須OK」
+  const sync=()=>{if(ngs.length)c.m7.ng=ngs.some(x=>c.m7.ngc[x]);if(L.must.length)c.m7.must=L.must.every(C=>c.m7.mustc[C.id]);save();};
+  $$("[data-ngc]",m).forEach(b=>b.onclick=()=>{const k=b.dataset.ngc;c.m7.ngc[k]=!c.m7.ngc[k];b.setAttribute("aria-pressed",String(c.m7.ngc[k]));sync();});
+  $$("[data-mc]",m).forEach(b=>b.onclick=()=>{const k=b.dataset.mc;c.m7.mustc[k]=!c.m7.mustc[k];b.setAttribute("aria-pressed",String(c.m7.mustc[k]));sync();});
   $("#delCo").onclick=()=>{if(!confirm(`「${c.n}」を候補から消します。採点や検証の内容も消えます。よろしいですか?`))return;S.cos=S.cos.filter(x=>x!==c);save();go("m7");};}};}
 function m7Result(){const R=m7Results();if(R.res.length)finishMod("m7");
  const top=R.res[0];
