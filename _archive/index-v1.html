@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>価値観マップ 実践ガイド ― 見て、書いて、選ぶ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --on-accent:#FFFFFF;--gold:#8A6410;--p3:#8A6410;
+  --paper:#F3F6F5;--card:#FFFFFF;--ink:#1B2733;--muted:#5B6975;--line:#D3DDDA;--tint:#E5EEEB;
+  --forest:#2E6B62;--forest-soft:#CFE3DE;--signal:#E0A01C;--signal-soft:#FBEFCF;--hazard:#C23B2A;--hazard-soft:#F8DEDA;--sky:#3D6FA8;--sky-soft:#DCE7F4;
+  --sans:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Noto Sans CJK JP","Yu Gothic",Meiryo,sans-serif;
+  --serif:"Zen Old Mincho","Hiragino Mincho ProN","Noto Serif CJK JP","Yu Mincho",serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --on-accent:#0F1A1D;--gold:#F0B93A;--p3:#F0B93A;
+  --paper:#11191C;--card:#18232A;--ink:#E5ECEA;--muted:#9AA9A6;--line:#2C3B40;--tint:#1C2B2C;
+  --forest:#62B5A5;--forest-soft:#1F3A36;--signal:#F0B93A;--signal-soft:#3A3120;--hazard:#F06B57;--hazard-soft:#3D2320;--sky:#7FA9DA;--sky-soft:#1E2C3D;}}
+:root[data-theme="dark"]{--on-accent:#0F1A1D;--gold:#F0B93A;--p3:#F0B93A;--paper:#11191C;--card:#18232A;--ink:#E5ECEA;--muted:#9AA9A6;--line:#2C3B40;--tint:#1C2B2C;
+  --forest:#62B5A5;--forest-soft:#1F3A36;--signal:#F0B93A;--signal-soft:#3A3120;--hazard:#F06B57;--hazard-soft:#3D2320;--sky:#7FA9DA;--sky-soft:#1E2C3D;}
+*{box-sizing:border-box}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);-webkit-text-size-adjust:100%}
+body{margin:0;padding-bottom:env(safe-area-inset-bottom,0px);background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75}
+img,svg{max-width:100%}
+a{color:var(--sky)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+/* nav */
+.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.nav .wrap{display:flex;gap:6px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
+.nav a{flex:none;text-decoration:none;color:var(--ink);font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card);white-space:nowrap}
+.nav a:hover{border-color:var(--forest)}
+.nav a.part{background:var(--forest);color:var(--on-accent);border-color:var(--forest)}
+/* hero */
+.hero{padding:48px 0 36px}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:clamp(34px,6vw,60px);line-height:1.2;margin:0 0 14px;letter-spacing:.02em}
+.hero p.lead{font-size:18px;color:var(--muted);margin:0 0 22px;max-width:30em}
+.route{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.route a{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.route a b{display:block;font-family:var(--serif);font-size:17px}
+.route a span{font-size:13px;color:var(--muted)}
+.route a:nth-child(1){border-top:5px solid var(--forest)}.route a:nth-child(2){border-top:5px solid var(--hazard)}.route a:nth-child(3){border-top:5px solid var(--signal)}
+.promise{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
+.promise span{font-size:13px;background:var(--tint);border-radius:6px;padding:4px 10px}
+/* sections */
+.part-head{margin:64px 0 8px;padding:26px 24px;border-radius:18px;color:var(--on-accent)}
+.part-head h2{font-family:var(--serif);font-size:clamp(26px,4vw,36px);margin:0}
+.part-head p{margin:6px 0 0;opacity:.92}
+.p1{background:var(--forest)}.p2{background:var(--hazard)}.p3{background:var(--p3)}.p0{background:var(--sky)}
+.area{padding:40px 0 10px;border-bottom:1px dashed var(--line)}
+.area-title{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.area-title .no{font-family:var(--serif);font-weight:900;font-size:44px;line-height:1;color:var(--forest);min-width:1.4em}
+.area-title h3{font-family:var(--serif);font-size:clamp(22px,3.2vw,30px);margin:0;line-height:1.35}
+.key{font-size:18px;font-weight:700;background:var(--signal-soft);border-left:6px solid var(--signal);padding:10px 16px;border-radius:0 10px 10px 0;margin:14px 0 20px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid2>*,.grid3>*,.grid4>*,.mapout>*,.hero-grid>*,.vs>*,.timeline>*{min-width:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.panel h4{margin:0 0 8px;font-size:16px}
+.panel p{margin:4px 0}
+.small{font-size:13px;color:var(--muted)}
+.ev{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:4px;background:var(--sky-soft);color:var(--sky);vertical-align:2px;white-space:nowrap}
+.ev.meta{background:var(--forest-soft);color:var(--forest)}
+.ev.weak{background:var(--tint);color:var(--muted)}
+.do{margin:22px 0 10px;border:2px solid var(--forest);border-radius:16px;padding:16px 18px;background:var(--card)}
+.do h4{margin:0 0 8px;font-size:16px;color:var(--forest)}
+.do ol,.do ul{margin:0;padding-left:1.4em}
+.do li{margin:3px 0}
+.big-num{font-family:var(--serif);font-weight:900;font-size:42px;line-height:1.05;color:var(--hazard)}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.stat .lbl{font-size:13px;color:var(--muted);margin-top:4px}
+.tbl{overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+.tbl th,.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--tint);font-size:13px}
+.tbl tr:last-child td{border-bottom:none}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.vs .arrow{align-self:center;font-weight:700;color:var(--muted)}
+.bad{border-color:var(--hazard)!important;background:var(--hazard-soft)!important}
+.good{border-color:var(--forest)!important;background:var(--forest-soft)!important}
+.pill{display:inline-block;font-size:12px;border-radius:999px;padding:2px 9px;background:var(--tint);margin:2px 3px 2px 0}
+/* bars */
+.bars{display:flex;flex-direction:column;gap:9px}
+.bar{display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:10px;align-items:center;font-size:14px}
+.bar .track{height:14px;background:var(--tint);border-radius:7px;position:relative;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;border-radius:7px;background:var(--forest)}
+.bar .fill.h{background:var(--hazard)}.bar .fill.s{background:var(--signal)}
+.bar .v{font-weight:700;min-width:4.5em;text-align:right}
+/* flow */
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.flow .st{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px}
+.flow .st b{color:var(--forest)}
+.flow .ar{color:var(--muted)}
+/* tools */
+.tool{background:var(--card);border:2px solid var(--signal);border-radius:18px;padding:18px;margin:18px 0}
+.tool > h4{margin:0 0 4px;font-size:18px}
+.tool .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+.stepbox{border-top:1px solid var(--line);padding:14px 0 6px}
+.stepbox h5{margin:0 0 8px;font-size:15px;display:flex;gap:8px;align-items:center}
+.stepbox h5 i{font-style:normal;background:var(--forest);color:var(--on-accent);border-radius:6px;padding:0 8px;font-size:13px}
+textarea,input[type=text],select{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:8px 10px;font-size:14px}
+textarea{min-height:64px;resize:vertical}
+.btn{border:1px solid var(--forest);background:var(--forest);color:var(--on-accent);border-radius:10px;padding:7px 14px;cursor:pointer;font-size:14px}
+.btn.ghost{background:transparent;color:var(--forest)}
+.btn.warn{background:transparent;color:var(--hazard);border-color:var(--hazard)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.cards{display:flex;flex-wrap:wrap;gap:7px}
+.vcard{border:1px solid var(--line);background:var(--paper);border-radius:9px;padding:6px 10px;font-size:14px;cursor:pointer;user-select:none;min-height:36px}
+.vcard[data-s="3"]{background:var(--forest);color:var(--on-accent);border-color:var(--forest)}
+.vcard[data-s="2"]{background:var(--forest-soft);border-color:var(--forest)}
+.vcard[data-s="1"]{opacity:.45;text-decoration:line-through}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted);margin:6px 0}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1px solid var(--forest)}
+.legend .l3::before{background:var(--forest)}.legend .l2::before{background:var(--forest-soft)}.legend .l1::before{background:var(--paper);opacity:.5}
+.rank{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rank li{display:grid;grid-template-columns:2em 1fr auto;gap:8px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 10px}
+.rank li b{font-family:var(--serif);font-size:20px;color:var(--forest)}
+.rank .mini{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:2px 8px;cursor:pointer}
+.pair{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.pair button{flex:1;min-width:130px;padding:14px;font-size:17px;border-radius:12px;border:2px solid var(--forest);background:var(--card);cursor:pointer;font-weight:700}
+.pair button:hover{background:var(--forest-soft)}
+.row5{display:grid;grid-template-columns:8em 1fr;gap:8px;align-items:start;margin:6px 0}
+.row5 .nm{font-weight:700;padding-top:7px}
+.slider{display:grid;grid-template-columns:8em 1fr 1fr 3.5em;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.slider input{width:100%;accent-color:var(--forest)}
+.gapv{font-weight:700;text-align:right}
+.mapout{display:grid;grid-template-columns:minmax(260px,1fr) 1fr;gap:18px;align-items:start}
+.verdict{border-radius:12px;padding:12px 16px;font-weight:700;margin-top:10px}
+.verdict.ok{background:var(--forest-soft);color:var(--forest)}
+.verdict.mid{background:var(--signal-soft);color:var(--gold)}
+.verdict.ng{background:var(--hazard-soft);color:var(--hazard)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line);font-size:15px;cursor:pointer}
+.chk input{margin-top:6px;width:18px;height:18px;accent-color:var(--hazard);flex:none}
+.score{overflow-x:auto}
+.score table{border-collapse:collapse;min-width:620px;width:100%;font-size:14px}
+.score th,.score td{border-bottom:1px solid var(--line);padding:6px;text-align:center}
+.score th:first-child,.score td:first-child{text-align:left}
+.score input[type=text]{min-width:90px}
+.score select,.score input.w{width:64px;padding:4px}
+.score tfoot td{font-weight:700;font-size:16px}
+.mine{display:grid;grid-template-columns:1fr 150px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{flex:1;border:none;background:var(--paper);padding:6px 4px;font-size:13px;cursor:pointer}
+.seg button.on[data-v="0"]{background:var(--forest);color:var(--on-accent)}
+.seg button.on[data-v="1"]{background:var(--signal);color:#1B2733}
+.seg button.on[data-v="2"]{background:var(--hazard);color:var(--on-accent)}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.timeline .t{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;position:relative}
+.timeline .t .when{font-family:var(--serif);font-weight:700;color:var(--forest);font-size:17px}
+.gloss{columns:2;column-gap:24px;font-size:14px}
+.gloss div{break-inside:avoid;margin-bottom:8px}
+.src{font-size:13px;color:var(--muted);columns:2;column-gap:24px}
+.src p{margin:0 0 6px;break-inside:avoid}
+footer{padding:40px 0 60px;color:var(--muted);font-size:13px}
+.save{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:6px 12px;border-radius:999px;font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none}
+.save.show{opacity:.9}
+@media (prefers-reduced-motion:reduce){.save{transition:none}}
+/* save dialog */
+.savebar{display:flex;justify-content:flex-end;margin-top:12px}
+#saveDlg{width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 48px);border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:18px 20px}
+#saveDlg::backdrop{background:rgba(0,0,0,.45)}
+#saveDlg .dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+#saveDlg h4{margin:0 0 6px;font-size:18px}
+#dlgClose{flex:none;width:34px;height:34px;border:1px solid var(--line);background:var(--paper);border-radius:8px;cursor:pointer;font-size:18px;line-height:1}
+.dlg-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.dlg-opt{text-align:left;border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:14px;cursor:pointer}
+.dlg-opt:hover{border-color:var(--forest)}
+.dlg-opt b{display:block;font-size:16px;margin-bottom:4px;color:var(--forest)}
+.dlg-opt span{font-size:13px;color:var(--muted)}
+#mdOut{min-height:min(50vh,420px);font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:13px;line-height:1.55}
+#report{display:none}
+@media (max-width:760px){
+  .hero-grid,.grid2,.grid3,.mapout{grid-template-columns:1fr}
+  .grid4,.timeline{grid-template-columns:1fr 1fr}
+  .route{grid-template-columns:1fr}
+  .vs{grid-template-columns:1fr}.vs .arrow{justify-self:center;transform:rotate(90deg)}
+  .slider{grid-template-columns:1fr 1fr;}.slider .nm{grid-column:1/-1}
+  .row5{grid-template-columns:1fr}
+  .gloss,.src{columns:1}
+  .mine{grid-template-columns:1fr}
+  .bar{grid-template-columns:1fr auto;}.bar .track{grid-column:1/-1;grid-row:2}
+  .dlg-opts{grid-template-columns:1fr}
+}
+@media print{.nav,.save,.btns,.savebar,.tool .btn{display:none!important}.area{break-inside:auto}.tool{break-inside:avoid-page}body{background:#fff}textarea{overflow:hidden;resize:none}}
+/* PDF用レポート:保存時にプレビューとして画面に表示し、そのまま印刷する。ダークモードでも白い用紙向けの配色にする */
+body.reporting>*:not(#report):not(#rpBar){display:none!important}
+body.reporting{background:#fff}
+body.reporting #report{display:block}
+#report{--paper:#F3F6F5;--card:#FFFFFF;--ink:#1B2733;--muted:#5B6975;--line:#D3DDDA;--tint:#E5EEEB;
+  --forest:#2E6B62;--forest-soft:#CFE3DE;--signal:#E0A01C;--signal-soft:#FBEFCF;--hazard:#C23B2A;--hazard-soft:#F8DEDA;--sky:#3D6FA8;--sky-soft:#DCE7F4;
+  --on-accent:#FFFFFF;--gold:#8A6410;color:var(--ink);background:#fff;font-size:12.5px;line-height:1.6}
+#report,#report *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#report .rp-head{border-bottom:2px solid var(--forest);padding-bottom:6px;margin-bottom:12px}
+#report h1{font-family:var(--serif);font-size:22px;margin:0 0 2px}
+#report h2{font-family:var(--serif);font-size:18px;margin:0 0 8px;padding:6px 10px;background:var(--forest);color:#fff;border-radius:8px}
+#report .rp-sec+.rp-sec{break-before:page}
+#report h3{font-size:14px;margin:16px 0 6px;padding-left:8px;border-left:4px solid var(--forest);break-after:avoid}
+#report h4{font-size:13px;margin:0 0 4px}
+#report .small{font-size:11px}
+#report .panel,#report .verdict,#report .bar,#report tr,#report .rp-2>*,#report .rp-3>*{break-inside:avoid}
+#report .panel{padding:8px 10px;border-radius:10px}
+#report .rp-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+#report .rp-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:start}
+#report .tbl{overflow:visible;margin:6px 0}
+#report .tbl table{min-width:0;font-size:11.5px}
+#report .tbl th,#report .tbl td{padding:4px 6px}
+#report .bars{gap:6px}
+#report .bar{grid-template-columns:minmax(110px,34%) 1fr auto;font-size:12px}
+#report .bar .track{grid-column:auto;grid-row:auto;height:11px}
+#report .rp-txt{margin:2px 0 6px}
+#report .rp-empty{color:var(--muted)}
+#report .rp-chk{list-style:none;padding:0;margin:0}
+#report .rp-chk li{padding:3px 0;border-bottom:1px dashed var(--line)}
+#report .rp-chk li.on{color:var(--hazard);font-weight:700}
+#report .rp-chk li.off{color:var(--muted)}
+#report .rp-chip{display:inline-block;padding:0 8px;border-radius:999px;font-size:11px;font-weight:700}
+#report .pill{font-size:11px}
+#report svg{max-width:250px!important}
+#report .verdict{margin:8px 0;padding:8px 12px}
+#rpBar{display:none}
+body.reporting #rpBar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;position:sticky;top:0;z-index:30;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#1B2733;color:#fff;font-size:13px;line-height:1.5}
+#rpBar .btn{background:#2E6B62;border-color:#2E6B62;color:#fff}
+#rpBar .btn.ghost{background:transparent;color:#fff;border-color:#9AA9A6}
+#rpBar p{margin:0;flex:1 1 260px}
+@media screen{#report{max-width:820px;margin:0 auto;padding:20px 16px 48px;font-size:14px}#report .rp-sec+.rp-sec{margin-top:36px}}
+@media screen and (max-width:600px){#report .rp-2,#report .rp-3{grid-template-columns:1fr}#report .tbl{overflow-x:auto}}
+@media print{@page{size:A4;margin:14mm 12mm}#rpBar{display:none!important}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="章の移動"><div class="wrap">
+<a href="#c0">序章</a><a class="part" href="#p1">第1部</a><a href="#c1">1 価値観とは</a><a href="#c2">2 効用と限界</a><a href="#c3">3 自己認識</a><a href="#c4">4 マップ作成</a>
+<a class="part" href="#p2">第2部</a><a href="#c5">5 地雷</a><a href="#c6">6 良い職場</a><a href="#c7">7 科学で選ぶ是非</a>
+<a class="part" href="#p3">第3部</a><a href="#c8">8 方法A 探す</a><a href="#c9">9 方法B 確かめる</a><a href="#c10">10 就活に実装</a><a href="#ap">付録</a>
+</div></nav>
+
+<header class="hero"><div class="wrap hero-grid">
+<div>
+<h1>価値観マップ<br>実践ガイド</h1>
+<p class="lead">自分の判断基準を1枚の地図にして、研究の知見で「合う職場」を探し、確かめる。読むより、手を動かすためのビジュアル版です。</p>
+<div class="route">
+<a href="#p1"><b>第1部 自分を知る</b><span>価値観マップを作る</span></a>
+<a href="#p2"><b>第2部 職場を知る</b><span>地雷と良い職場の条件</span></a>
+<a href="#p3"><b>第3部 選ぶ</b><span>探す・確かめる・決める</span></a>
+</div>
+<div class="promise"><span>入力内容はこの端末のブラウザに自動保存</span><span>文系・理系どちらにも対応</span><span>詳しい解説は解説&実践ブック版へ</span></div>
+<div class="btns" style="margin-top:14px"><button type="button" class="btn" data-save="all">全章の入力内容を保存</button></div>
+</div>
+<div id="heroWheel" aria-hidden="true"></div>
+</div></header>
+
+<main class="wrap">
+
+<!-- 序章 -->
+<section class="area" id="c0">
+<div class="area-title"><span class="no">0</span><h3>このガイドの使い方</h3></div>
+<p class="key">ゴールは2つ:判断の物差し(価値観マップ)を持つこと、そして地雷を避けて合う職場を選べるようになること。</p>
+<div class="grid2">
+<div class="panel"><h4>あなたの状況から始める</h4>
+<div class="tbl"><table><tr><th>状況</th><th>最短ルート</th></tr>
+<tr><td>1-2年生</td><td>4 → 5 → 8</td></tr>
+<tr><td>就活準備中</td><td>4 → 5 → 8 → 10</td></tr>
+<tr><td>選考・内定で迷い中</td><td>4(短縮) → 5 → 9</td></tr>
+<tr><td>入社後にモヤモヤ</td><td>3 → 4 → 9</td></tr></table></div></div>
+<div class="panel"><h4>根拠の強さラベル</h4>
+<div class="bars" id="evLadder"></div>
+<p class="small" style="margin-top:10px">各データに <span class="ev meta">メタ分析</span> <span class="ev">RCT・コホート</span> <span class="ev weak">横断・解説</span> のラベルをつけています。</p></div>
+</div>
+<div class="panel" style="margin-top:16px"><h4>数字の読み方:効果の大きさの目安</h4>
+<div class="grid3">
+<div><b>相関 r</b><div class="small">一緒に動く度合い</div><div class="flow"><span class="st">小 0.1</span><span class="st">中 0.3</span><span class="st">大 0.5</span></div></div>
+<div><b>差 d / g</b><div class="small">2群の平均の差</div><div class="flow"><span class="st">小 0.2</span><span class="st">中 0.5</span><span class="st">大 0.8</span></div></div>
+<div><b>リスク比 RR</b><div class="small">1.0で差なし</div><div class="flow"><span class="st">1.3 = 3割増</span><span class="st">2.0 = 2倍</span></div></div>
+</div>
+<p class="small">横断研究の「関連」は因果とは限りません。因果に近いのは、RCTや前向きコホート(原因が先・結果が後)です。</p></div>
+</section>
+
+<!-- 第1部 -->
+<div class="part-head p1" id="p1"><h2>第1部 自分を知る</h2><p>価値観とは何か、なぜ明確にするのか、どう落とし穴を避けて作るのか。</p></div>
+
+<section class="area" id="c1">
+<div class="area-title"><span class="no">1</span><h3>価値観とは何か</h3></div>
+<p class="key">価値観=場面を超えて選択を方向づける「何が大切か」の順位。大切なものを並べるのではなく、順位をつけること。</p>
+<div class="mapout">
+<div class="panel"><h4>Schwartzの価値の円環 <span class="ev">80か国以上で確認</span></h4>
+<div id="wheel1"></div><p class="small">価値をタップすると説明が出ます。隣り合う価値は両立しやすく、向かい合う価値はぶつかりやすい。</p></div>
+<div>
+<div class="panel" id="wheelInfo" style="min-height:150px"><h4>自己志向</h4><p>自分で考え、選び、創り、探究する。</p><p class="small">仕事では:裁量、専門性、自由な進め方</p></div>
+<div class="panel" style="margin-top:12px"><h4>2つの葛藤軸</h4>
+<div class="vs"><div class="panel good" style="padding:10px">開放性<div class="small">自己志向・刺激</div></div><div class="arrow">⇄</div><div class="panel" style="padding:10px">保守<div class="small">安全・同調・伝統</div></div></div>
+<div class="vs" style="margin-top:8px"><div class="panel" style="padding:10px">自己高揚<div class="small">達成・権力</div></div><div class="arrow">⇄</div><div class="panel good" style="padding:10px">自己超越<div class="small">慈善・普遍主義</div></div></div>
+<p class="small">上位に両端が入っている人は、両立できる職場の設計が必要。</p></div>
+</div></div>
+
+<div class="grid3" style="margin-top:16px">
+<div class="panel"><h4>方角と目的地</h4><p><b>価値=方角</b>(学び続ける)<br><b>目標=目的地</b>(資格を取る)</p><p class="small">第一志望に落ちても、方角があれば次の道を選べる(ACT)。</p></div>
+<div class="panel"><h4>行動との関係は「中程度」</h4><p>価値観と行動の関連は中程度 <span class="ev weak">横断</span></p><p class="small">状況の圧力が強いから。だから「価値観に沿って動ける環境」選びが大事。</p></div>
+<div class="panel"><h4>変わるもの?</h4><p>成人ではかなり安定、若い時期は経験で変わりやすい <span class="ev">縦断</span></p><p class="small">今のマップは暫定版。年1回更新する。</p></div>
+</div>
+
+<div class="tbl" style="margin-top:14px"><table>
+<tr><th>混同しやすいもの</th><th>問い</th><th>例</th><th>職場選びでの役割</th></tr>
+<tr><td><b>価値観</b></td><td>何が大切か</td><td>自律、貢献、安定</td><td>何を満たす職場か</td></tr>
+<tr><td>性格</td><td>どう振る舞いやすいか</td><td>外向的、慎重</td><td>どこで消耗しにくいか</td></tr>
+<tr><td>興味</td><td>何が楽しいか</td><td>分析する、人と関わる</td><td>どんな作業か(RIASEC)</td></tr>
+<tr><td>目標</td><td>何を達成したいか</td><td>30歳で管理職</td><td>期限つきの通過点</td></tr>
+</table></div>
+<p class="small">性格と価値観は関連するが別物(Parks-Leducら 2015 <span class="ev meta">メタ分析</span>)。</p>
+
+<div class="panel" style="margin-top:12px"><h4>人生の価値観 → 仕事の価値観への橋渡し(O*NETの6つの仕事の価値)</h4>
+<div class="flow"><span class="st"><b>達成</b> 能力を活かす</span><span class="st"><b>自立</b> 自分で判断</span><span class="st"><b>承認</b> 評価・昇進</span><span class="st"><b>人間関係</b> 良い同僚・奉仕</span><span class="st"><b>支援</b> 公正な経営・良い上司</span><span class="st"><b>労働条件</b> 安定・給与</span></div>
+<p class="small">第8章で、あなたのトップ5をこの形の「職場の条件」に翻訳します。</p></div>
+</section>
+
+<section class="area" id="c2">
+<div class="area-title"><span class="no">2</span><h3>明確にすると何が得か、何が限界か</h3></div>
+<p class="key">効果は「小さいが確か」。就活のように自己評価が揺さぶられる時期に最も効く。</p>
+<div class="panel"><h4>研究で示された効果の大きさ</h4><div class="bars" id="benefitBars"></div>
+<p class="small" style="margin-top:8px">値は各メタ分析・研究の代表値(概数)。バーは効果量 d/g を示す(中程度=0.5)。</p></div>
+<div class="grid2" style="margin-top:14px">
+<div class="panel good"><h4>メリット</h4><ul>
+<li><b>ストレスの緩衝</b>:大切な価値を書くと、脅威下の成績やストレス反応が改善 <span class="ev">RCT</span></li>
+<li><b>目標が続く</b>:価値観に沿った目標は努力が続き、達成で幸福が増す(Sheldon & Elliot 1999) <span class="ev">縦断</span></li>
+<li><b>意味と健康</b>:人生の目的の感覚が高い人は全死亡リスク約17%低い <span class="ev meta">メタ分析</span></li>
+<li><b>キャリア判断</b>:書くワーク・個別の解釈・職業情報・モデル・支援の5成分で効果が上がる <span class="ev meta">メタ分析</span></li></ul></div>
+<div class="panel bad"><h4>限界・注意</h4><ul>
+<li><b>脅威がなければほぼ効果なし</b>(アファメーション)</li>
+<li><b>借り物の価値</b>:受けのよい言葉を選ぶと逆効果 → エピソードで検証</li>
+<li><b>外発的価値の偏り</b>:お金・名声が最上位を独占すると幸福感と小さな負の関連(r≈-0.15)</li>
+<li><b>ギャップの痛み</b>:理想と現実の差に気づき一時的につらい</li>
+<li><b>考えすぎ</b>:「なぜ?」の繰り返しは反芻に → 第3章</li>
+<li><b>悪い職場を我慢する道具にしない</b></li></ul></div>
+</div>
+<div class="do"><h4>やること</h4><ol><li>「就活で不安になったら読む」前提で、第4章の Step 6 でアファメーション文を作る。</li><li>選ぶ価値は、受けのよさではなくエピソードで決める。</li></ol></div>
+</section>
+
+<section class="area" id="c3">
+<div class="area-title"><span class="no">3</span><h3>自己認識の落とし穴を避ける</h3></div>
+<p class="key">人は自分を知っているつもりで知らない。「なぜ?」ではなく「何を?」と問い、他人の目を借りる。</p>
+<div class="grid3">
+<div class="stat"><div class="big-num" style="color:var(--sky)">95%</div><div class="lbl">自分は自己認識できていると思う人(Eurich)</div></div>
+<div class="stat"><div class="big-num">10-15%</div><div class="lbl">実際に基準を満たした人(著者の推計)</div></div>
+<div class="stat"><div class="big-num" style="color:var(--signal)">r≈0.29</div><div class="lbl">自己評価と実際の成績の一致(22メタ分析の統合) <span class="ev meta">メタ分析</span></div></div>
+</div>
+<div class="grid2" style="margin-top:16px">
+<div class="panel"><h4>自己認識の4タイプ</h4>
+<svg viewBox="0 0 320 250" role="img" aria-label="内的と外的の自己認識の2×2">
+<text x="170" y="16" text-anchor="middle" font-size="12" fill="currentColor">外的自己認識(他者からの見え方) →</text>
+<text x="12" y="140" font-size="12" fill="currentColor" transform="rotate(-90 12 140)" text-anchor="middle">内的自己認識 →</text>
+<rect x="30" y="26" width="140" height="100" rx="10" fill="var(--sky-soft)"/><text x="100" y="70" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">内省家</text><text x="100" y="92" text-anchor="middle" font-size="11" fill="currentColor">自分はわかるが他者に無頓着</text>
+<rect x="176" y="26" width="140" height="100" rx="10" fill="var(--forest-soft)"/><text x="246" y="70" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">自己認識者</text><text x="246" y="92" text-anchor="middle" font-size="11" fill="currentColor">目指す状態</text>
+<rect x="30" y="132" width="140" height="100" rx="10" fill="var(--tint)"/><text x="100" y="176" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">探索者</text><text x="100" y="198" text-anchor="middle" font-size="11" fill="currentColor">自分も他者の見方も曖昧</text>
+<rect x="176" y="132" width="140" height="100" rx="10" fill="var(--signal-soft)"/><text x="246" y="176" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">迎合者</text><text x="246" y="198" text-anchor="middle" font-size="11" fill="currentColor">就活で陥りがち</text>
+</svg>
+<p class="small">内省(自分で掘る)と、愛ある批評者(他人に聞く)の両輪で右上へ。</p></div>
+<div class="panel"><h4>問いの変換表 <span class="ev">レビュー</span></h4>
+<div class="tbl"><table><tr><th>避ける(なぜ)</th><th>使う(何を・どう)</th></tr>
+<tr><td>なぜこの仕事が嫌?</td><td>どんな場面で、何を感じる?</td></tr>
+<tr><td>なぜリーダーに向かない?</td><td>やってみて何がうまくいき、何が難しかった?</td></tr>
+<tr><td>なぜ面接に落ちた?</td><td>次は何を変える?</td></tr>
+<tr><td>なぜ成長が大事?</td><td>成長を感じた瞬間、何をしていた?</td></tr></table></div>
+<p class="small">「なぜ」は反芻と後付けの作り話を生みやすい(Trapnell & Campbell 1999、Watkins 2008)。</p></div>
+</div>
+<div class="grid4" style="margin-top:14px">
+<div class="panel"><h4>What質問</h4><p class="small">具体的な出来事と行動を問う</p></div>
+<div class="panel"><h4>エピソード主義</h4><p class="small">証拠のある価値だけ採用</p></div>
+<div class="panel"><h4>三人称で考える</h4><p class="small">「親友なら何と言う?」 自分の問題は他人の問題より判断が下手(Grossmann & Kross 2014) <span class="ev">実験</span></p></div>
+<div class="panel"><h4>知的謙虚さ</h4><p class="small">証拠が出たらマップを書き換える(Leary et al. 2017)</p></div>
+</div>
+<div class="do"><h4>やること:愛ある批評者に送るメッセージ(コピーして使えます)</h4>
+<blockquote style="margin:0;padding:10px 14px;background:var(--tint);border-radius:10px;font-size:15px">自己分析を手伝ってほしい。率直に答えてくれると助かる。①私が一番生き生きしていたのはどんな場面? ②私が大事にしていそうな価値観を3つ挙げると? ③私が無理している・らしくないと感じたのはいつ? ④私が気づいていない癖や傾向は? ⑤私に合わなそうな職場はどんなところ?</blockquote>
+<p class="small">返事には反論せず「ありがとう、もう少し詳しく」とだけ返す。異なる場面で自分を見ている2-3人に送る。</p></div>
+</section>
+<section class="area" id="c4">
+<div class="area-title"><span class="no">4</span><h3>価値観マップを作る</h3></div>
+<p class="key">8ステップ・約3時間。1日で全部やらず、3回に分けると精度が上がる。</p>
+<div class="flow"><span class="st"><b>1日目</b> Step 0-4</span><span class="ar">→</span><span class="st"><b>数日後</b> Step 5-7</span><span class="ar">→</span><span class="st"><b>1-2週間後</b> Step 8</span></div>
+
+<div class="tool" id="mapTool">
+<h4>価値観マップ・メーカー</h4>
+<p class="hint">入力はこの端末に自動保存されます。記入例を見たいときは「Aさんの例を読み込む」を押してください(今の入力は上書きされます)。</p>
+<div class="btns"><button class="btn ghost" id="loadSample">Aさんの例を読み込む</button><button class="btn warn" id="resetAll">すべて消去</button><button type="button" class="btn ghost" data-save="map">この章を保存</button></div>
+
+<div class="stepbox"><h5><i>Step 0</i>準備 10分</h5>
+<div class="flow"><span class="st">正解を探さない</span><span class="st">「なぜ」より「何を」</span><span class="st">60分でいったん終了</span></div></div>
+
+<div class="stepbox"><h5><i>Step 1</i>感情が動いた出来事を集める 40分</h5>
+<p class="small">人生曲線(年齢×充実度)の山と谷から、1-3個ずつ。そのとき「何をしていたか」まで書く。</p>
+<div class="grid2">
+<label><b>ピーク体験</b><span class="small"> 満たされた価値</span><textarea data-k="ep_peak" placeholder="時間を忘れて没頭した場面と、そのとき何をしていたか"></textarea></label>
+<label><b>怒り・違和感</b><span class="small"> 踏みにじられた価値</span><textarea data-k="ep_anger" placeholder="強く『おかしい』と感じた場面"></textarea></label>
+<label><b>羨望</b><span class="small"> まだ満たされていない価値</span><textarea data-k="ep_envy" placeholder="心からうらやましい人と、その何がうらやましいか"></textarea></label>
+<label><b>誇り</b><span class="small"> 中核にある価値</span><textarea data-k="ep_pride" placeholder="誰にも褒められなくても誇らしい行動"></textarea></label>
+</div></div>
+
+<div class="stepbox"><h5><i>Step 2</i>カードソート 25分</h5>
+<p class="small">カードをタップするたびに「非常に重要 → 重要 → 重要でない → 未分類」と切り替わります。迷ったら「これが10年満たされなくても耐えられる?」と問う。</p>
+<div class="legend"><span class="l3">非常に重要</span><span class="l2">重要</span><span class="l1">重要でない</span><b id="starCount" style="margin-left:auto"></b></div>
+<div class="cards" id="cards"></div>
+<div class="btns"><input type="text" id="newCard" maxlength="30" placeholder="足りない価値を追加(例:音楽)" style="max-width:260px"><button class="btn ghost" id="addCard">カードを追加</button></div></div>
+
+<div class="stepbox"><h5><i>Step 3</i>トップ5に絞る 20分</h5>
+<p class="small">「非常に重要」から一対比較。「人生でどちらか一方しか守れないなら?」と答えるだけで順位が決まります。</p>
+<div class="btns"><button class="btn" id="startPair">一対比較を始める</button></div>
+<div id="pairArea"></div>
+<ol class="rank" id="rankList"></ol>
+<p class="small">↑↓で手動調整もできます。6位以下は準候補として残ります。</p></div>
+
+<div class="stepbox"><h5><i>Step 4</i>エピソードで検証 20分</h5>
+<p class="small">Step 1の出来事に証拠がない価値は「保留」にして、次点と入れ替える。お金や安定は「何を守るための手段か」も確認。</p>
+<div id="evidenceRows"></div></div>
+
+<div class="stepbox"><h5><i>Step 5</i>円環に置いて、重心と葛藤を見る 15分</h5>
+<div class="mapout"><div id="myWheel"></div><div class="panel" id="mapReading"></div></div></div>
+
+<div class="stepbox"><h5><i>Step 6</i>自分の言葉で定義し、アファメーション文を作る 15分</h5>
+<p class="small">「満たされているときの具体的な状態」が、第8章で職場の条件になります。</p>
+<div id="defRows"></div>
+<label><b>アファメーション文</b><span class="small"> 面接前・不採用のあとに読み返す</span><textarea data-k="affirm" style="min-height:90px" placeholder="私は〇〇を大切にしている。それは〇〇の経験で〇〇を感じたからだ。この価値は〇〇の場面で私の判断を支えている。"></textarea></label>
+<div class="btns"><button class="btn ghost" id="affTpl">1位の価値で下書きを作る</button></div></div>
+
+<div class="stepbox"><h5><i>Step 7</i>ギャップを測り、小さな行動実験 20分</h5>
+<p class="small">左=どれだけ大切か、右=今の生活でどれだけ実現できているか。差が大きい価値は職場選びで最重視。</p>
+<div id="gapRows"></div></div>
+
+<div class="stepbox"><h5><i>Step 8</i>他者に聞いて完成 1-2週間後</h5>
+<p class="small">第3章のメッセージを2-3人に送り、返ってきた価値を書く。一致=確定、他者だけ=候補に追加して Step 4 へ、自分だけ=行動実験で確かめる。</p>
+<textarea data-k="feedback" placeholder="例)ゼミの友人:納得いかないと引かない、調べ物になると止まらない"></textarea>
+</div>
+<div class="savebar"><button type="button" class="btn" data-save="map">価値観マップを保存(テキスト/PDF)</button></div>
+</div>
+</section>
+
+<!-- 第2部 -->
+<div class="part-head p2" id="p2"><h2>第2部 職場を知る</h2><p>誰にとっても有害な条件を先に除外し、そのうえで「合う」条件を知る。</p></div>
+
+<section class="area" id="c5">
+<div class="area-title"><span class="no">5</span><h3>科学的に避けるべき7つの地雷</h3></div>
+<p class="key">職場選びの最初の一手は、合う職場を探すことではなく、地雷を踏まないこと。</p>
+<div class="panel"><h4>健康リスクの大きさ(1.0=差なし)</h4><div class="bars" id="riskBars"></div>
+<p class="small" style="margin-top:8px">個人には「3割増し」でも、数十年働く間に毎年積み重なる。WHO/ILOは2016年に長時間労働で745,194人が死亡したと推計。</p></div>
+
+<div class="grid2" style="margin-top:16px" id="mineCards"></div>
+
+<div class="panel" style="margin-top:16px"><h4>残業時間のものさし(月あたり)</h4>
+<svg viewBox="0 0 640 96" role="img" aria-label="月の残業時間の目安のスケール" style="width:100%">
+<rect x="0" y="20" width="100" height="26" fill="var(--forest)"/><rect x="100" y="20" width="125" height="26" fill="var(--forest-soft)"/><rect x="225" y="20" width="175" height="26" fill="var(--signal)"/><rect x="400" y="20" width="240" height="26" fill="var(--hazard)"/>
+<g font-size="12" fill="currentColor"><text x="0" y="14">0h</text><text x="92" y="14">20h</text><text x="217" y="14">45h</text><text x="392" y="14">80h</text>
+<text x="4" y="66">健全</text><text x="104" y="66">法の原則上限内</text><text x="229" y="66">要警戒(週50-58h相当)</text><text x="404" y="66">過労死ライン 避ける</text></g>
+<text x="229" y="86" font-size="11" fill="var(--muted)">固定残業代が45hを超える求人も要注意</text></svg></div>
+
+<div class="tool" id="redFlags"><h4>レッドフラッグ・チェック</h4><p class="hint">気になる会社を思い浮かべてチェック。1つでも強く当てはまれば第9章で詳しく検証。</p>
+<div id="flagList"></div><div class="verdict ok" id="flagVerdict">チェックなし</div>
+<div class="savebar"><button type="button" class="btn" data-save="flags">チェック結果を保存(テキスト/PDF)</button></div></div>
+</section>
+
+<section class="area" id="c6">
+<div class="area-title"><span class="no">6</span><h3>良い職場の科学</h3></div>
+<p class="key">「誰にでも良い特徴」×「あなたとの適合」。満足を決めるのは、仕事の中身と人間関係と価値観の一致。</p>
+<div class="flow"><span class="st"><b>①</b> 地雷がない</span><span class="ar">→</span><span class="st"><b>②</b> 誰にでも良い特徴</span><span class="ar">→</span><span class="st"><b>③</b> 自分との適合</span><span class="ar">→</span><span class="st" style="border-color:var(--forest)"><b>良い職場</b></span></div>
+
+<div class="grid2" style="margin-top:14px">
+<div class="panel"><h4>職務特性:仕事の中身が意欲を生む <span class="ev meta">259研究</span></h4>
+<div class="flow"><span class="st">技能多様性</span><span class="st">完結性</span><span class="st">重要性</span><span class="st"><b>自律性</b></span><span class="st"><b>フィードバック</b></span></div>
+<p class="small">自律性とフィードバックは満足と一貫して強く関連。さらに同僚の支援など「社会的特性」が上乗せで効く。</p></div>
+<div class="panel"><h4>3つの心の欲求(自己決定理論) <span class="ev meta">メタ分析</span></h4>
+<div class="grid3" style="gap:8px"><div class="panel good" style="padding:8px"><b>自律性</b><div class="small">裁量・選択・理由の説明</div></div><div class="panel good" style="padding:8px"><b>有能感</b><div class="small">適度な難しさ・成長</div></div><div class="panel good" style="padding:8px"><b>関係性</b><div class="small">支え合い・尊重</div></div></div>
+<p class="small">満たされるほど熱意・満足・成績が高く、燃え尽きと離職意図が低い。</p></div>
+</div>
+
+<div class="panel" style="margin-top:14px"><h4>忙しさには2種類ある(JD-Rモデル) <span class="ev meta">メタ分析</span></h4>
+<div class="vs"><div class="panel good"><b>挑戦的な要求</b><p class="small">仕事量、締切、大きな責任</p><p>熱意 ↑ ・ 疲れ ↑</p></div><div class="arrow">vs</div><div class="panel bad"><b>阻害的な要求</b><p class="small">役割の曖昧さ、矛盾する指示、無駄な手続き、社内政治</p><p>熱意 ↓ ・ 疲れ ↑</p></div></div>
+<p class="small">面接では「忙しいか」ではなく「忙しいとき何に時間を取られているか」を聞く。</p></div>
+
+<div class="grid2" style="margin-top:14px">
+<div class="panel"><h4>適合(フィット)と満足・離職の関係 <span class="ev meta">172研究</span></h4><div class="bars" id="fitBars"></div>
+<p class="small">「合っていると感じる」は満足と強く相関。でも本人と会社の価値観を別々に測って計算すると、相関はずっと弱い。感覚は証拠で確かめる(第9章)。</p></div>
+<div class="panel"><h4>日本では「人との適合」がより効く</h4>
+<p>東アジアでは組織・チーム・上司との適合が、北米では仕事内容との適合が成果とより強く関連(Ohら 2014) <span class="ev meta">国際比較</span></p>
+<p class="small">配属で仕事が変わる新卒一括採用では、価値観マップによる組織との適合チェックが特に重要。</p>
+<div class="stat" style="margin-top:10px"><div class="big-num" style="color:var(--sky)">r≈0.15</div><div class="lbl">給与水準と職務満足の相関(Judgeら 2010) <span class="ev meta">メタ分析</span>。生活の基盤としては重要だが、日々の満足を決める力は小さい。</div></div></div>
+</div>
+
+<div class="grid2" style="margin-top:14px">
+<div class="panel"><h4>興味の6タイプ(RIASEC)</h4><div id="hexa"></div>
+<p class="small">タイプをタップすると文系・理系の職種例が出ます。興味の一致は「長く続けて上達するか」に効き、満足への効果は小さめ(r≈0.17)。</p></div>
+<div class="panel" id="hexInfo"><h4>I 研究的</h4><p>観察、分析、探究が好き</p><p class="small">文系:リサーチ、調査分析、編集<br>理系:研究開発、データサイエンス</p></div>
+</div>
+
+<div class="grid3" style="margin-top:14px">
+<div class="panel"><h4>心理的安全性</h4><p class="small">失敗・質問・反対意見を言っても罰せられない。学習と成果と関連(Frazierら 2017) <span class="ev meta">メタ分析</span></p></div>
+<div class="panel"><h4>在宅勤務</h4><p class="small">自律性と満足に小さなプラス。ただし頻度が高すぎると同僚との関係や若手の学習機会にマイナスの可能性 <span class="ev meta">メタ分析</span></p></div>
+<div class="panel"><h4>意味のある仕事</h4><p class="small">熱意・満足・定着と強く関連(Allanら 2019) <span class="ev meta">メタ分析</span></p></div>
+</div>
+
+<div class="panel" style="margin-top:14px"><h4>良い職場を評価する12の軸(第8・9章で使う)</h4>
+<div class="grid2">
+<div><p class="small"><b>誰にとっても重要</b></p><div id="axesCommon"></div></div>
+<div><p class="small"><b>人によって違う(適合)</b></p><div id="axesFit"></div></div></div></div>
+</section>
+
+<section class="area" id="c7">
+<div class="area-title"><span class="no">7</span><h3>科学で選ぶことの得と限界</h3></div>
+<p class="key">科学は「避けるもの」には強い。「何を選ぶか」はあなたの価値観で決める。そして最善でなく「十分に良い」を選ぶ。</p>
+<div class="grid3">
+<div class="stat"><div class="big-num">33.8%</div><div class="lbl">大卒の3年以内離職率(2022年3月卒、厚生労働省)</div></div>
+<div class="stat"><div class="big-num">28.5%</div><div class="lbl">初めての会社を辞めた理由1位:労働時間・休日・休暇の条件</div></div>
+<div class="stat"><div class="big-num">26.4%</div><div class="lbl">2位:人間関係がよくなかった(令和5年若年者雇用実態調査)</div></div>
+</div>
+<p class="small">離職理由の上位は、第5章の地雷と第6章の人間関係にそのまま対応。事前に確かめれば、多くは避けられた可能性がある。</p>
+
+<div class="grid2" style="margin-top:14px">
+<div class="panel good"><h4>得</h4><ul>
+<li>健康と命を守れる(地雷を除外)</li><li>早期離職の主因を事前に確認できる</li><li>満足と定着に効く軸がわかる</li><li>知名度や年収への過大評価(焦点化の錯覚)を防げる</li><li>「成長できる」などの言葉を事実で検証できる</li><li>現実的な情報は定着を小さく高める <span class="ev meta">メタ分析</span></li></ul></div>
+<div class="panel bad"><h4>限界</h4><ul>
+<li>研究は平均の話。個人差は大きい</li><li>効果の多くは小〜中程度</li><li>多くは欧米のデータ</li><li>無礼や上司との相性は外から見えにくい</li><li>適合は入社後にも変わる</li><li>分析しすぎると時間を失う</li></ul></div>
+</div>
+
+<div class="panel" style="margin-top:14px"><h4>完璧を求めると満足が下がる(Iyengarら 2006) <span class="ev">縦断</span></h4>
+<div class="vs"><div class="panel"><b>最大化型</b><p class="small">すべてを比較して最善を探す</p><p>初任給 約20%高い<br>でも満足は低く、不安と後悔が多い</p></div><div class="arrow">vs</div><div class="panel good"><b>満足化型</b><p class="small">基準を満たせば決める</p><p>このガイドの方式<br>NGなし+必須を満たす+歓迎が多い</p></div></div></div>
+</section>
+<!-- 第3部 -->
+<div class="part-head p3" id="p3"><h2>第3部 選ぶ</h2><p>方法A:マップから合う職場を探す。方法B:良さそうな職場が本当に合うか確かめる。</p></div>
+
+<section class="area" id="c8">
+<div class="area-title"><span class="no">8</span><h3>方法A:合う職場・働き方・職種を探す</h3></div>
+<p class="key">人気ランキングからではなく、価値観マップから出発する。条件を決め、広く集め、地雷で絞り、採点する。</p>
+<div class="flow">
+<span class="st"><b>A1</b> 価値→条件に翻訳</span><span class="ar">→</span><span class="st"><b>A2</b> NG・必須・歓迎</span><span class="ar">→</span><span class="st"><b>A3</b> 興味で職種の方向</span><span class="ar">→</span><span class="st"><b>A4</b> 働き方</span><span class="ar">→</span><span class="st"><b>A5</b> 30-50社集める</span><span class="ar">→</span><span class="st"><b>A6</b> 地雷で10-20社に</span><span class="ar">→</span><span class="st"><b>A7</b> 一次情報</span><span class="ar">→</span><span class="st"><b>A8</b> 採点</span><span class="ar">→</span><span class="st"><b>A9</b> マップ更新</span></div>
+
+<h4 style="margin-top:22px">A1 価値を「確かめられる条件」に翻訳する</h4>
+<div class="tbl"><table><tr><th>価値</th><th>職場の条件</th><th>確かめる事実</th></tr>
+<tr><td>自己志向</td><td>裁量、専門性</td><td>若手の担当範囲、職種別採用、研修・資格支援</td></tr>
+<tr><td>刺激</td><td>変化・挑戦</td><td>新規事業、異動頻度、海外の機会</td></tr>
+<tr><td>快楽</td><td>余暇、心地よさ</td><td>残業、年間休日、有給取得</td></tr>
+<tr><td>達成</td><td>正当な評価、成長</td><td>評価制度、昇進スピード、若手の登用例</td></tr>
+<tr><td>権力</td><td>報酬、影響力</td><td>年収モデル、管理職の年齢、事業規模</td></tr>
+<tr><td>安全</td><td>雇用と生活の安定</td><td>業績推移、離職率、福利厚生、転勤</td></tr>
+<tr><td>同調・伝統</td><td>明確なルール、歴史</td><td>職務範囲の明確さ、創業年、地域との関係</td></tr>
+<tr><td>慈善</td><td>仲間を大切に</td><td>1on1頻度、相互支援の仕組み</td></tr>
+<tr><td>普遍主義</td><td>社会貢献、多様性</td><td>事業の社会的影響、多様性の指標</td></tr></table></div>
+<div class="panel" style="margin-top:10px" id="myConditions"><h4>あなたのトップ5 → 条件</h4><p class="small">第4章の Step 6 で書いた「満たされている状態」がここに表示されます。</p></div>
+
+<h4 style="margin-top:22px">A2 条件を3段階に分ける(満足化)</h4>
+<div class="grid3">
+<label class="panel bad"><b>NG条件</b><span class="small"> 1つでも該当で除外(5-10個)</span><textarea data-k="cond_ng" placeholder="例)月残業45h超、固定残業45h超、全国転勤が頻繁"></textarea></label>
+<label class="panel good"><b>必須条件</b><span class="small"> 全部満たす(3個まで)</span><textarea data-k="cond_must" placeholder="例)若手に裁量、評価基準の公開、年間休日120日以上"></textarea></label>
+<label class="panel"><b>歓迎条件</b><span class="small"> 多いほど良い(5-8個)</span><textarea data-k="cond_want" placeholder="例)研修充実、職種別採用、在宅可、社会的意義"></textarea></label>
+</div>
+<p class="small">必須が5個を超えると該当企業が消えて、結局守れなくなる。</p>
+
+<h4 style="margin-top:22px">A3 興味×価値観で職種の方向を出す(仮説)</h4>
+<div class="tbl"><table><tr><th>興味</th><th>価値観の重心</th><th>文系の例</th><th>理系の例</th></tr>
+<tr><td>I 研究的</td><td>自律・好奇心</td><td>リサーチ、経営企画、コンサル</td><td>研究開発、データサイエンス</td></tr>
+<tr><td>I 研究的</td><td>公正・社会貢献</td><td>シンクタンク、公務(分析)</td><td>公衆衛生、環境技術</td></tr>
+<tr><td>S 社会的</td><td>助け合い・家族</td><td>人事・教育、福祉、自治体</td><td>医療・保健、技術サポート</td></tr>
+<tr><td>E 企業的</td><td>達成・権力</td><td>営業、事業開発、商社</td><td>技術営業、PdM</td></tr>
+<tr><td>C 慣習的</td><td>安全・同調</td><td>経理・財務、法務、金融事務</td><td>品質保証、インフラ運用</td></tr>
+<tr><td>A 芸術的</td><td>創造・刺激</td><td>広告・編集・企画</td><td>デザイン、UI/UX、ゲーム</td></tr>
+<tr><td>R 現実的</td><td>安全・秩序</td><td>物流・生産管理</td><td>生産技術、設備、施工管理</td></tr></table></div>
+<label style="display:block;margin-top:8px"><b>私の興味コード(上位3つ)と、調べる職種の候補</b><span class="small"> job tag の職業興味検査で測れる</span><input type="text" data-k="riasec" placeholder="例)ISE:経営企画、マーケティングリサーチ、コンサル、人事(制度設計)、公務"></label>
+<div class="savebar"><button type="button" class="btn" data-save="cond">職場の条件(A1〜A3)を保存(テキスト/PDF)</button></div>
+
+<h4 style="margin-top:22px">A4 働き方の条件</h4>
+<div class="grid3">
+<div class="panel"><b>労働時間</b><p class="small">月残業の上限を決める(45h以下が目安)</p></div>
+<div class="panel"><b>勤務地・転勤</b><p class="small">全国/エリア限定/なし。家族・安全の価値と照合</p></div>
+<div class="panel"><b>通勤</b><p class="small">長い通勤は給与で埋め合わされにくい(通勤のパラドックス)</p></div>
+<div class="panel"><b>在宅勤務</b><p class="small">自律↑ だが若手の学びの機会↓の可能性</p></div>
+<div class="panel"><b>採用形態</b><p class="small">総合職は「配属ガチャ」あり。自律・専門性が上位なら職種別採用や配属確約を歓迎条件に</p></div>
+<div class="panel"><b>組織規模</b><p class="small">大企業/中堅/スタートアップ/公務。安全⇄刺激、裁量の大きさ</p></div>
+</div>
+
+<h4 style="margin-top:22px">A5-A6 広く集めて、地雷で絞る</h4>
+<svg viewBox="0 0 640 170" role="img" aria-label="候補を絞り込む漏斗" style="width:100%;max-width:640px">
+<polygon points="20,10 620,10 520,60 120,60" fill="var(--sky-soft)"/><text x="320" y="40" text-anchor="middle" font-size="14" fill="currentColor">30-50社:職種から逆引き・認定企業・業界地図・人づて(公開データ確認 1社10分)</text>
+<polygon points="120,64 520,64 440,112 200,112" fill="var(--signal-soft)"/><text x="320" y="93" text-anchor="middle" font-size="14" fill="currentColor">10-20社:地雷なし(重みづけ採点 1社30分)</text>
+<polygon points="200,116 440,116 390,162 250,162" fill="var(--forest-soft)"/><text x="320" y="144" text-anchor="middle" font-size="14" fill="currentColor">3-5社:方法Bでフル検証</text></svg>
+<div class="tbl"><table><tr><th>一次選別で見るもの</th><th>どこで</th><th>目安</th></tr>
+<tr><td>月平均残業</td><td>青少年雇用情報、就職四季報、しょくばらぼ</td><td>30h以下が安心、45h超は除外</td></tr>
+<tr><td>3年以内離職率</td><td>同上</td><td>約3割より明らかに高い、または非開示は確認</td></tr>
+<tr><td>有給取得</td><td>同上</td><td>年10日以上 or 取得率70%以上</td></tr>
+<tr><td>固定残業代</td><td>求人票</td><td>45h超は注意</td></tr>
+<tr><td>法令違反</td><td>厚労省の公表事案一覧</td><td>掲載は原則除外</td></tr>
+<tr><td>業績</td><td>決算、四季報</td><td>連続大赤字・大規模リストラは確認</td></tr></table></div>
+
+<h4 style="margin-top:22px">A7 一次情報を取りに行く</h4>
+<div class="grid4">
+<div class="panel"><b>インターン</b><p class="small">仕事の中身と空気。良い面の強調に注意</p></div>
+<div class="panel"><b>OB・OG訪問</b><p class="small">本音と実態。立場の違う2-3人に同じ質問</p></div>
+<div class="panel"><b>口コミ</b><p class="small">多数の声。時期と件数を見る</p></div>
+<div class="panel"><b>逆質問</b><p class="small">評価・配属・若手の働き方。質問例は第9章</p></div>
+</div>
+
+<h4 style="margin-top:22px">A8 重みづけ採点</h4>
+<div class="tool" id="scoreTool"><h4>企業スコアカード</h4>
+<p class="hint">評価軸は価値観マップのトップ5(重み5〜3)+共通3軸(重み3)。点数は1-5、根拠がなければ3。NG・必須を満たさない会社は点数に関係なく「除外」になります。</p>
+<div class="score"><table id="scoreTable"></table></div>
+<div id="scoreVerdict"></div>
+<div class="savebar"><button type="button" class="btn" data-save="score">スコアカードを保存(テキスト/PDF)</button></div></div>
+
+<h4 style="margin-top:22px">A9 経験でマップを更新する</h4>
+<div class="flow"><span class="st">インターン・訪問</span><span class="ar">→</span><span class="st">発見(意外に楽しかった/強い抵抗)</span><span class="ar">→</span><span class="st">順位を入れ替える</span><span class="ar">→</span><span class="st">条件と重みを見直す</span><span class="ar">↺</span></div>
+<p class="small">例)Aさん:繁忙期に家族との時間がないと聞いて強い抵抗 →「家族」を必須条件(月残業45h以下)に格上げ。</p>
+</section>
+
+<section class="area" id="c9">
+<div class="area-title"><span class="no">9</span><h3>方法B:「良い」と感じる職場を確かめる</h3></div>
+<p class="key">直感を否定しない。直感を事実で裏づけるか、修正する。1社2-3時間、最終面接や内定承諾の前に。</p>
+<div class="flow"><span class="st"><b>B0</b> 惹かれる理由を分解</span><span class="ar">→</span><span class="st"><b>B1</b> 地雷</span><span class="ar">→</span><span class="st"><b>B2</b> 12軸を証拠つきで</span><span class="ar">→</span><span class="st"><b>B3</b> トップ5の根拠</span><span class="ar">→</span><span class="st"><b>B4</b> 感覚と実態のずれ</span><span class="ar">→</span><span class="st"><b>B5</b> 事前検死</span><span class="ar">→</span><span class="st"><b>B6</b> 三人称で判定</span></div>
+
+<div class="tool" id="verifyTool"><h4>1社検証シート</h4>
+<p class="hint">入力に応じて、下に判定が出ます。</p>
+<label><b>会社名</b><input type="text" data-k="v_name" placeholder="例)X社"></label>
+
+<div class="stepbox"><h5><i>B0</i>惹かれている理由はどれ?</h5>
+<div class="grid3">
+<div class="panel"><b>表面的</b><div class="small">焦点化の錯覚に注意</div><div id="b0a"></div></div>
+<div class="panel"><b>選考体験</b><div class="small">評価してくれた相手への好意</div><div id="b0b"></div></div>
+<div class="panel good"><b>日々の体験</b><div class="small">満足に効く。ただし要確認</div><div id="b0c"></div></div>
+</div></div>
+
+<div class="stepbox"><h5><i>B1</i>7つの地雷</h5><div id="mineSeg"></div></div>
+
+<div class="stepbox"><h5><i>B2</i>12軸の採点(根拠が書けない軸は3)</h5><div id="axisScore" class="grid2"></div>
+<details style="margin-top:10px"><summary><b>事実を引き出す質問集を開く</b></summary>
+<div class="tbl"><table><tr><th>軸</th><th>こう聞く</th></tr>
+<tr><td>自律性</td><td>入社2年目の方は、どんな判断を自分でしていますか? 上司の承認が必要なのはどこからですか?</td></tr>
+<tr><td>フィードバック</td><td>上司と1対1で話すのは月に何回? 最近受けたフィードバックの例は?</td></tr>
+<tr><td>人間関係</td><td>困ったとき最初に誰に相談しますか? 最近チームで助け合った場面は?</td></tr>
+<tr><td>心理的安全性</td><td>若手が会議で上司と違う意見を言った最近の例は? そのあとどうなりましたか?</td></tr>
+<tr><td>要求の質</td><td>忙しいとき、時間を取られているのは何の作業ですか?</td></tr>
+<tr><td>公正</td><td>評価基準は公開されていますか? 納得できないときはどうしますか?</td></tr>
+<tr><td>意味</td><td>仕事が誰の役に立っているか実感した最近の場面は?</td></tr>
+<tr><td>労働時間</td><td>昨日は何時に退社しましたか? 一番忙しい月は何時ごろまで?</td></tr>
+<tr><td>上司</td><td>上司は任せるタイプ? 細かく指示するタイプ? 部署で違いますか?</td></tr>
+<tr><td>離職</td><td>同期のうち今も在籍しているのは何人くらい? 辞めた理由は?</td></tr></table></div>
+<p class="small">「最近の」「具体例」を聞く。すぐ例が出ないなら、その実態は少ないかもしれない。</p></details></div>
+
+<div class="stepbox"><h5><i>B3</i>トップ5それぞれ、満たされる事実を書ける?</h5><div id="b3rows"></div></div>
+
+<div class="stepbox"><h5><i>B4</i>自分と職場の価値のずれ(事実だけで職場を採点)</h5>
+<p class="small">左=自分にとっての重要度(マップから自動)、右=職場の実態。差が-2以下の価値がトップ3にあると要注意。</p>
+<div id="b4rows"></div></div>
+
+<div class="stepbox"><h5><i>B5</i>事前検死:3年後、この会社を辞めて後悔している。なぜ?</h5>
+<textarea data-k="v_premortem" style="min-height:90px" placeholder="理由 → 確かめる方法 → 起きたときの対処 の順で書く&#10;例)配属先で裁量がない → 配属の決まり方をOB訪問で確認 → 社内公募制度の有無"></textarea></div>
+
+<div class="stepbox"><h5><i>B6</i>親友がこの結果を持って相談してきたら、何と言う?</h5>
+<textarea data-k="v_friend" placeholder="三人称だと判断が賢明になる"></textarea></div>
+<div class="verdict ok" id="verifyVerdict"></div>
+<div class="savebar"><button type="button" class="btn" data-save="verify">検証シートを保存(テキスト/PDF)</button></div>
+</div>
+</section>
+
+<section class="area" id="c10">
+<div class="area-title"><span class="no">10</span><h3>日本の就活に実装する</h3></div>
+<p class="key">公的データで地雷を先に確認し、時期ごとに調べる深さを変える。マップは選考でも入社後でも使う。</p>
+<div class="grid3">
+<div class="panel"><h4>青少年雇用情報</h4><p class="small">若者雇用促進法。応募者が求めれば、企業は3分野それぞれ1つ以上を提供する義務。離職者数、残業、有給など。渋る対応もデータ。</p></div>
+<div class="panel"><h4>就職四季報</h4><p class="small">3年後離職率、残業、有給、年収、転勤。「NA(未回答)」にも注目。</p></div>
+<div class="panel"><h4>しょくばらぼ</h4><p class="small">厚生労働省の職場情報総合サイト。企業が登録した労働時間・休暇などのデータ。</p></div>
+<div class="panel"><h4>job tag</h4><p class="small">職業の仕事内容、スキル、興味検査・価値観検査。</p></div>
+<div class="panel"><h4>認定制度</h4><p class="small"><b>ユースエール</b>(新卒等の離職率20%以下、月平均残業20h以下、有給取得率70%以上か年10日以上 など)、くるみん、えるぼし、健康経営優良法人。</p></div>
+<div class="panel"><h4>有価証券報告書・公表事案</h4><p class="small">人的資本の開示(女性管理職比率、男性育休取得率、男女賃金差)。厚労省の法令違反公表事案。</p></div>
+</div>
+
+<h4 style="margin-top:22px">いつ何をするか</h4>
+<div class="timeline">
+<div class="t"><div class="when">1-2年生</div><p class="small">価値観マップ初版。アルバイト・ゼミを行動実験の場に。<br><b>→ 第4章</b></p></div>
+<div class="t"><div class="when">3年 春</div><p class="small">他者の声で完成。興味検査。条件と職種の方向を決める。<br><b>→ Step 8、A1-A4</b></p></div>
+<div class="t"><div class="when">3年 夏</div><p class="small">30-50社を集め、夏インターンで一次情報。<br><b>→ A5-A7</b></p></div>
+<div class="t"><div class="when">3年 秋冬</div><p class="small">マップ更新、地雷で選別、OB・OG訪問。<br><b>→ A6-A9</b></p></div>
+<div class="t"><div class="when">3年 2-3月</div><p class="small">重みづけ採点、エントリーシート。<br><b>→ A8</b></p></div>
+<div class="t"><div class="when">4年 春夏</div><p class="small">面接。気になる会社ごとに検証。<br><b>→ 第9章</b></p></div>
+<div class="t"><div class="when">内定後</div><p class="small">複数内定を比較して承諾。<br><b>→ 第9章の判定</b></p></div>
+<div class="t"><div class="when">入社後</div><p class="small">年1回の見直しとジョブ・クラフティング。</p></div>
+</div>
+<p class="small">スケジュールは年度・業界で変わる。最新情報は大学のキャリアセンターで確認。</p>
+
+<h4 style="margin-top:22px">マップを選考で使う</h4>
+<div class="grid4">
+<div class="panel"><b>自己PR・ガクチカ</b><p class="small">Step 1・4のエピソードをそのまま使う</p></div>
+<div class="panel"><b>志望動機</b><p class="small">Step 6の「満たされる状態」×A7で集めた会社の事実</p></div>
+<div class="panel"><b>逆質問</b><p class="small">第9章の事実を聞く質問</p></div>
+<div class="panel"><b>面接前</b><p class="small">アファメーション文を読む</p></div>
+</div>
+<p class="small">伝え方は工夫しても中身は偽らない。偽ると、合わない会社に受かる確率が上がるだけ。構造化面接(決まった質問と基準)は非構造化より入社後の成果を予測する(妥当性 約0.51 vs 0.38) <span class="ev meta">メタ分析</span>。基準が明確な選考をする会社は、評価の公正さの手がかりにもなる。</p>
+
+<h4 style="margin-top:22px">複数内定で迷ったら</h4>
+<div class="flow"><span class="st">方法Bで「避けるべき」を外す</span><span class="ar">→</span><span class="st">スコアカードで比較</span><span class="ar">→</span><span class="st">近ければトップ1-2の点を優先</span><span class="ar">→</span><span class="st">事前検死で後悔の少ない方</span><span class="ar">→</span><span class="st">三人称で確認</span></div>
+<p class="small">決めたら、選ばなかった会社との比較を繰り返さない(満足化)。</p>
+
+<h4 style="margin-top:22px">入社後</h4>
+<div class="grid3">
+<div class="panel"><b>仕事の工夫</b><p class="small">やり方・範囲を変える。例:定型業務を効率化し新しい分析に時間を使う</p></div>
+<div class="panel"><b>関係の工夫</b><p class="small">関わる人を変える。例:他部署の専門家に話を聞く</p></div>
+<div class="panel"><b>意味の工夫</b><p class="small">捉え方を変える。例:資料作成を業界を学ぶ機会に</p></div>
+</div>
+<p class="small">ジョブ・クラフティングは熱意・満足・成績と正の関連(Rudolphら 2017) <span class="ev meta">メタ分析</span></p>
+
+<div class="panel" style="margin-top:14px"><h4>辞めるべきか迷ったとき</h4>
+<div class="grid3">
+<div class="panel bad"><b>地雷あり+心身の不調</b><p class="small">健康が最優先。早めに医療機関や相談窓口へ(厚生労働省「こころの耳」、総合労働相談コーナー)。我慢で解決する問題ではない。</p></div>
+<div class="panel" style="border-color:var(--signal)"><b>地雷なし+価値観の大きなずれ</b><p class="small">ジョブ・クラフティングや異動を先に試す。1-2年で埋まらなければ転職を検討。</p></div>
+<div class="panel"><b>何となく不満</b><p class="small">第4章と第9章で原因を特定。「隣の芝生」の可能性も。</p></div>
+</div></div>
+</section>
+
+<section class="area" id="ap">
+<div class="area-title"><span class="no">+</span><h3>付録:用語と出典</h3></div>
+<div class="panel"><h4>用語ミニ辞典</h4><div class="gloss" id="gloss"></div></div>
+<div class="panel" style="margin-top:14px"><h4>主な出典</h4><div class="src" id="srcList"></div>
+<p class="small" style="margin-top:8px">数値の一部はよく知られた研究に基づく概数です。レポート等で引用する際は原典で確認してください。詳しい解説・全文献は「解説&実践ブック」版にあります。</p></div>
+</section>
+</main>
+<footer class="wrap">価値観マップ 実践ガイド(ビジュアル版)― 解説&実践ブックの姉妹版。入力内容はこのブラウザにのみ保存され、共有されません。</footer>
+<div class="save" id="saveToast">保存しました</div>
+<dialog id="saveDlg" aria-labelledby="saveTitle">
+<div class="dlg-head"><h4 id="saveTitle">保存</h4><button type="button" class="mini" id="dlgClose" aria-label="閉じる">×</button></div>
+<div id="saveChoose">
+<p class="small">保存する形式を選んでください。入力内容がこの端末の外に送られることはありません。</p>
+<div class="dlg-opts">
+<button type="button" class="dlg-opt" id="optText"><b>テキスト(Markdown)</b><span>見返す・AIに読み込ませる用。表示された文章をコピー、または .md ファイルで保存します。</span></button>
+<button type="button" class="dlg-opt" id="optPdf"><b>PDF(図・グラフつき)</b><span>人が見返す用。図・グラフ入りのプレビューを開き、そこから印刷・PDFに保存します。</span></button>
+</div></div>
+<div id="saveText" hidden>
+<textarea id="mdOut" readonly spellcheck="false" aria-label="保存するテキスト(Markdown)"></textarea>
+<div class="btns"><button type="button" class="btn" id="mdCopy">コピー</button><button type="button" class="btn ghost" id="mdDl">.mdファイルで保存</button><button type="button" class="btn ghost" id="mdBack">形式の選択に戻る</button></div>
+<p class="small" id="mdMsg" role="status"></p>
+</div>
+</dialog>
+<div id="rpBar" role="toolbar" aria-label="PDF保存のプレビュー"><button type="button" class="btn ghost" id="rpBack">← 戻る</button><button type="button" class="btn" id="rpPrint">印刷・PDFに保存</button><p id="rpHint"></p></div>
+<div id="report"></div>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const KEY="vmap-visual-v1";
+const VALS=[
+ {n:"自己志向",q:"open",d:"自分で考え、選び、創り、探究する。",w:"裁量、専門性、自由な進め方"},
+ {n:"刺激",q:"open",d:"興奮、新しさ、挑戦。",w:"変化の多い仕事、新規事業、海外"},
+ {n:"快楽",q:"hed",d:"自分の喜びと感覚的な満足。",w:"楽しさ、余暇、心地よい環境"},
+ {n:"達成",q:"enh",d:"社会的基準で能力を示し成功する。",w:"成果評価、昇進、競争のある環境"},
+ {n:"権力",q:"enh",d:"地位、威信、人や資源への影響力。",w:"高収入、管理職、影響力の大きさ"},
+ {n:"安全",q:"cons",d:"社会・関係・自分の安定と調和。",w:"雇用の安定、福利厚生、予測可能性"},
+ {n:"同調",q:"cons",d:"他者を害したり規範に反したりしない。",w:"ルールの明確さ、協調的な組織"},
+ {n:"伝統",q:"cons",d:"文化や慣習を尊重する。",w:"老舗、伝統産業、地域への根ざし"},
+ {n:"慈善",q:"trans",d:"身近な人々の幸せを守り高める。",w:"チームへの貢献、仲間思いの職場"},
+ {n:"普遍主義",q:"trans",d:"すべての人と自然への理解・寛容・保護。",w:"社会課題、環境、公共性の高い仕事"}];
+const QN={open:"変化への開放性",enh:"自己高揚",cons:"保守",trans:"自己超越"};
+const QC={open:"var(--sky)",hed:"var(--signal)",enh:"var(--signal)",cons:"var(--muted)",trans:"var(--forest)"};
+const CARDS={"自己志向":["自律(自分で決める)","創造性","知的好奇心","独立","専門性","自分らしさ"],"刺激":["冒険","挑戦","変化","新しい経験","情熱"],"快楽":["楽しさ","余暇","心地よさ","ユーモア","美しさ"],"達成":["成功","有能さ","成長","影響力のある成果","向上心"],"権力":["経済的豊かさ","地位","リーダーシップ","名声・承認","主導権"],"安全":["安定","健康","家族の安全","秩序","予測可能な生活"],"同調":["礼儀","責任","自制","信頼に応える"],"伝統":["伝統の尊重","謙虚さ","信仰・精神性","ふるさと"],"慈善":["友情","誠実さ","思いやり","家族","忠誠","助け合い"],"普遍主義":["公正・正義","社会貢献","多様性の尊重","環境","平和","知恵"]};
+const CAT={};Object.keys(CARDS).forEach(k=>CARDS[k].forEach(c=>CAT[c]=k));
+let S={f:{},cards:{},custom:[],rank:[],ev:{},def:{},gap:{},flags:[],sc:{w:{},co:[{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}}]},b0:[],mines:[null,null,null,null,null,null,null],ax:Array(12).fill(3),b3:{},b4:{}};
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&typeof o==="object")S=Object.assign(S,o);}}catch(e){}
+const badName=v=>/[|]/.test(v)||v in Object.prototype||v.length>30;
+S.custom=(Array.isArray(S.custom)?S.custom:[]).filter(c=>typeof c==="string"&&!badName(c));
+let tmr=null;function save(){clearTimeout(tmr);tmr=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S));const t=$("#saveToast");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),900);}catch(e){}},400);}
+
+/* ---------- generic bars ---------- */
+function bars(el,rows,max){el.innerHTML=barsHTML(rows,max);}
+function barsHTML(rows,max){return rows.map(r=>`<div class="bar"><div>${r.l}${r.e?` <span class="ev ${r.ec||""}">${r.e}</span>`:""}</div><div class="track"><div class="fill ${r.c||""}" style="width:${Math.max(2,Math.min(100,(r.x/max)*100))}%"></div></div><div class="v">${r.v}</div></div>`).join("");}
+bars($("#evLadder"),[{l:"メタ分析・系統的レビュー",x:5,v:"最も高い",ec:"meta",e:""},{l:"RCT・大規模コホート",x:4,v:"高い"},{l:"自然実験",x:3,v:"中〜高"},{l:"横断研究",x:2,v:"中",c:"s"},{l:"書籍・解説記事",x:1,v:"補助",c:"s"}].map(r=>(delete r.e,r)),5);
+bars($("#benefitBars"),[
+ {l:"ACT(価値の明確化が中核の心理療法)の症状改善",x:.57,v:"g≈0.57",e:"メタ分析",ec:"meta"},
+ {l:"健康メッセージ前の自己肯定 → 行動変化",x:.32,v:"d≈0.32",e:"メタ分析",ec:"meta"},
+ {l:"キャリア支援全般の効果",x:.30,v:"d≈0.3",e:"メタ分析",ec:"meta"},
+ {l:"価値観アファメーション → 学業(脅威下の集団)",x:.15,v:"小さいが有意",e:"メタ分析",ec:"meta",c:"s"},
+ {l:"同(脅威のない集団)",x:.01,v:"≈0",c:"h"}],.8);
+bars($("#riskBars"),[
+ {l:"長時間労働(週55h+)→ 脳卒中",x:1.33,v:"1.33倍",c:"h",e:"60万人規模",ec:"meta"},
+ {l:"高ストレイン → 臨床的うつ病",x:1.27,v:"1.27倍",c:"h",e:"メタ分析",ec:"meta"},
+ {l:"努力-報酬不均衡 → うつ病",x:1.49,v:"1.49倍",c:"h",e:"8コホート",ec:"meta"},
+ {l:"高ストレイン → 冠動脈疾患",x:1.23,v:"1.23倍",c:"h",e:"約20万人",ec:"meta"},
+ {l:"努力-報酬不均衡 → 冠動脈疾患",x:1.16,v:"1.16倍",c:"h",e:"メタ分析",ec:"meta"},
+ {l:"長時間労働 → 冠動脈疾患",x:1.13,v:"1.13倍",c:"h",e:"メタ分析",ec:"meta"},
+ {l:"長時間労働 → 抑うつ症状",x:1.14,v:"OR 1.14",c:"h",e:"メタ分析",ec:"meta"}].map(r=>(r.x=(r.x-1)/0.6*1,r)),1);
+bars($("#fitBars"),[
+ {l:"仕事内容との適合 → 職務満足",x:.56,v:"r≈0.56"},
+ {l:"組織との適合 → 組織への愛着",x:.51,v:"r≈0.51"},
+ {l:"仕事内容との適合 → 辞めたい気持ち",x:.46,v:"r≈-0.46",c:"h"},
+ {l:"組織との適合 → 職務満足",x:.44,v:"r≈0.44"},
+ {l:"組織との適合(別々に測って計算)→ 満足",x:.28,v:"r≈0.28",c:"s"},
+ {l:"組織との適合 → 仕事の成績",x:.07,v:"r≈0.07",c:"s"}],.6);
+
+/* ---------- wheel ---------- */
+function wheelSVG(opt){
+ const R=118,cx=160,cy=160;let g="";
+ g+=`<circle cx="${cx}" cy="${cy}" r="${R+26}" fill="none" stroke="var(--line)"/><circle cx="${cx}" cy="${cy}" r="${R*0.62}" fill="none" stroke="var(--line)" stroke-dasharray="3 4"/>`;
+ VALS.forEach((v,i)=>{const ang=(i*36-90)*Math.PI/180;const x=cx+R*Math.cos(ang),y=cy+R*Math.sin(ang);
+  const hl=opt.hl&&opt.hl[v.n];const rad=hl?20:15;
+  g+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)"/>`;
+  g+=`<g class="wv" data-i="${i}" tabindex="${opt.inter?0:-1}" role="${opt.inter?"button":"img"}" aria-label="${v.n}" style="cursor:${opt.inter?"pointer":"default"}"><circle cx="${x}" cy="${y}" r="${rad}" fill="${hl?QC[v.q]:"var(--card)"}" stroke="${QC[v.q]}" stroke-width="2"/>`;
+  g+=`<text x="${x}" y="${y+(y<cy-5?-rad-6:rad+14)}" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">${v.n}</text>`;
+  if(hl) g+=`<text x="${x}" y="${y+5}" text-anchor="middle" font-size="14" font-weight="900" style="fill:var(--on-accent)">${hl}</text>`;
+  g+=`</g>`;});
+ const lab=[["開放性",18,"var(--sky)"],["自己高揚",126,"#A57A10"],["保守",216,"var(--muted)"],["自己超越",306,"var(--forest)"]];
+ lab.forEach(([t,a,c])=>{g+=`<text x="${cx+R*0.38*Math.cos((a-90)*Math.PI/180)}" y="${cy+R*0.38*Math.sin((a-90)*Math.PI/180)+4}" text-anchor="middle" font-size="11" fill="${c}" font-weight="700">${t}</text>`;});
+ return `<svg viewBox="0 0 320 330" style="width:100%;max-width:360px;display:block;margin:auto">${g}</svg>`;}
+$("#heroWheel").innerHTML=wheelSVG({hl:{"自己志向":"1","普遍主義":"2","達成":"3","慈善":"4","安全":"5"}});
+function bindWheel(){ $("#wheel1").innerHTML=wheelSVG({inter:true});
+ $$("#wheel1 .wv").forEach(g=>{const f=()=>{const v=VALS[+g.dataset.i];$("#wheelInfo").innerHTML=`<h4 style="color:${QC[v.q]}">${v.n}</h4><p>${v.d}</p><p class="small">仕事では:${v.w}</p><p class="small">グループ:${v.q==="hed"?"開放性と自己高揚の境目":QN[v.q]}/カード例:${CARDS[v.n].join("、")}</p>`;};g.addEventListener("click",f);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f();}});});}
+bindWheel();
+
+/* ---------- mines ---------- */
+const MINES=[
+ ["長時間労働","週55h以上で脳卒中1.33倍・冠動脈疾患1.13倍(Kivimäkiら2015)","青少年雇用情報の残業、固定残業代の時間数、繁忙期の実態をOB訪問で"],
+ ["高ストレイン","要求が高く裁量がない。冠動脈疾患1.23倍、うつ病1.27倍。忙しさより「決められない」が問題","2年目の人が自分で決めていること、承認の範囲、監視の強さ"],
+ ["努力-報酬不均衡","頑張っても給与・承認・安定・昇進で報われない。うつ病1.49倍","評価の頻度と説明、3・5・10年目の年収、やりがいばかり強調しないか"],
+ ["組織の不公正","決め方が不透明。満足・信頼の低下、心身の不調と関連","評価基準の公開、異議申立て、配属の決め方の説明"],
+ ["職場の無礼","無視・割り込み・軽視。離職意図と r≈0.31。見ている人にも伝染","面接官・社員同士の態度、選考連絡の雑さ"],
+ ["いじめ・ハラスメント","抑うつ r≈0.28、不安 r≈0.34、縦断で将来の不調を予測。日本では過去3年のパワハラ経験 約2割","相談窓口(社外含む)の実態、口コミの時期と頻度、圧迫面接"],
+ ["雇用の不安定","失うかもしれない不安が健康と態度を損なう","業績推移、リストラ歴、他社でも通用するスキルが身につくか"]];
+$("#mineCards").innerHTML=MINES.map((m,i)=>`<div class="panel"><h4 style="color:var(--hazard)">地雷${i+1} ${m[0]}</h4><p class="small">${m[1]}</p><p style="font-size:14px;margin-top:6px"><b>見分け方:</b>${m[2]}</p></div>`).join("");
+const FLAGS=["月平均残業が45hを超える/固定残業代が45h超","3年以内離職率が明らかに高い、または開示を拒む","有給取得が年5日程度にとどまる","若手の仕事の進め方を上司がすべて細かく決める","評価基準が非公開でフィードバックがない","「やりがい」を強調し、給与・昇給の説明があいまい","選考中に人格否定や威圧的な言動がある","社員同士や応募者への態度が無礼","ハラスメント窓口が形だけで社外窓口がない","リストラが繰り返される、業績が長期低迷"];
+function renderFlags(){$("#flagList").innerHTML=FLAGS.map((f,i)=>`<label class="chk"><input type="checkbox" data-fi="${i}" ${S.flags.includes(i)?"checked":""}><span>${f}</span></label>`).join("");
+ $$("#flagList input").forEach(c=>c.addEventListener("change",()=>{const i=+c.dataset.fi;S.flags=S.flags.filter(x=>x!==i);if(c.checked)S.flags.push(i);flagV();save();}));flagV();}
+function flagResult(){const n=S.flags.length;return{cls:n===0?"ok":n<3?"mid":"ng",text:n===0?"チェックなし:次は第6章の良い職場の条件へ":n<3?`${n}個該当:第9章で事実を確認してから判断`:`${n}個該当:候補から外すことを強く検討`};}
+function flagV(){const r=flagResult(),v=$("#flagVerdict");v.className="verdict "+r.cls;v.textContent=r.text;}
+renderFlags();
+
+/* ---------- RIASEC hexagon ---------- */
+const HEX=[["R","現実的","道具・機械・体を使う具体的な作業","物流・現場管理","生産技術、施工管理、設備保全"],["I","研究的","観察、分析、探究","リサーチ、調査分析、編集","研究開発、データサイエンス"],["A","芸術的","創造、表現、型にはまらない活動","広告制作、編集、デザイン","製品デザイン、UI/UX"],["S","社会的","人を助け、教え、世話をする","人事、教育、福祉、公務","医療、技術サポート、教育"],["E","企業的","人を説得し、導き、目標を達成する","営業、企画、経営","技術営業、プロダクトマネージャー"],["C","慣習的","データや書類を正確に整理・処理する","経理、法務、金融事務","品質管理、システム運用"]];
+(function(){let g="";const cx=150,cy=130,R=95;const pts=HEX.map((h,i)=>{const a=(i*60-90)*Math.PI/180;return[cx+R*Math.cos(a),cy+R*Math.sin(a)];});
+ g+=`<polygon points="${pts.map(p=>p.join(",")).join(" ")}" fill="var(--tint)" stroke="var(--line)" stroke-width="2"/>`;
+ HEX.forEach((h,i)=>{const[x,y]=pts[i];g+=`<g class="hx" data-i="${i}" tabindex="0" role="button" aria-label="${h[1]}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="24" fill="var(--card)" stroke="var(--forest)" stroke-width="2"/><text x="${x}" y="${y-2}" text-anchor="middle" font-size="16" font-weight="900" fill="var(--forest)">${h[0]}</text><text x="${x}" y="${y+12}" text-anchor="middle" font-size="9.5" fill="currentColor">${h[1]}</text></g>`;});
+ g+=`<text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="10" fill="var(--muted)">隣=似ている/向かい=似ていない</text>`;
+ $("#hexa").innerHTML=`<svg viewBox="0 0 300 260" style="width:100%;max-width:340px;display:block;margin:auto">${g}</svg>`;
+ $$("#hexa .hx").forEach(el=>{const f=()=>{const h=HEX[+el.dataset.i];$("#hexInfo").innerHTML=`<h4>${h[0]} ${h[1]}</h4><p>${h[2]}が好き</p><p class="small">文系:${h[3]}<br>理系:${h[4]}</p><p class="small">上位3タイプの組み合わせ(例:ISE)で自分の興味を表す。</p>`;};el.addEventListener("click",f);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f();}});});})();
+
+/* ---------- 12 axes ---------- */
+const AX=["自律性(裁量)","フィードバックと成長機会","支え合う人間関係","心理的安全性","挑戦的な要求が多く阻害的な要求が少ない","公正な評価と報酬","仕事の意味・重要性","価値観の適合(組織)","興味の適合(RIASEC)","上司・チームとの適合","仕事の価値の適合","働き方の適合(時間・場所・通勤)"];
+$("#axesCommon").innerHTML=AX.slice(0,7).map((a,i)=>`<span class="pill">${i+1} ${a}</span>`).join("");
+$("#axesFit").innerHTML=AX.slice(7).map((a,i)=>`<span class="pill">${i+8} ${a}</span>`).join("");
+
+/* ---------- fields (textarea/input with data-k) ---------- */
+function bindFields(){$$("[data-k]").forEach(el=>{const k=el.dataset.k;el.value=S.f[k]||"";el.oninput=()=>{S.f[k]=el.value;save();if(k.startsWith("v_"))verify();};});}
+
+/* ---------- card sort ---------- */
+function allCards(){const out=[];Object.keys(CARDS).forEach(k=>CARDS[k].forEach(c=>out.push(c)));return out.concat(S.custom);}
+function starred(){return allCards().filter(c=>S.cards[c]===3);}
+function renderCards(){$("#cards").innerHTML=allCards().map(c=>`<button type="button" class="vcard" data-c="${esc(c)}" data-s="${S.cards[c]||0}">${esc(c)}</button>`).join("");
+ $$("#cards .vcard").forEach(b=>b.onclick=()=>{const c=b.dataset.c;const cur=S.cards[c]||0;const nx=cur===0?3:cur===3?2:cur===2?1:0;S.cards[c]=nx;b.dataset.s=nx;
+  if(nx!==3&&S.rank.includes(c)){S.rank=S.rank.filter(x=>x!==c);}
+  if(nx===3&&!S.rank.includes(c))S.rank.push(c);
+  starInfo();renderRank();save();});starInfo();}
+function starInfo(){const n=starred().length;$("#starCount").textContent=`非常に重要:${n}枚`+(n>15?"(15枚以下に絞ろう)":"");}
+$("#addCard").onclick=()=>{const inp=$("#newCard"),v=inp.value.trim();
+ const err=!v?"":badName(v)?"「|」を含む名前や30文字を超える名前、予約語は使えません。":allCards().includes(v)?"同じ名前のカードがすでにあります。":"";
+ inp.setCustomValidity(err);if(err){inp.reportValidity();return;}if(!v)return;
+ S.custom.push(v);inp.value="";renderCards();save();};
+$("#newCard").oninput=()=>$("#newCard").setCustomValidity("");
+
+/* ---------- pairwise ---------- */
+let P=null;
+$("#startPair").onclick=()=>{let list=starred();if(list.length<2){$("#pairArea").innerHTML=`<p class="small" style="color:var(--hazard)">Step 2で「非常に重要」を2枚以上選んでください。</p>`;return;}
+ let note="";if(list.length>10){list=S.rank.filter(c=>list.includes(c)).slice(0,10);note=`<p class="small">多いので、現在の順位の上位10枚で比較します。</p>`;}
+ const pairs=[];for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++)pairs.push(Math.random()<.5?[list[i],list[j]]:[list[j],list[i]]);
+ pairs.sort(()=>Math.random()-.5);P={list,pairs,idx:0,wins:Object.fromEntries(list.map(c=>[c,0])),note};showPair();};
+function showPair(){if(!P)return;if(P.idx>=P.pairs.length){const order=P.list.slice().sort((a,b)=>P.wins[b]-P.wins[a]);const rest=S.rank.filter(c=>!order.includes(c));S.rank=order.concat(rest);
+  $("#pairArea").innerHTML=`<div class="verdict ok">比較完了。勝ち数:${order.map(c=>`${esc(c)} ${P.wins[c]}`).join(" / ")}</div>`;P=null;renderRank();save();return;}
+ const[a,b]=P.pairs[P.idx];$("#pairArea").innerHTML=`${P.note}<p><b>人生でどちらか一方しか守れないとしたら?</b> <span class="small">(${P.idx+1}/${P.pairs.length})迷ったら「親友ならどちらを勧める?」</span></p><div class="pair"><button type="button" data-w="${esc(a)}">${esc(a)}</button><button type="button" data-w="${esc(b)}">${esc(b)}</button></div>`;
+ $$("#pairArea .pair button").forEach(bt=>bt.onclick=()=>{P.wins[bt.dataset.w]++;P.idx++;showPair();});}
+
+/* ---------- rank list ---------- */
+function top5(){return S.rank.filter(c=>S.cards[c]===3).slice(0,5);}
+const held=c=>!!(S.ev[c]&&S.ev[c].hold);
+function renderRank(){S.rank=S.rank.filter(c=>S.cards[c]===3);starred().forEach(c=>{if(!S.rank.includes(c))S.rank.push(c);});
+ // 保留中の価値は常に保留でない価値の後ろに置く
+ S.rank=S.rank.filter(c=>!held(c)).concat(S.rank.filter(held));
+ const r=S.rank,nh=r.filter(c=>!held(c)).length;
+ $("#rankList").innerHTML=r.length?r.map((c,i)=>`<li style="${i>=5||held(c)?"opacity:.6":""}"><b>${i+1}</b><span>${esc(c)} <span class="small">${esc(CAT[c]||"その他")}${i>=5?"・準候補":""}${held(c)?"・保留":""}</span></span><span>${held(c)?`<button class="mini" data-uh="${i}">保留を解除</button>`:`<button class="mini" data-u="${i}" aria-label="上へ">↑</button> <button class="mini" data-d="${i}" aria-label="下へ" ${i>=nh-1?"disabled":""}>↓</button>`}</span></li>`).join(""):`<li><span></span><span class="small">まだありません。Step 2で「非常に重要」を選ぶとここに並びます。</span><span></span></li>`;
+ $$("#rankList [data-u]").forEach(b=>b.onclick=()=>{const i=+b.dataset.u;if(i>0){[r[i-1],r[i]]=[r[i],r[i-1]];renderRank();save();}});
+ $$("#rankList [data-d]").forEach(b=>b.onclick=()=>{const i=+b.dataset.d;if(i<nh-1){[r[i+1],r[i]]=[r[i],r[i+1]];renderRank();save();}});
+ $$("#rankList [data-uh]").forEach(b=>b.onclick=()=>{const c=r[+b.dataset.uh];S.ev[c]=Object.assign(S.ev[c]||{},{hold:false});renderRank();save();});
+ renderTop5Dependent();}
+
+/* ---------- top5 dependent parts ---------- */
+function renderTop5Dependent(){const t=top5();
+ const empty=`<p class="small">Step 3でトップ5が決まると表示されます。</p>`;
+ // Step4
+ $("#evidenceRows").innerHTML=t.length?t.map(c=>{const e=S.ev[c]||{};return `<div class="row5"><div class="nm">${esc(c)}</div><div><textarea data-ev="${esc(c)}" placeholder="裏づけるエピソード(Step 1の出来事から)">${esc(e.t||"")}</textarea><label class="small"><input type="checkbox" data-hold="${esc(c)}" ${e.hold?"checked":""}> 証拠が見つからない → 保留にする(順位を下げて次点を検証)</label></div></div>`;}).join(""):empty;
+ $$("[data-ev]").forEach(x=>x.oninput=()=>{const c=x.dataset.ev;S.ev[c]=Object.assign(S.ev[c]||{},{t:x.value});save();});
+ $$("[data-hold]").forEach(x=>x.onchange=()=>{const c=x.dataset.hold;S.ev[c]=Object.assign(S.ev[c]||{},{hold:x.checked});renderRank();save();});
+ const nHeld=t.filter(held).length;if(nHeld)$("#evidenceRows").insertAdjacentHTML("beforeend",`<p class="small" style="color:var(--hazard)">保留中の価値が${nHeld}つトップ5に残っています。Step 2で「非常に重要」の候補を増やすと、次点と入れ替わります。</p>`);
+ // Step5
+ const A=mapAnalysis();
+ $("#myWheel").innerHTML=wheelSVG({hl:A.hl});
+ $("#mapReading").innerHTML=t.length?mapReadingHTML(A):empty;
+ // Step6
+ $("#defRows").innerHTML=t.length?t.map(c=>{const d=S.def[c]||{};return `<div class="row5"><div class="nm">${esc(c)}</div><div class="grid2" style="gap:8px"><input type="text" data-dm="${esc(c)}" value="${esc(d.m||"")}" placeholder="私にとっての意味(1文)"><input type="text" data-ds="${esc(c)}" value="${esc(d.s||"")}" placeholder="満たされているときの具体的な状態"></div></div>`;}).join(""):empty;
+ $$("[data-dm]").forEach(x=>x.oninput=()=>{const c=x.dataset.dm;S.def[c]=Object.assign(S.def[c]||{},{m:x.value});save();renderConds();});
+ $$("[data-ds]").forEach(x=>x.oninput=()=>{const c=x.dataset.ds;S.def[c]=Object.assign(S.def[c]||{},{s:x.value});save();renderConds();});
+ // Step7
+ $("#gapRows").innerHTML=t.length?`<div class="slider small"><span class="nm"></span><span>大切さ</span><span>今の実現度</span><span class="gapv">差</span></div>`+t.map(c=>{const g=S.gap[c]||[8,5];return `<div class="slider"><span class="nm"><b>${esc(c)}</b></span><input type="range" min="0" max="10" value="${g[0]}" data-gi="${esc(c)}" aria-label="${esc(c)}の大切さ"><input type="range" min="0" max="10" value="${g[1]}" data-ga="${esc(c)}" aria-label="${esc(c)}の実現度"><span class="gapv" id="gv-${t.indexOf(c)}">${g[0]-g[1]}</span></div><input type="text" data-act="${esc(c)}" value="${esc((S.gap[c]&&S.gap[c][2])||"")}" placeholder="今週できる小さな行動" style="margin:0 0 8px">`;}).join(""):empty;
+ const upd=(c)=>{const g=gapOf(c);const i=t.indexOf(c);const el=$("#gv-"+i);if(el){const d=g[0]-g[1];el.textContent=d;el.style.color=gapColor(d);}};
+ $$("[data-gi]").forEach(x=>x.oninput=()=>{const c=x.dataset.gi;S.gap[c]=S.gap[c]||[8,5,""];S.gap[c][0]=+x.value;upd(c);save();});
+ $$("[data-ga]").forEach(x=>x.oninput=()=>{const c=x.dataset.ga;S.gap[c]=S.gap[c]||[8,5,""];S.gap[c][1]=+x.value;upd(c);save();});
+ $$("[data-act]").forEach(x=>x.oninput=()=>{const c=x.dataset.act;S.gap[c]=S.gap[c]||[8,5,""];S.gap[c][2]=x.value;save();});
+ t.forEach(upd);
+ renderConds();renderScore();renderVerify();}
+
+/* ---------- 分析(画面・テキスト保存・PDF保存で共用) ---------- */
+const gapOf=c=>S.gap[c]||[8,5,""];
+const gapColor=d=>d>=4?"var(--hazard)":d>=2?"var(--gold)":"var(--forest)";
+const diffColor=d=>d<=-2?"var(--hazard)":d>=2?"var(--gold)":"var(--forest)";
+function mapAnalysis(){const t=top5();
+ const hl={};t.forEach((c,i)=>{const cat=CAT[c];if(cat&&!hl[cat])hl[cat]=String(i+1);else if(cat)hl[cat]+=","+(i+1);});
+ const cnt={open:0,enh:0,cons:0,trans:0};t.forEach((c,i)=>{const v=VALS.find(v=>v.n===CAT[c]);if(!v)return;const w=5-i;if(v.q==="hed"){cnt.open+=w/2;cnt.enh+=w/2;}else cnt[v.q]+=w;});
+ const mx=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a]);
+ const center=!cnt[mx[0]]?"判定なし(トップ5が円環外の価値のみ)":QN[mx[0]]+(cnt[mx[1]]>0&&cnt[mx[1]]>=cnt[mx[0]]*0.6?" と "+QN[mx[1]]:"");
+ const zero=Object.keys(cnt).filter(k=>cnt[k]===0).map(k=>QN[k]);
+ const conf=[];if(cnt.open&&cnt.cons)conf.push("開放性 ⇄ 保守(挑戦と安定)");if(cnt.enh&&cnt.trans)conf.push("自己高揚 ⇄ 自己超越(成果・報酬と貢献)");
+ return{t,hl,center,zero,conf,other:t.filter(c=>!CAT[c])};}
+function mapReadingHTML(a){return `<h4>あなたのマップの読み方</h4><p><b>重心:</b>${esc(a.center)}</p><p><b>空白の象限:</b>${a.zero.length?a.zero.join("、"):"なし(バランス型)"}</p><p><b>葛藤軸:</b>${a.conf.length?a.conf.join("<br>"):"大きな対立なし"}</p>${a.other.length?`<p class="small">円環外の価値:${a.other.map(esc).join("、")}</p>`:""}<p class="small">葛藤軸は欠点ではなく設計情報。両方を満たす職場(例:挑戦できるが雇用は安定)を探す手がかりになる。</p>`;}
+
+function renderConds(){const t=top5();$("#myConditions").innerHTML=`<h4>あなたのトップ5 → 条件</h4>`+(t.length?`<div class="tbl"><table><tr><th>順位</th><th>価値</th><th>満たされている状態(Step 6)</th><th>Schwartz</th></tr>${t.map((c,i)=>`<tr><td>${i+1}</td><td><b>${esc(c)}</b></td><td>${esc((S.def[c]&&S.def[c].s)||"—(Step 6で記入)")}</td><td>${esc(CAT[c]||"その他")}</td></tr>`).join("")}</table></div><p class="small">上の辞書を使って「確かめる事実」に落とし込み、A2の必須・歓迎条件に書き写す。</p>`:`<p class="small">第4章の価値観マップ・メーカーでトップ5を決めると表示されます。</p>`);}
+
+$("#affTpl").onclick=()=>{const t=top5();if(!t.length)return;const c=t[0];const e=(S.ev[c]&&S.ev[c].t)||"〇〇の経験";const d=(S.def[c]&&S.def[c].m)||"〇〇";
+ const el=$('[data-k="affirm"]');el.value=`私は「${c}」を大切にしている。それは私にとって、${d}ということだ。${e}で、そのことを強く感じた。この価値は、進路や日々の選択で迷ったとき、私の判断を支えている。結果がどうであれ、この価値に沿って行動した自分を誇りに思う。`;S.f.affirm=el.value;save();};
+
+/* ---------- score tool ---------- */
+function scoreAxes(){const t=top5();const base=t.length?t:["価値1","価値2","価値3","価値4","価値5"];const dw=[5,4,4,3,3];
+ return base.map((c,i)=>({k:"v:"+c,l:c,w:dw[i]})).concat([{k:"c:rel",l:"人間関係・心理的安全性",w:3},{k:"c:fair",l:"公正な評価と報酬",w:3},{k:"c:time",l:"労働時間・働き方",w:3}]);}
+function renderScore(){const ax=scoreAxes(),co=S.sc.co;
+ const opt=v=>[1,2,3,4,5].map(n=>`<option ${n===v?"selected":""}>${n}</option>`).join("");
+ let h=`<thead><tr><th>評価軸</th><th>重み</th>${co.map((c,j)=>`<th><input type="text" data-cn="${j}" value="${esc(c.n)}" placeholder="会社${j+1}"></th>`).join("")}</tr></thead><tbody>`;
+ ax.forEach(a=>{const w=wOf(a);h+=`<tr><td>${esc(a.l)}</td><td><input class="w" type="number" min="0" max="5" data-wt="${esc(a.k)}" value="${w}" aria-label="${esc(a.l)}の重み"></td>${co.map((c,j)=>`<td><select data-sc="${j}|${esc(a.k)}" aria-label="${esc(a.l)} 会社${j+1}">${opt(c.s[a.k]||3)}</select></td>`).join("")}</tr>`;});
+ h+=`<tr><td style="color:var(--hazard)">NG条件に該当</td><td></td>${co.map((c,j)=>`<td><input type="checkbox" data-ng="${j}" ${c.ng?"checked":""} aria-label="会社${j+1}はNGに該当"></td>`).join("")}</tr>`;
+ h+=`<tr><td style="color:var(--forest)">必須条件をすべて満たす</td><td></td>${co.map((c,j)=>`<td><input type="checkbox" data-mu="${j}" ${c.must?"checked":""} aria-label="会社${j+1}は必須を満たす"></td>`).join("")}</tr></tbody><tfoot><tr><td>合計(重み×点数)</td><td></td>${co.map((c,j)=>`<td id="tot${j}"></td>`).join("")}</tr></tfoot>`;
+ $("#scoreTable").innerHTML=h;
+ $$("#scoreTable [data-cn]").forEach(x=>x.oninput=()=>{co[+x.dataset.cn].n=x.value;calcScore();save();});
+ $$("#scoreTable [data-wt]").forEach(x=>x.oninput=()=>{S.sc.w[x.dataset.wt]=Math.max(0,Math.min(5,+x.value||0));calcScore();save();});
+ $$("#scoreTable [data-sc]").forEach(x=>x.onchange=()=>{const v=x.dataset.sc,p=v.indexOf("|");co[+v.slice(0,p)].s[v.slice(p+1)]=+x.value;calcScore();save();});
+ $$("#scoreTable [data-ng]").forEach(x=>x.onchange=()=>{co[+x.dataset.ng].ng=x.checked;calcScore();save();});
+ $$("#scoreTable [data-mu]").forEach(x=>x.onchange=()=>{co[+x.dataset.mu].must=x.checked;calcScore();save();});
+ calcScore();}
+const wOf=a=>S.sc.w[a.k]!=null?S.sc.w[a.k]:a.w;
+function scoreResults(){const ax=scoreAxes(),co=S.sc.co;const res=co.map((c,j)=>{let s=0,m=0;ax.forEach(a=>{const w=wOf(a);s+=w*(c.s[a.k]||3);m+=w*5;});return{n:c.n||`会社${j+1}`,s,m,ng:!!c.ng,must:!!c.must,ok:!c.ng&&!!c.must,c,used:!!(c.n||c.ng||c.must||Object.keys(c.s).length)};});
+ const ok=res.filter(r=>r.ok).sort((a,b)=>b.s-a.s);const out=res.filter(r=>r.ng);
+ let msg,cls;if(ok.length){msg=`有力候補:${ok[0].n}(${ok[0].s}点)`+(ok[1]&&ok[0].s-ok[1].s<=5?`。${ok[1].n}と僅差なので、トップ1-2の価値の点数が高い方を優先し、方法Bで両方を検証。`:"。次は方法Bで検証。");cls="ok";}
+ else if(out.length===res.length){msg="すべてNGに該当。A5に戻って母集団を広げる。";cls="ng";}
+ else{msg="「必須条件をすべて満たす」会社がまだない。情報が足りなければA7で確認、足りていれば必須条件を見直す(3個以内)。";cls="mid";}
+ if(out.length&&cls!=="ng")msg+=` NG該当(除外):${out.map(r=>r.n).join("、")}。`;
+ return{ax,res,cls,msg};}
+function scoreBarsHTML(res){return `<div class="bars" style="margin-top:12px">${res.map(r=>`<div class="bar"><div>${esc(r.n)}</div><div class="track"><div class="fill ${r.ng?"h":r.ok?"":"s"}" style="width:${r.m?Math.max(2,r.s/r.m*100):0}%"></div></div><div class="v">${r.ng?"除外":r.s}</div></div>`).join("")}</div>`;}
+function calcScore(){const R=scoreResults();
+ R.res.forEach((r,j)=>{const el=$("#tot"+j);el.innerHTML=`${r.s}<div class="small">/${r.m}</div>`;el.style.color=r.ng?"var(--hazard)":"";});
+ $("#scoreVerdict").innerHTML=scoreBarsHTML(R.res)+`<div class="verdict ${R.cls}">${esc(R.msg)}</div>`;}
+
+/* ---------- verify tool ---------- */
+const B0=[["知名度・ブランド","有名企業に入れる","初任給が高い","オフィスがきれい"],["面接官が感じよかった","選考が早かった・高く評価された"],["仕事内容に興味がある","社員同士が支え合っていた","若手に裁量がある","残業が少ない"]];
+function renderVerify(){["#b0a","#b0b","#b0c"].forEach((id,gi)=>{$(id).innerHTML=B0[gi].map((t,ti)=>{const k=gi+"-"+ti;return `<label class="chk" style="font-size:14px"><input type="checkbox" data-b0="${k}" ${S.b0.includes(k)?"checked":""}><span>${t}</span></label>`;}).join("");});
+ $$("[data-b0]").forEach(x=>x.onchange=()=>{const k=x.dataset.b0;S.b0=S.b0.filter(y=>y!==k);if(x.checked)S.b0.push(k);verify();save();});
+ $("#mineSeg").innerHTML=MINES.map((m,i)=>`<div class="mine"><span>${m[0]}</span><div class="seg" role="group" aria-label="${m[0]}">${["なし","不明","あり"].map((l,v)=>`<button type="button" data-mi="${i}" data-v="${v}" class="${S.mines[i]===v?"on":""}">${l}</button>`).join("")}</div></div>`).join("");
+ $$("[data-mi]").forEach(b=>b.onclick=()=>{const i=+b.dataset.mi,v=+b.dataset.v;S.mines[i]=S.mines[i]===v?null:v;$$(`[data-mi="${i}"]`).forEach(x=>x.classList.toggle("on",+x.dataset.v===S.mines[i]));verify();save();});
+ $("#axisScore").innerHTML=AX.map((a,i)=>`<div class="mine" style="grid-template-columns:1fr 70px"><span style="font-size:14px">${i+1} ${a}</span><select data-ax="${i}" aria-label="${a}">${[1,2,3,4,5].map(n=>`<option ${n===S.ax[i]?"selected":""}>${n}</option>`).join("")}</select></div>`).join("");
+ $$("[data-ax]").forEach(x=>x.onchange=()=>{S.ax[+x.dataset.ax]=+x.value;verify();save();});
+ const t=top5();
+ $("#b3rows").innerHTML=t.length?t.map((c,i)=>{const o=S.b3[c]||{};return `<div class="row5"><div class="nm">${i+1} ${esc(c)}</div><div><input type="text" data-b3t="${esc(c)}" value="${esc(o.t||"")}" placeholder="この職場でこの価値が満たされると言える事実"><label class="small"><input type="checkbox" data-b3="${esc(c)}" ${o.ok?"checked":""}> 具体的な事実で書けた</label></div></div>`;}).join(""):`<p class="small">第4章でトップ5を決めると表示されます。</p>`;
+ $$("[data-b3t]").forEach(x=>x.oninput=()=>{const c=x.dataset.b3t;S.b3[c]=Object.assign(S.b3[c]||{},{t:x.value});save();});
+ $$("[data-b3]").forEach(x=>x.onchange=()=>{const c=x.dataset.b3;S.b3[c]=Object.assign(S.b3[c]||{},{ok:x.checked});verify();save();});
+ const imp=selfImp();
+ $("#b4rows").innerHTML=VALS.map(v=>{const me=imp[v.n],co=S.b4[v.n]||3,d=co-me;return `<div class="mine" style="grid-template-columns:7em 1fr 90px 3em"><b>${v.n}</b><span class="small">自分 ${"●".repeat(me)}${"○".repeat(5-me)}</span><select data-b4="${v.n}" aria-label="${v.n}の職場の実態">${[1,2,3,4,5].map(n=>`<option ${n===co?"selected":""}>${n}</option>`).join("")}</select><span id="d-${v.n}" style="font-weight:700;color:${diffColor(d)}">${d>0?"+":""}${d}</span></div>`;}).join("");
+ $$("[data-b4]").forEach(x=>x.onchange=()=>{S.b4[x.dataset.b4]=+x.value;renderVerifyDiff();verify();save();});
+ verify();}
+function selfImp(){const t=top5();const imp={};VALS.forEach(v=>{let m=1;CARDS[v.n].forEach(c=>{const s=S.cards[c]||0;if(s===2)m=Math.max(m,2);if(s===3)m=Math.max(m,3);});imp[v.n]=m;});t.forEach((c,i)=>{const k=CAT[c];if(k)imp[k]=Math.max(imp[k],i<2?5:4);});return imp;}
+function renderVerifyDiff(){const imp=selfImp();VALS.forEach(v=>{const d=(S.b4[v.n]||3)-imp[v.n];const el=$("#d-"+v.n);if(el){el.textContent=(d>0?"+":"")+d;el.style.color=diffColor(d);}});}
+function verify(){const el=$("#verifyVerdict");if(!el)return;const R=verifyResult();
+ el.className="verdict "+R.cls;el.innerHTML=esc(R.msg)+(R.notes.length?`<div class="small" style="font-weight:400;margin-top:6px">${R.notes.map(esc).join("<br>")}</div>`:"");}
+function verifyResult(){const t=top5();const name=S.f.v_name||"この会社";
+ const mineYes=S.mines.filter(x=>x===2).length,mineUnk=S.mines.filter(x=>x===1||x==null).length;
+ const yes=t.filter(c=>S.b3[c]&&S.b3[c].ok).length,top1=t[0]&&S.b3[t[0]]&&S.b3[t[0]].ok;
+ const imp=selfImp();const topCats=[...new Set(t.map(c=>CAT[c]).filter(Boolean))].slice(0,3);const worst=topCats.length?Math.min(...topCats.map(k=>(S.b4[k]||3)-imp[k])):0;
+ const surf=S.b0.filter(k=>k[0]==="0"||k[0]==="1").length,daily=S.b0.filter(k=>k[0]==="2").length;
+ const unknownAx=S.ax.filter(x=>x===3).length;
+ let cls,msg;
+ if(mineYes){cls="ng";msg=`${name}:避けるべき(地雷「あり」が${mineYes}つ)。配属先で当てはまらないと確認できない限り見送る。`;}
+ else if(mineUnk>=3){cls="mid";msg=`${name}:判定保留。地雷の「不明・未入力」が${mineUnk}つ。OB・OG訪問や青少年雇用情報で先に確認する。`;}
+ else if(!t.length){cls="mid";msg="第4章でトップ5を決めると、B3・B4を含めた判定が出ます。";}
+ else if(yes>=4&&top1&&worst>=-1){cls="ok";msg=`${name}:本当に合っている可能性が高い。B5で挙げたリスクへの対処を決めて進む。`;}
+ else if(yes>=3&&worst>=-2){cls="mid";msg=`${name}:条件つきで合っている。ずれ(最大 ${worst})と根拠の足りない価値について追加情報を取る。`;}
+ else{cls="mid";msg=`${name}:感覚と実態がずれている可能性。根拠を書けた価値は${yes}/5、トップ価値のずれは最大 ${worst}。「良い」と感じる理由(B0)を見直し、他の候補と比べる。`;}
+ const notes=[];if(surf>daily)notes.push("惹かれる理由が表面・選考体験に偏っています(焦点化の錯覚・ハロー効果に注意)。");if(unknownAx>=6)notes.push(`12軸のうち${unknownAx}軸が3点(不明/根拠なし)。質問集で情報を取りに行く。`);
+ return{cls,msg,notes};}
+
+/* ---------- glossary & sources ---------- */
+const GL=[["価値観","場面を超えて選択を方向づける「大切さ」の順位"],["Schwartzの円環","10の価値。隣は両立、向かいは葛藤"],["価値観アファメーション","大切な価値を短く書く。脅威下の緩衝材"],["自己一致モデル","価値観に沿う目標は続き、達成で幸福が増す"],["内的・外的自己認識","自分の内面の理解/他者からの見え方の理解"],["反芻と内省","不安からの堂々巡り/好奇心からの探究"],["自己距離化","三人称で考えて判断を賢明にする"],["知的謙虚さ","証拠で自分の考えを修正できる性質"],["高ストレイン","要求が高く裁量が低い状態"],["努力-報酬不均衡","努力に見合う給与・承認・安定がない状態"],["職場の無礼","害意があいまいな低強度の失礼な行動"],["職務特性","多様性・完結性・重要性・自律性・フィードバック"],["自己決定理論","自律性・有能感・関係性の3欲求"],["JD-Rモデル","要求は疲れ、資源は熱意を生む"],["心理的安全性","失敗や反対を言っても罰せられない信念"],["P-E適合","個人と仕事・組織・チーム・上司の一致"],["RIASEC","6つの職業興味タイプ"],["満足化","基準を満たせば決める選び方"],["事前検死","失敗した未来を想像して原因を洗い出す"],["ジョブ・クラフティング","仕事のやり方・関係・意味を自分で工夫"]];
+$("#gloss").innerHTML=GL.map(g=>`<div><b>${g[0]}</b>:${g[1]}</div>`).join("");
+const SRC=[["Schwartz 基本的人間価値理論","https://scholarworks.gvsu.edu/orpc/vol2/iss1/11/"],["Miller et al.(2001)Personal Values Card Sort",""],["Wu, Spreckelsen & Cohen(2021)価値観アファメーションのメタ分析","https://ouci.dntb.gov.ua/en/works/legZObk7/"],["Sheldon & Elliot(1999)自己一致モデル",""],["Eurich(2017, 2018)自己認識の研究","https://hbr.org/podcast/2018/06/how-to-become-more-self-aware"],["Trapnell & Campbell(1999)反芻と内省",""],["Grossmann & Kross(2014)ソロモンのパラドックス",""],["Leary et al.(2017)知的謙虚さ",""],["Kivimäki et al.(2015, Lancet)長時間労働","https://www.thelancet.com/pdfs/journals/lancet/PIIS0140-6736(15)60295-1.pdf"],["Pega et al.(2021)WHO/ILO推計","https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8204267/"],["Madsen et al.(2017)ジョブストレインとうつ病","https://www.cambridge.org/core/journals/psychological-medicine/article/job-strain-as-a-risk-factor-for-clinical-depression-systematic-review-and-metaanalysis-with-additional-individual-participant-data/9EF85F9574FF0B929E01184B7B40B47D"],["Rugulies et al.(2017)努力-報酬不均衡とうつ病",""],["Namin et al.(2021)職場の無礼と離職意図","https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8751201/"],["Verkuil et al.(2015)いじめと精神的健康","https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0135225"],["Sverke et al.(2002)雇用不安","https://www.semanticscholar.org/paper/No-security:-a-meta-analysis-and-review-of-job-and-Sverke-Hellgren/2a5fea74ecc95113adf0385104adcb18a8c0333c"],["Humphrey et al.(2007)職務特性のメタ分析","http://www.morgeson.com/downloads/humphrey_nahrgang_morgeson_2007.pdf"],["自己決定理論と職場のメタ分析","https://escholarship.org/uc/item/655196mt"],["Kristof-Brown et al.(2005)適合のメタ分析","https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-6570.2005.00672.x"],["Verquer et al.(2003)組織適合のメタ分析","https://www.sciencedirect.com/science/article/abs/pii/S0001879102000362"],["Oh et al.(2014)適合の国際比較",""],["Judge et al.(2010)給与と満足",""],["Iyengar, Wells & Schwartz(2006)最大化と満足",""],["Schmidt & Hunter(1998)選考方法の妥当性",""],["Rudolph et al.(2017)ジョブ・クラフティング",""],["厚生労働省 新規学卒就職者の離職状況(令和4年3月卒)","https://www.rodo.co.jp/column/206987/"],["厚生労働省 令和5年若年者雇用実態調査","https://jinjibu.jp/news/detl/24261/"]];
+$("#srcList").innerHTML=SRC.map(s=>`<p>${s[1]?`<a href="${s[1]}" target="_blank" rel="noopener">${s[0]}</a>`:s[0]}</p>`).join("");
+
+/* ---------- sample / reset / print ---------- */
+$("#loadSample").onclick=()=>{if(!confirm("Aさんの記入例を読み込みます。今の入力内容は上書きされます。よろしいですか?"))return;S.f=Object.assign({},S.f,{ep_peak:"ゼミで自分で集めたデータから仮説を検証した(分析方法を自分で選び、夜中まで没頭)/塾講師で担当生徒の成績が上がった(教材を自作した)",ep_anger:"サークルで先輩が根拠なく方針を決め、反対意見を封じた",ep_envy:"自分で事業を始めた友人。自分で決めて動いている姿",ep_pride:"実家の店が忙しい時期に、頼まれなくても手伝い続けた",affirm:"",feedback:"ゼミの友人:納得いかないと引かない、調べ物になると止まらない/母:昔から指図が嫌い、家族思い/塾の室長:生徒に合わせる工夫がうまい",cond_ng:"月残業45h超、固定残業45h超、頻繁な全国転勤",cond_must:"若手に裁量、評価基準の公開、年間休日120日以上",cond_want:"研修充実、職種別採用、在宅可、社会的意義が見える事業",riasec:"ISE:経営企画、マーケティングリサーチ、コンサル、人事(制度設計)、公務"});
+ S.cards={};["自律(自分で決める)","知的好奇心","公正・正義","家族","成長","安定","助け合い","経済的豊かさ","挑戦","楽しさ"].forEach(c=>S.cards[c]=3);["健康","誠実さ","専門性","友情"].forEach(c=>S.cards[c]=2);["地位","伝統の尊重","名声・承認"].forEach(c=>S.cards[c]=1);
+ S.rank=["自律(自分で決める)","知的好奇心","公正・正義","家族","成長","助け合い","安定","経済的豊かさ","挑戦","楽しさ"];
+ S.ev={"自律(自分で決める)":{t:"ゼミの分析、起業した友人への羨望、サークルでの怒り"},"知的好奇心":{t:"ゼミの分析で夜中まで没頭"},"公正・正義":{t:"サークルの理不尽な決定への怒り"},"家族":{t:"実家の店の手伝いへの誇り"},"成長":{t:"塾で教え方を工夫し続けた"}};
+ S.def={"自律(自分で決める)":{m:"何をどう進めるかを自分で判断できること",s:"目標だけ決まっていて、やり方は任されている"},"知的好奇心":{m:"わからないことを調べ、仕組みを理解すること",s:"新しい分野を学ぶ時間と機会がある"},"公正・正義":{m:"決定が根拠と公平な手続きで行われること",s:"異論を言っても不利益を受けない"},"家族":{m:"家族を経済的にも時間的にも支えられること",s:"平日の夜と週末に家族と過ごせる"},"成長":{m:"昨日より上手くできるよう工夫し続けること",s:"定期的にフィードバックがある"}};
+ S.gap={"自律(自分で決める)":[10,5,"ゼミ発表のテーマを自分で提案する"],"知的好奇心":[9,7,"業界本を1冊読む"],"公正・正義":[8,4,"サークルの意思決定のルール化を提案"],"家族":[8,6,"週1回実家に電話"],"成長":[7,6,"塾の授業後に振り返りメモ"]};
+ S.sc={w:{},co:[{n:"X社(大手メーカー)",ng:false,must:false,s:{"v:自律(自分で決める)":2,"v:知的好奇心":4,"v:公正・正義":3,"v:家族":4,"v:成長":3,"c:rel":4,"c:fair":3,"c:time":4}},{n:"Y社(中堅コンサル)",ng:true,must:true,s:{"v:自律(自分で決める)":4,"v:知的好奇心":5,"v:公正・正義":4,"v:家族":2,"v:成長":5,"c:rel":3,"c:fair":4,"c:time":2}},{n:"",ng:false,must:false,s:{}}]};
+ S.f.v_name="X社";S.b0=["0-0","0-1","1-0","2-0"];S.mines=[0,1,0,0,0,0,0];S.ax=[2,3,4,4,3,3,3,2,4,3,3,4];
+ S.b3={"知的好奇心":{t:"研修と自己啓発支援が充実",ok:true},"家族":{t:"残業月20h、転勤は数年に1回",ok:true},"成長":{t:"評価面談が年1回",ok:false},"公正・正義":{t:"評価基準は公開",ok:true},"自律(自分で決める)":{t:"若手は資料作成中心",ok:false}};
+ S.b4={"自己志向":2,"刺激":3,"快楽":3,"達成":4,"権力":4,"安全":5,"同調":4,"伝統":3,"慈善":4,"普遍主義":3};
+ S.f.v_premortem="配属先で裁量がなく指示待ちの仕事しかない → 配属の決まり方と若手の業務をOB訪問で確認 → 社内公募制度の有無\n転勤で家族と離れる → 転勤頻度と拒否時の扱い → エリア職への転換制度\n年功的な評価に不満 → 若手の評価事例 → ジョブ・クラフティング";
+ S.f.v_friend="安定と家族の面は良い。でも一番大事な自律が満たされにくいなら、配属と社内公募を確かめてから決めた方がいい。";
+ init();save();};
+$("#resetAll").onclick=()=>{if(!confirm("入力内容をすべて消去します。よろしいですか?"))return;try{localStorage.removeItem(KEY);}catch(e){}location.reload();};
+
+/* ---------- 保存(テキスト=Markdown / PDF=印刷用レポート) ---------- */
+const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;};
+const LV={3:"非常に重要",2:"重要",1:"重要でない"};
+const MINE_L=["なし","不明","あり"],MINE_C=["var(--forest)","var(--gold)","var(--hazard)"];
+const B0G=["表面的","選考体験","日々の体験"];
+const NO_TOP5="(第4章でトップ5が決まると出力されます)";
+const rankStatus=(c,i)=>(i<5?"トップ5":"準候補")+(held(c)?"(保留)":"");
+// Markdown用:表のセルは1行に、自由記述は引用ブロックにして区切りを明確にする
+const cell=s=>String(s==null?"":s).replace(/\r?\n+/g," / ").replace(/\|/g,"｜").trim()||"(未記入)";
+const one=s=>String(s==null?"":s).replace(/\r?\n+/g," / ").trim()||"(未記入)";
+const quote=s=>{s=String(s||"").trim();return s?s.split(/\r?\n/).map(l=>"> "+l).join("\n"):"> (未記入)";};
+const mdTable=(head,rows)=>[`| ${head.map(cell).join(" | ")} |`,`|${head.map(()=>"---").join("|")}|`,...rows.map(r=>`| ${r.map(cell).join(" | ")} |`)].join("\n");
+
+function mdMap(h){const a=mapAnalysis(),t=a.t,L=[];
+ L.push(`${h(1)} Step 1 感情が動いた出来事`);
+ [["ep_peak","ピーク体験(満たされた価値)"],["ep_anger","怒り・違和感(踏みにじられた価値)"],["ep_envy","羨望(まだ満たされていない価値)"],["ep_pride","誇り(中核にある価値)"]].forEach(([k,l])=>L.push(`${h(2)} ${l}`,quote(S.f[k])));
+ L.push(`${h(1)} Step 2 カードソート`,[3,2,1].map(s=>{const cs=allCards().filter(c=>S.cards[c]===s);return `- ${LV[s]}(${cs.length}枚):${cs.length?cs.join("、"):"なし"}`;}).concat(S.custom.length?[`- 自分で追加したカード:${S.custom.join("、")}`]:[]).join("\n"));
+ L.push(`${h(1)} Step 3 順位`,S.rank.length?mdTable(["順位","価値","Schwartzの分類","状態"],S.rank.map((c,i)=>[i+1,c,CAT[c]||"その他",rankStatus(c,i)])):"(「非常に重要」のカードがまだありません)");
+ L.push(`${h(1)} Step 4 エピソードによる検証`,t.length?t.map((c,i)=>{const e=S.ev[c]||{};return `${i+1}. ${c}${e.hold?"(保留:証拠が見つからない)":""}:${one(e.t)}`;}).join("\n"):NO_TOP5);
+ L.push(`${h(1)} Step 5 円環での読み取り`,t.length?[`- 重心:${a.center}`,`- 空白の象限:${a.zero.length?a.zero.join("、"):"なし(バランス型)"}`,`- 葛藤軸:${a.conf.length?a.conf.join("/"):"大きな対立なし"}`,`- トップ5の分類:${t.map((c,i)=>`${i+1}. ${c}=${CAT[c]||"円環外"}`).join("、")}`].join("\n"):NO_TOP5);
+ L.push(`${h(1)} Step 6 自分の言葉での定義`);
+ if(!t.length)L.push(NO_TOP5);else t.forEach((c,i)=>{const d=S.def[c]||{};L.push(`${h(2)} ${i+1}. ${c}`,`- 私にとっての意味:${one(d.m)}\n- 満たされているときの具体的な状態:${one(d.s)}`);});
+ L.push(`${h(2)} アファメーション文`,quote(S.f.affirm));
+ L.push(`${h(1)} Step 7 ギャップと行動実験`,t.length?mdTable(["価値","大切さ(0-10)","今の実現度(0-10)","差","今週できる小さな行動"],t.map(c=>{const g=gapOf(c);return[c,g[0],g[1],g[0]-g[1],g[2]];})):NO_TOP5);
+ L.push(`${h(1)} Step 8 他者からのフィードバック`,quote(S.f.feedback));
+ return L;}
+function mdFlags(){const r=flagResult();return[FLAGS.map((f,i)=>`- [${S.flags.includes(i)?"x":" "}] ${f}`).join("\n"),`**判定:**${r.text}`];}
+function mdConds(h){const t=top5();return[`${h(1)} A1 トップ5 → 職場の条件`,t.length?mdTable(["順位","価値","満たされている状態(Step 6)","Schwartzの分類"],t.map((c,i)=>[i+1,c,S.def[c]&&S.def[c].s,CAT[c]||"その他"])):NO_TOP5,
+ `${h(1)} A2 条件の3段階`,`${h(2)} NG条件(1つでも該当で除外)`,quote(S.f.cond_ng),`${h(2)} 必須条件(すべて満たす)`,quote(S.f.cond_must),`${h(2)} 歓迎条件(多いほど良い)`,quote(S.f.cond_want),
+ `${h(1)} A3 興味コードと調べる職種`,quote(S.f.riasec)];}
+function mdScore(){const R=scoreResults(),u=R.res.filter(r=>r.used);if(!u.length)return["(まだ会社が入力されていません)"];
+ return[mdTable(["評価軸","重み",...u.map(r=>r.n)],R.ax.map(a=>[a.l,wOf(a),...u.map(r=>r.c.s[a.k]||3)]).concat([["NG条件に該当","—",...u.map(r=>r.ng?"該当(除外)":"—")],["必須条件をすべて満たす","—",...u.map(r=>r.must?"満たす":"未確認")],["合計(重み×点数)","—",...u.map(r=>`${r.s}/${r.m}`)]])),`**判定:**${R.msg}`];}
+function mdVerify(h){const R=verifyResult(),t=top5(),imp=selfImp();
+ return[`- 会社名:${one(S.f.v_name)}`,`**判定:**${R.msg}`+(R.notes.length?"\n\n"+R.notes.map(n=>`- ${n}`).join("\n"):""),
+ `${h(1)} B0 惹かれている理由`,B0.map((g,gi)=>{const on=g.filter((x,ti)=>S.b0.includes(gi+"-"+ti));return `- ${B0G[gi]}:${on.length?on.join("、"):"なし"}`;}).join("\n"),
+ `${h(1)} B1 7つの地雷`,mdTable(["地雷","判定"],MINES.map((m,i)=>[m[0],S.mines[i]==null?"未入力":MINE_L[S.mines[i]]])),
+ `${h(1)} B2 12軸の採点(1-5)`,mdTable(["軸","点数"],AX.map((a,i)=>[`${i+1} ${a}`,S.ax[i]])),
+ `${h(1)} B3 トップ5が満たされる事実`,t.length?t.map((c,i)=>{const o=S.b3[c]||{};return `${i+1}. ${c}(${o.ok?"具体的な事実で書けた":"未確認"}):${one(o.t)}`;}).join("\n"):NO_TOP5,
+ `${h(1)} B4 自分と職場の価値のずれ`,mdTable(["価値","自分の重要度(1-5)","職場の実態(1-5)","差"],VALS.map(v=>{const co=S.b4[v.n]||3,d=co-imp[v.n];return[v.n,imp[v.n],co,(d>0?"+":"")+d];})),
+ `${h(1)} B5 事前検死(3年後に辞めて後悔している理由)`,quote(S.f.v_premortem),`${h(1)} B6 親友が相談してきたら何と言うか`,quote(S.f.v_friend)];}
+
+// PDF用:入力欄ではなく文章と図で組み立てる(長文が切れない)
+const rpText=s=>{s=String(s||"").trim();return s?`<p class="rp-txt">${esc(s).replace(/\n/g,"<br>")}</p>`:`<p class="rp-txt rp-empty">(未記入)</p>`;};
+const rpTable=(head,rows)=>`<div class="tbl"><table><tr>${head.map(x=>`<th>${esc(x)}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</table></div>`;
+const rpNone=`<p class="rp-empty">${NO_TOP5}</p>`;
+const chip=(txt,col)=>`<span class="rp-chip" style="background:${col};color:#fff">${esc(txt)}</span>`;
+function htmlMap(){const a=mapAnalysis(),t=a.t;let h="";
+ h+=`<div class="rp-2"><div>${wheelSVG({hl:a.hl})}</div><div class="panel">${t.length?mapReadingHTML(a):rpNone}</div></div>`;
+ h+=`<h3>順位とエピソードによる検証(Step 3・4)</h3>`+(S.rank.length?rpTable(["順位","価値","分類","状態","裏づけるエピソード"],S.rank.map((c,i)=>[i+1,`<b>${esc(c)}</b>`,esc(CAT[c]||"その他"),esc(rankStatus(c,i)),i<5?esc(one(S.ev[c]&&S.ev[c].t)):"—"])):`<p class="rp-empty">(「非常に重要」のカードがまだありません)</p>`);
+ h+=`<h3>自分の言葉での定義(Step 6)</h3>`+(t.length?rpTable(["価値","私にとっての意味","満たされているときの具体的な状態"],t.map((c,i)=>{const d=S.def[c]||{};return[`<b>${i+1}. ${esc(c)}</b>`,esc(one(d.m)),esc(one(d.s))];})):rpNone);
+ h+=`<div class="panel"><h4>アファメーション文</h4>${rpText(S.f.affirm)}</div>`;
+ h+=`<h3>ギャップと行動実験(Step 7)</h3>`+(t.length?`<div class="bars">${t.map(c=>{const g=gapOf(c),d=g[0]-g[1];return `<div class="bar"><div>${esc(c)}</div><div class="track"><div class="fill" style="width:${g[0]*10}%;background:var(--forest-soft)"></div><div class="fill" style="width:${g[1]*10}%"></div></div><div class="v" style="color:${gapColor(d)}">差 ${d}</div></div>`;}).join("")}</div><p class="small">薄い色=大切さ、濃い色=今の実現度(どちらも0-10)。差が大きい価値は職場選びで最重視。</p>`+rpTable(["価値","大切さ","実現度","今週できる小さな行動"],t.map(c=>{const g=gapOf(c);return[esc(c),g[0],g[1],esc(one(g[2]))];})):rpNone);
+ h+=`<h3>感情が動いた出来事(Step 1)</h3><div class="rp-2">${[["ep_peak","ピーク体験","満たされた価値"],["ep_anger","怒り・違和感","踏みにじられた価値"],["ep_envy","羨望","まだ満たされていない価値"],["ep_pride","誇り","中核にある価値"]].map(([k,l,s])=>`<div class="panel"><h4>${l} <span class="small">${s}</span></h4>${rpText(S.f[k])}</div>`).join("")}</div>`;
+ h+=`<h3>カードソート(Step 2)</h3>`+[3,2,1].map(s=>{const cs=allCards().filter(c=>S.cards[c]===s);return `<p><b>${LV[s]}(${cs.length}枚)</b> ${cs.length?cs.map(c=>`<span class="pill">${esc(c)}</span>`).join(""):`<span class="rp-empty">なし</span>`}</p>`;}).join("");
+ h+=`<h3>他者からのフィードバック(Step 8)</h3>`+rpText(S.f.feedback);
+ return h;}
+function htmlFlags(){const r=flagResult();return `<ul class="rp-chk">${FLAGS.map((f,i)=>S.flags.includes(i)?`<li class="on">☑ ${esc(f)}</li>`:`<li class="off">☐ ${esc(f)}</li>`).join("")}</ul><div class="verdict ${r.cls}">${esc(r.text)}</div>`;}
+function htmlConds(){const t=top5();
+ return `<h3>A1 トップ5 → 職場の条件</h3>`+(t.length?rpTable(["順位","価値","満たされている状態(Step 6)","Schwartzの分類"],t.map((c,i)=>[i+1,`<b>${esc(c)}</b>`,esc(one(S.def[c]&&S.def[c].s)),esc(CAT[c]||"その他")])):rpNone)+
+ `<h3>A2 条件の3段階</h3><div class="rp-3"><div class="panel bad"><h4>NG条件</h4><p class="small">1つでも該当で除外</p>${rpText(S.f.cond_ng)}</div><div class="panel good"><h4>必須条件</h4><p class="small">すべて満たす</p>${rpText(S.f.cond_must)}</div><div class="panel"><h4>歓迎条件</h4><p class="small">多いほど良い</p>${rpText(S.f.cond_want)}</div></div>`+
+ `<h3>A3 興味コードと調べる職種</h3>`+rpText(S.f.riasec);}
+function htmlScore(){const R=scoreResults(),u=R.res.filter(r=>r.used);if(!u.length)return `<p class="rp-empty">(まだ会社が入力されていません)</p>`;
+ return rpTable(["評価軸","重み",...u.map(r=>r.n)],R.ax.map(a=>[esc(a.l),wOf(a),...u.map(r=>r.c.s[a.k]||3)]).concat([["NG条件に該当","",...u.map(r=>r.ng?chip("該当(除外)","var(--hazard)"):"—")],["必須条件をすべて満たす","",...u.map(r=>r.must?chip("満たす","var(--forest)"):"未確認")],["<b>合計(重み×点数)</b>","",...u.map(r=>`<b>${r.s}</b> / ${r.m}`)]]))+
+ `<p class="small">点数は1-5(根拠がなければ3)。NG該当の会社は点数に関係なく除外。</p>`+scoreBarsHTML(u)+`<div class="verdict ${R.cls}">${esc(R.msg)}</div>`;}
+function htmlVerify(){const R=verifyResult(),t=top5(),imp=selfImp();
+ return `<p><b>会社名:</b>${esc(one(S.f.v_name))}</p><div class="verdict ${R.cls}">${esc(R.msg)}${R.notes.length?`<div class="small" style="font-weight:400;margin-top:4px">${R.notes.map(esc).join("<br>")}</div>`:""}</div>`+
+ `<h3>B0 惹かれている理由</h3><div class="rp-3">${B0.map((g,gi)=>`<div class="panel${gi===2?" good":""}"><h4>${B0G[gi]}</h4><ul class="rp-chk">${g.map((x,ti)=>S.b0.includes(gi+"-"+ti)?`<li>☑ ${esc(x)}</li>`:`<li class="off">☐ ${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`+
+ `<h3>B1 7つの地雷</h3>`+rpTable(["地雷","判定"],MINES.map((m,i)=>[esc(m[0]),S.mines[i]==null?`<span class="rp-empty">未入力</span>`:chip(MINE_L[S.mines[i]],MINE_C[S.mines[i]])]))+
+ `<h3>B2 12軸の採点(1-5、根拠がなければ3)</h3><div class="bars">${barsHTML(AX.map((a,i)=>({l:esc(`${i+1} ${a}`),x:S.ax[i],v:S.ax[i]+"点",c:S.ax[i]<=2?"h":S.ax[i]===3?"s":""})),5)}</div>`+
+ `<h3>B3 トップ5が満たされる事実</h3>`+(t.length?rpTable(["価値","事実","確認"],t.map((c,i)=>{const o=S.b3[c]||{};return[`<b>${i+1}. ${esc(c)}</b>`,esc(one(o.t)),o.ok?chip("事実で書けた","var(--forest)"):"未確認"];})):rpNone)+
+ `<h3>B4 自分と職場の価値のずれ</h3>`+rpTable(["価値","自分の重要度","職場の実態","差"],VALS.map(v=>{const me=imp[v.n],co=S.b4[v.n]||3,d=co-me;return[esc(v.n),"●".repeat(me)+"○".repeat(5-me),"●".repeat(co)+"○".repeat(5-co),`<b style="color:${diffColor(d)}">${d>0?"+":""}${d}</b>`];}))+`<p class="small">差=職場−自分。トップ3の価値で-2以下は要注意。</p>`+
+ `<h3>B5 事前検死(3年後に辞めて後悔している理由)</h3>`+rpText(S.f.v_premortem)+`<h3>B6 親友が相談してきたら何と言うか</h3>`+rpText(S.f.v_friend);}
+
+const SEC={
+ map:{title:"価値観マップ(第4章)",file:"価値観マップ",pre:"カードの重要度は「非常に重要/重要/重要でない」の3段階。トップ5は順位の上位5つ。ギャップの大切さ・実現度は0-10。",md:mdMap,html:htmlMap},
+ flags:{title:"レッドフラッグ・チェック(第5章)",file:"レッドフラッグ",pre:"気になる会社について、当てはまる項目に [x] がついています。",md:mdFlags,html:htmlFlags},
+ cond:{title:"職場の条件(第8章 A1〜A3)",file:"職場の条件",pre:"価値観マップのトップ5を、職場で確かめられる条件に翻訳したもの。",md:mdConds,html:htmlConds},
+ score:{title:"企業スコアカード(第8章 A8)",file:"企業スコアカード",pre:"点数は1-5(根拠がなければ3)、重みは0-5。合計=Σ(重み×点数)。NG該当の会社は点数に関係なく除外。",md:mdScore,html:htmlScore},
+ verify:{title:"1社検証シート(第9章)",file:"1社検証",pre:"12軸と職場の実態は1-5(根拠がなければ3)。自分の重要度は価値観マップから自動算出した1-5。差=職場−自分で、-2以下は要注意。",md:mdVerify,html:htmlVerify}};
+const UNITS=Object.keys(SEC);
+const saveTitle=k=>k==="all"?"全章の入力内容まとめ":SEC[k].title;
+const fileBase=k=>((k==="all"?"価値観マップ_全章まとめ":SEC[k].file+(k==="verify"&&S.f.v_name?"_"+S.f.v_name:""))+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
+function buildMD(k){const head=[`# ${k==="all"?"価値観マップ 実践ガイド 入力内容まとめ":SEC[k].title}`,`> 出力日:${today()} / 出典:価値観マップ 実践ガイド`+(k!=="all"?`\n> ${SEC[k].pre}`:"")];
+ const body=k==="all"?UNITS.flatMap(u=>[`## ${SEC[u].title}`,`> ${SEC[u].pre}`,...SEC[u].md(n=>"#".repeat(2+n))]):SEC[k].md(n=>"#".repeat(1+n));
+ return head.concat(body).join("\n\n")+"\n";}
+function buildReport(k){const head=`<header class="rp-head"><h1>${esc(k==="all"?"価値観マップ 実践ガイド 入力内容まとめ":SEC[k].title)}</h1><p class="small">出力日 ${today()} ・ 価値観マップ 実践ガイド</p></header>`;
+ return head+(k==="all"?UNITS.map(u=>`<section class="rp-sec"><h2>${esc(SEC[u].title)}</h2>${SEC[u].html()}</section>`).join(""):`<section class="rp-sec">${SEC[k].html()}</section>`);}
+
+let saveKey="all",reportMode=false,titleBak=null,scrollBak=0;
+const dlg=$("#saveDlg");
+// PDFは、レポートを画面にプレビュー表示してから印刷する。
+// 印刷の瞬間だけ表示を切り替える方式は、iPhoneで切り替えが間に合わなかったり印刷が呼べなかったりしたため
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);// iPadOSはMacとして名乗る
+const RP_HINT=!isIOS?"「印刷・PDFに保存」を押し、送信先(プリンター)で「PDFに保存」を選んでください。"
+ :/CriOS|FxiOS|EdgiOS|GSA\//.test(navigator.userAgent)?"印刷画面が開かないときは、ブラウザの共有ボタン(□に↑)から「プリント」を選んでください。プリントオプション上部の共有ボタンから「\"ファイル\"に保存」でPDFになります。"
+ :"「印刷・PDFに保存」→ プリントオプション上部の共有ボタン(□に↑)→「\"ファイル\"に保存」でPDFになります。";
+function openSave(k){saveKey=k;$("#saveTitle").textContent=`「${saveTitle(k)}」を保存`;$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";
+ if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");}
+function closeSave(){if(dlg.close)dlg.close();else dlg.removeAttribute("open");}
+$$("[data-save]").forEach(b=>b.addEventListener("click",()=>openSave(b.dataset.save)));
+$("#dlgClose").onclick=closeSave;
+$("#mdBack").onclick=()=>{$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";};
+$("#optText").onclick=()=>{const ta=$("#mdOut");ta.value=buildMD(saveKey);$("#saveChoose").hidden=true;$("#saveText").hidden=false;ta.scrollTop=0;};
+$("#optPdf").onclick=()=>{closeSave();showReport(saveKey);};
+$("#mdCopy").onclick=async()=>{const ta=$("#mdOut");let ok=false;
+ try{await navigator.clipboard.writeText(ta.value);ok=true;}catch(e){try{ta.focus();ta.select();ok=document.execCommand("copy");}catch(e2){}}
+ $("#mdMsg").textContent=ok?"コピーしました。AIやメモアプリに貼り付けられます。":"自動でコピーできませんでした。テキストを長押し(または Ctrl+A)で選択してコピーしてください。";};
+$("#mdDl").onclick=()=>{const name=fileBase(saveKey)+".md";try{const url=URL.createObjectURL(new Blob([$("#mdOut").value],{type:"text/markdown;charset=utf-8"}));
+ const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$("#mdMsg").textContent=`${name} を保存しました。`;}
+ catch(e){$("#mdMsg").textContent="ファイルを保存できませんでした。「コピー」を使ってください。";}};
+function showReport(k){$("#report").innerHTML=buildReport(k);$("#rpHint").textContent=RP_HINT;
+ if(!reportMode){scrollBak=window.scrollY;titleBak=document.title;try{history.pushState({report:1},"");}catch(e){}}// スマホの「戻る」操作でもプレビューを閉じられるようにする
+ reportMode=true;document.body.classList.add("reporting");
+ document.title=fileBase(k);// Chrome・EdgeではPDFのファイル名の初期値になる
+ window.scrollTo(0,0);$("#rpPrint").focus();}
+function endReport(){if(!reportMode)return;reportMode=false;document.body.classList.remove("reporting");$("#report").innerHTML="";
+ if(titleBak!=null){document.title=titleBak;titleBak=null;}window.scrollTo(0,scrollBak);}
+$("#rpPrint").onclick=()=>window.print();
+$("#rpBack").onclick=()=>{if(history.state&&history.state.report)history.back();else endReport();};
+window.addEventListener("popstate",()=>{if(reportMode)endReport();});
+// Ctrl+Pなどの通常印刷ではページ全体を印刷し、テキストエリアを内容の高さまで広げて長文が切れないようにする
+window.addEventListener("beforeprint",()=>{if(reportMode)return;
+ $$("textarea").forEach(t=>{t.dataset.ph=t.style.height;t.style.height="auto";t.style.height=(t.scrollHeight+24)+"px";});});
+window.addEventListener("afterprint",()=>{$$("textarea").forEach(t=>{if(t.dataset.ph!=null){t.style.height=t.dataset.ph;delete t.dataset.ph;}});});
+function init(){bindFields();renderCards();renderRank();renderFlags();}
+init();
+})();
+</script>
+</body></html>
