@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>価値観マップ 図解ガイド</title>
+<meta name="description" content="解説実践ブック(66ページ)の大事なところだけを、図で読める図解ガイド。価値観、自己認識、避けるべき職場、良い職場の条件、会社の選び方。">
+<meta name="theme-color" content="#D3EEF3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="logo" href="#/" aria-label="図解ガイドの目次へ"><span class="cv" data-m="normal" data-w="30"></span>図解ガイド</a>
+  <span class="sp"></span>
+  <a class="iconb" href="index.html">診断へ</a>
+</header>
+<main id="app" tabindex="-1"></main>
+
+<script src="content.js"></script>
+<script src="chara.js"></script>
+<script>
+/* 図解ガイド:ブックの大事なところだけを、1章1ページの図にする */
+(function(){
+"use strict";
+const {VALS,QN,CARDS,MINES,OT,AX,HEX,BOOK,WHY_WHAT}=window.Content;const CH=window.Chara;
+const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pdf=p=>`${encodeURI(BOOK)}#page=${p}`;
+const bars=(rows,max,cls)=>`<div class="gbars ${cls||""}">${rows.map(([l,x,v])=>`<div><span>${esc(l)}</span><i><u style="width:${Math.max(2,Math.min(100,x/max*100)).toFixed(0)}%"></u></i><em>${esc(v)}</em></div>`).join("")}</div>`;
+const tbl=(head,rows)=>`<div class="tblwrap"><table><tr>${head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</table></div>`;
+function wheel(){const R=108,cx=160,cy=150;let g=`<circle cx="${cx}" cy="${cy}" r="${R+22}" fill="none" stroke="var(--hair)" stroke-width="2"/>`;
+ VALS.forEach((v,i)=>{const a=(i*36-90)*Math.PI/180,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);
+  g+=`<g class="wv" data-i="${i}" tabindex="0" role="button" aria-label="${v.n}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="19" fill="var(--q-${v.q})" stroke="var(--outline)" stroke-width="2"/><text x="${x.toFixed(1)}" y="${(y+(y<cy-5?-26:33)).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor" font-family="Zen Maru Gothic, sans-serif">${v.n}</text><text x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" text-anchor="middle" font-size="14" fill="#26324B">${["★","!","♪","↑","♛","☂","✿","☕","♥","☘"][i]}</text></g>`;});
+ [["変化への開放性",18],["自己高揚",120],["保守",212],["自己超越",302]].forEach(([t,d])=>{const a=(d-90)*Math.PI/180;g+=`<text x="${(cx+R*.45*Math.cos(a)).toFixed(1)}" y="${(cy+R*.45*Math.sin(a)+4).toFixed(1)}" text-anchor="middle" font-size="11" fill="currentColor" opacity=".65" font-family="Zen Maru Gothic, sans-serif">${t}</text>`;});
+ return `<svg class="wheel" viewBox="0 0 320 305" role="group" aria-label="Schwartzの10の価値の円環。タップで説明">${g}</svg><div class="card" id="wInfo" aria-live="polite"><p class="small" style="margin:0">価値をタップすると、説明とキャラが出るよ</p></div>`;}
+function bindWheel(){$$(".wv").forEach(g=>{const f=()=>{const i=+g.dataset.i,v=VALS[i],c=CH.V[i];$("#wInfo").innerHTML=`<div style="display:flex;gap:12px;align-items:center"><span class="cv" data-c="${i}-${i}x" data-w="70"></span><div><b style="font:900 19px/1.3 var(--round)">${esc(v.n)}</b> <span class="qchip ${v.q}">${esc(v.q==="hed"?"開放性と自己高揚の境目":QN[v.q])}</span><p style="margin:4px 0 0">${esc(v.d)}</p><p class="small" style="margin:2px 0 0">仕事では:${esc(v.w)}</p></div></div><p class="small" style="margin:6px 0 0">カードの例:${CARDS[v.n].map(c=>esc(c[0])).join("、")}</p>`;CH.paint($("#wInfo"));$$(".wv").forEach(x=>x.classList.toggle("on",x===g));};g.addEventListener("click",f);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();f();}});});}
+const flow=(steps)=>`<div class="gflow">${steps.map((s,i)=>`${i?`<span class="ar" aria-hidden="true">↓</span>`:""}<div class="gs"><b>${esc(s[0])}</b>${s[1]?`<span>${esc(s[1])}</span>`:""}${s[2]?`<a href="index.html#/${s[2]}" class="try">やってみる →</a>`:""}</div>`).join("")}</div>`;
+const tiers=rows=>`<div class="tiers">${rows.map(([a,b],i)=>`<div style="--i:${i}"><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join("")}</div>`;
+
+// 章:t=タイトル、s=一言まとめ、fig=図、pts=要点3つ、go=診断で試す[ラベル,ルート]、p=ブックのページ、pl=ページの表記
+const CHS=[
+ {t:"この本の使い方",s:"ゴールは、判断の「物差し」を持つこと",p:3,pl:"序章 p.3",go:[["入口の4問",`q/1`]],
+  fig:()=>`<h3>3部の関係</h3>${flow([["第1部 価値観を知る","1〜4章 → あなたの価値観マップ(判断の物差し)"],["第2部 職場を科学する","5〜7章 → 避けるべき条件と、合う条件の知識"],["第3部 実践","8〜10章 → 方法A 能動的に探す / 方法B 候補を確かめる"]])}
+   <h3>根拠の強さのものさし</h3>${bars([["メタ分析・系統的レビュー",5,"最も高い"],["大規模な追跡研究・RCT",4,"高い"],["自然実験",3,"中〜高"],["横断研究(ある一時点)",2,"中"],["書籍・解説記事",1,"補助"]],5)}
+   <h3>効果の大きさの目安</h3>${tbl(["指標","小","中","大"],[["相関 r","0.1","0.3","0.5"],["差の大きさ d・g","0.2","0.5","0.8"],["リスクの倍率 RR","1.1〜1.3","1.5","2以上"]])}`,
+  pts:["就活を通るための自己PRではなく、内定が複数出たときや、入社3年目に迷ったときにも使える物差しを作る","研究は「効いた/効かなかった」ではなく「どれくらいの大きさか」で読む","時間がない人は、価値観マップ(第4章)と避けるべき条件(第5章)だけ先に"]},
+ {t:"価値観ってなに?",s:"大切なものの「順位」のこと",p:6,pl:"第1章 p.6",go:[["価値観診断","m1"]],
+  fig:()=>`<h3>Schwartzの10の価値(タップで説明)</h3>${wheel()}<p class="small">隣り合う価値は両立しやすく、向かい合う価値はぶつかりやすい。80か国以上のデータで確かめられた構造です。</p>
+   <h3>価値は「方角」、目標は「目的地」</h3><div class="compass2"><div><span class="cv" data-m="normal" data-w="64"></span><b>価値=方角</b><span>「学び続ける人でいる」終わりがなく、毎日の行動で体現できる</span></div><div><span class="flag" aria-hidden="true">⚑</span><b>目標=目的地</b><span>「資格を取る」達成したら終わる</span></div></div>
+   <h3>価値観・性格・興味・目標の違い</h3>${tbl(["","問い","職場選びでの役割"],[["<b>価値観</b>","何が大切か","何を満たす職場を選ぶかの基準"],["性格","どう振る舞いやすいか","どんな環境で消耗しにくいか"],["興味","何をしていると楽しいか","どんな作業内容が向くか"],["目標","何を達成したいか","期限つきの目印"]])}`,
+  pts:["多くの人は「誠実さも成長も家族も大事」と答える。選択を決めるのは、ぶつかったときにどちらを取るかという順位","価値観と行動の関係は中程度。だから価値観に沿って動ける環境を選ぶことが大事","大学生の今の価値観は暫定版。年に1回見直して更新しよう"],after:bindWheel},
+ {t:"はっきりさせると何が得?",s:"効果は小さいが確か。限界もある",p:10,pl:"第2章 p.10",go:[["価値観診断","m1"],["エピソード検証","m2"]],
+  fig:()=>`<h3>効果の大きさ</h3>${bars([["ACT(価値の明確化が中心の心理療法)",.57,"g≈0.57"],["キャリア支援全般",.3,"d≈0.3"],["価値観アファメーション(プレッシャーの中)",.15,"小さいが確か"],["同(プレッシャーのないとき)",.01,"≈0"]],.8)}
+   <div class="twocol"><div class="g"><h4>得すること</h4><ul><li>プレッシャーの中で気持ちを支える</li><li>価値観に沿った目標は努力が続き、達成で幸福が増す</li><li>書くワークで進路の決め方が上手くなる</li></ul></div><div class="l"><h4>限界と注意</h4><ul><li>ブラックな職場を我慢する道具にしてはいけない</li><li>就活で受けのいい「借り物の言葉」を選ぶと逆効果</li><li>「なぜ?」を繰り返すと考えすぎのループに</li></ul></div></div>`,
+  pts:["大切な価値を1〜2つ選んで10〜15分書くだけで、脅威の中の成績差が縮んだ研究がある","「親が喜ぶから」で選んだ目標は、達成しても幸福につながりにくい","エピソードで裏づけられない価値は「保留」にして、借り物をふるい落とす"]},
+ {t:"自分を知るのは難しい",s:"「なぜ?」より「何を?」と聞く",p:13,pl:"第3章 p.13",go:[["自己認識チェック","m3"]],
+  fig:()=>`<h3>知っているつもりと、実際</h3><div class="vs2"><div><b>約95%</b><span>自分は自己認識できていると思っている人</span></div><div class="lo"><b>約10〜15%</b><span>研究の基準で、実際に自己認識が高かった人</span></div></div><p class="small">Eurichの研究チームの推計。自己評価と客観的な成績の相関も r≈0.29 にとどまる(22のメタ分析の統合)。</p>
+   <h3>自己認識の4タイプ</h3><div class="tgrid"><div class="tcell"><b>内省家</b><span>自分は分かるが、周りの目に無頓着</span></div><div class="tcell on"><b>自己認識者</b><span>両方そろっている</span></div><div class="tcell"><b>探索者</b><span>自分も周りの見方も探している途中</span></div><div class="tcell"><b>迎合者</b><span>周りの期待に合わせ、自分の望みを見失う。就活で多い</span></div></div><p class="small">たて:自分の内面の理解 / よこ:周りからの見え方の理解</p>
+   <h3>問いの言い換え</h3><div class="ww">${WHY_WHAT.map(([a,b])=>`<div><s>${esc(a)}</s><b>→ ${esc(b)}</b></div>`).join("")}</div>`,
+  pts:["「なぜ?」の答えは、あとから作ったもっともらしい物語になりやすい。具体的な出来事を集めよう","自分の問題は、親友の問題だと思って三人称で考えると、賢く判断できる","価値観は自分で掘り、「どんな場面で力を発揮しているか」は人に聞く"]},
+ {t:"価値観マップの作り方",s:"8ステップを、3回に分けて",p:18,pl:"第4章 p.18",go:[["価値観診断","m1"],["エピソード検証","m2"],["ギャップ診断","m4"]],
+  fig:()=>`<h3>8つのステップ</h3>${flow([["1日目 Step0〜4","準備、感情が動いた出来事、カードの仕分け、トップ5、エピソード検証","m1"],["数日後 Step5〜7","円環で重心と葛藤を見る、自分の言葉で定義、ギャップと小さな行動","m4"],["1〜2週間後 Step8","身近な人に聞いて確かめ、マップを完成","m3"]])}
+   <p class="small">時間を空けて見直すほうが、一時の気分の影響が薄まって精度が上がります。</p>`,
+  pts:["体験で裏づけられない価値は「保留」。6位の価値と入れ替えてもう一度確かめる","同じ「成長」でも意味は人それぞれ。満たされているときの状態を具体的に書く","ギャップが大きい価値は、職場選びで特に重視する候補"]},
+ {t:"避けるべき7つの地雷",s:"最初の一手は、地雷を踏まないこと",p:27,pl:"第5章 p.27",go:[["地雷センサー","m5"]],
+  fig:()=>`<h3>地雷が健康に与える影響</h3>${bars([["長時間労働 → 脳卒中",.33,"1.33倍"],["高ストレイン → うつ病",.27,"1.27倍"],["努力が報われない → うつ病",.49,"1.49倍"]],.6,"red")}<p class="small">その条件がない人と比べたリスクの高さ。1つ1つは「3割増し」ほどでも、何十年も積み重なります。</p>
+   <h3>7つの地雷</h3><div class="minecards">${MINES.map((M,i)=>`<div><span class="mtag">地雷 ${i+1}</span><b>${esc(M.n)}</b><span>${esc(M.d)}</span></div>`).join("")}</div>
+   <h3>残業のものさし(月)</h3>${tiers([["20時間以下","健全な水準"],["45時間以下","法律の原則の上限。部署差を確かめる"],["80時間以下","研究で健康リスクが上がる水準に近い。要警戒"],["80時間超","過労死ライン。避けるべき"]])}`,
+  pts:["長時間労働、裁量なき激務、報われない努力、不公正、無礼、ハラスメント、雇用不安は、価値観にかかわらず避ける","忙しさそのものより「忙しいのに自分で決められない」が問題","地雷は青少年雇用情報やOB・OG訪問で、事実で確かめる"]},
+ {t:"良い職場の条件",s:"地雷なし+誰にでも良い特徴+あなたとの適合",p:33,pl:"第6章 p.33",go:[["理想の職場","m6"]],
+  fig:()=>`<h3>良い職場の3段</h3>${tiers([["地雷がない","第5章。まずここ"],["誰にでも良い特徴","裁量、フィードバック、支え合い、心理的安全性"],["あなたとの適合","価値観、興味、上司・チーム、働き方"]])}
+   <h3>3つの心の欲求</h3><div class="needs"><div><b>自律性</b><span>自分の意思で動いている</span></div><div><b>有能感</b><span>自分はできると感じる</span></div><div><b>関係性</b><span>人とつながり、大切にされている</span></div></div>
+   <h3>忙しさには2種類ある</h3><div class="twocol"><div class="g"><h4>挑戦的な忙しさ</h4><ul><li>仕事の量、時間的プレッシャー、大きな責任</li><li>やりがいにもなる</li></ul></div><div class="l"><h4>邪魔な忙しさ</h4><ul><li>あいまいな役割、矛盾する指示、無駄な手続き</li><li>意欲を下げ、辞めたくなる</li></ul></div></div>
+   <h3>良い職場を評価する12の軸</h3><ol class="ax12">${AX.map((a,i)=>`<li class="${i<7?"":"fit"}">${esc(a.n)}</li>`).join("")}</ol><p class="small">1〜7は誰にとっても大切、8〜12は人によって違う「適合」。</p>`,
+  pts:["仕事の中身だけでなく「誰と、どんな関係で働くか」が同じくらい大事","「合っている感」は満足と強く結びつくが、実際の一致とはずれることがある","日本では、職種より組織・上司・チームとの相性が満足を左右しやすい"]},
+ {t:"科学で選ぶ得と限界",s:"最善ではなく「十分に良い」を選ぶ",p:39,pl:"第7章 p.39",go:[["企業マッチ度","m7"]],
+  fig:()=>`<h3>新卒の3年以内離職率(2022年3月卒)</h3>${bars([["大学卒",33.8,"33.8%"],["高校卒",37.9,"37.9%"],["短大など",44.5,"44.5%"]],50)}
+   <h3>初めての会社を辞めた理由(上位)</h3>${bars([["労働時間・休日・休暇の条件",28.5,"28.5%"],["人間関係がよくなかった",26.4,"26.4%"]],40,"red")}<p class="small">離職理由の上位は、第5章の地雷や第6章の人間関係とそのまま重なります。</p>
+   <h3>最大化と満足化</h3><div class="twocol"><div class="l"><h4>最大化型(最善を探し続ける)</h4><ul><li>初任給は約20%高かった</li><li>でも就職後の満足度は低く、不安や後悔が多い</li></ul></div><div class="g"><h4>満足化型(基準を満たせば決める)</h4><ul><li>NGなし+必須を満たす中から選ぶ</li><li>満足しやすい</li></ul></div></div>`,
+  pts:["人は「有名企業なら幸せ」のように、1つの要素の影響を大きく見積もりがち(焦点化の錯覚)","研究は平均の話。確率を上げる道具であって、保証ではない","地雷の除外は科学に厳密に従い、合う職場の選択は自分の価値観で決める"]},
+ {t:"合う会社を探す",s:"人気順ではなく、マップから探す",p:42,pl:"第8章 p.42",go:[["理想の職場","m6"],["企業マッチ度","m7"]],
+  fig:()=>`<h3>候補の絞り方</h3><div class="funnel"><span style="width:100%">30〜50社 公開データを確認(1社10分)</span><span style="width:78%">10〜20社 点数をつけて比べる(1社30分)</span><span style="width:56%">3〜5社 1社検証(1社2〜3時間)</span></div>
+   <h3>価値 → 職場の条件</h3>${tbl(["価値","職場の条件","確かめる事実"],[["自己志向","裁量が大きい、専門性","若手の担当範囲、職種別採用"],["刺激","変化、新しい挑戦","新規事業の数、海外駐在"],["快楽","余暇、心地よさ","残業時間、年間休日"],["達成","成果の評価、成長","評価制度、昇進スピード"],["権力","高い報酬、影響力","年収モデル、管理職の年齢"],["安全","雇用と生活の安定","業績推移、離職率、転勤"],["同調","ルールと役割が明確","職務範囲の明確さ"],["伝統","歴史や文化を大切に","創業年、地域との関わり"],["慈善","仲間を大切に","チーム構成、1on1の頻度"],["普遍主義","社会や環境への貢献","事業の社会的影響、多様性"]])}
+   <h3>条件の3段階</h3>${tiers([["NG条件(5〜10個)","1つでも当てはまれば候補から外す"],["必須条件(3個ほど)","すべて満たす必要がある"],["歓迎条件(5〜8個)","満たすほど良い"]])}`,
+  pts:["知っている会社だけから選ぶと、有名なBtoC企業にかたよる。認定制度や業界地図で広く集める","必須は3つまで。5つを超えると当てはまる会社がほとんどなくなる","点数は結論ではなく話し合いの材料。NGに当たれば点数が高くても外す"]},
+ {t:"その会社、本当に合う?",s:"直感を、事実で確かめる",p:50,pl:"第9章 p.50",go:[["1社検証","m8"]],
+  fig:()=>`<h3>確かめる流れ</h3>${flow([["B0 惹かれている理由を分ける","表面 / 選考体験 / 日々の体験"],["B1 地雷チェック","あり → 追加調査か除外"],["B2 12の軸で採点","根拠がなければ3点"],["B3 トップ5の根拠","満たされると言える事実はある?"],["B4 価値のずれ","あなたと会社の差を見る"],["B5 事前検死","3年後に後悔しているとしたら、なぜ?"],["B6 親友ならどう言う?","三人称で最終判定"]])}
+   <h3>評価を聞く質問より、事実を聞く質問</h3>${tbl(["避ける","使う"],[["裁量はありますか?","入社2年目の方は、どんな判断を自分でしていますか?"],["雰囲気は良いですか?","仕事で困ったとき、最初に誰に相談しますか?"],["残業は多いですか?","昨日は何時に退社しましたか?"],["辞める人は多いですか?","同期のうち、今も在籍しているのは何人くらいですか?"]])}
+   <h3>判定の4段階</h3><div class="verd4"><span class="ok">合う</span><span class="mid">条件つき</span><span class="gap">ずれ</span><span class="ng">避ける</span></div>`,
+  pts:["面接官が感じよかった、有名だった、という理由は「ハロー効果」を生みやすい","「最近の」「具体的な例」を、立場の違う2〜3人に聞く","事前検死で見落としていたリスクを見つけ、確かめ方と対処を決めておく"]},
+ {t:"日本の就活で使う",s:"公的データで、先に地雷を確かめる",p:56,pl:"第10章 p.56",go:[["プログラム","program"]],
+  fig:()=>`<h3>信頼できる情報源</h3>${tbl(["情報源","分かること"],[["青少年雇用情報","新卒の離職者数、月平均残業、有給取得日数"],["就職四季報","3年後離職率、残業、有給、平均年収、転勤"],["しょくばらぼ","企業が公開した労働時間・休暇などのデータ"],["job tag","職業の仕事内容、興味・価値観の検査"],["認定制度","ユースエール、くるみん、えるぼし、健康経営優良法人"]])}
+   <h3>いつ何をする?</h3>${tbl(["時期","やること"],[["1〜2年生","価値観マップの初版。バイト・サークル・ゼミで小さな行動実験"],["3年生 4〜6月","マップを完成。興味検査。条件と職種の方向を決める"],["3年生 夏","候補を集める。インターンで生の情報"],["3年生 秋冬","地雷で絞る。OB・OG訪問。マップを更新"],["4年生 春夏","面接。気になる会社は1社検証"],["入社後","年1回の見直し、仕事の工夫(ジョブ・クラフティング)"]])}`,
+  pts:["青少年雇用情報は、応募者が企業に提供を求められる。あいまいな返答も判断材料","選考では価値観を偽らない。演じると合わない会社に受かる確率が上がるだけ","地雷があって心身の不調があるなら、我慢せず早めに相談する"]},
+ {t:"ことばと出典",s:"用語集と、主な出典",p:60,pl:"付録 p.60",go:[],
+  fig:()=>`<h3>用語集</h3><dl class="gloss">${GL.map(g=>`<dt>${esc(g[0])}</dt><dd>${esc(g[1])}</dd>`).join("")}</dl>
+   <h3>主な出典</h3><ul class="srcs2">${SRC.map(s=>`<li>${s[1]?`<a href="${esc(s[1])}" target="_blank" rel="noopener">${esc(s[0])}</a>`:esc(s[0])}</li>`).join("")}</ul>`,
+  pts:["数字は主にメタ分析や大規模な追跡研究から","研究の多くは欧米のデータ。日本の慣行も考えて読む","詳しい解説と全出典は、解説実践ブックの付録へ"]}];
+// 用語集と出典(前のページと同じもの)
+const GL=[["価値観","場面を超えて選択を方向づける「大切さ」の順位"],["Schwartzの円環","10の価値。隣は両立、向かいは葛藤"],["価値観アファメーション","大切な価値を短く書く。脅威下の緩衝材"],["自己一致モデル","価値観に沿う目標は続き、達成で幸福が増す"],["内的・外的自己認識","自分の内面の理解/他者からの見え方の理解"],["反芻と内省","不安からの堂々巡り/好奇心からの探究"],["自己距離化","三人称で考えて判断を賢明にする"],["知的謙虚さ","証拠で自分の考えを修正できる性質"],["高ストレイン","要求が高く裁量が低い状態"],["努力-報酬不均衡","努力に見合う給与・承認・安定がない状態"],["職場の無礼","害意があいまいな低強度の失礼な行動"],["職務特性","多様性・完結性・重要性・自律性・フィードバック"],["自己決定理論","自律性・有能感・関係性の3欲求"],["JD-Rモデル","要求は疲れ、資源は熱意を生む"],["心理的安全性","失敗や反対を言っても罰せられない信念"],["P-E適合","個人と仕事・組織・チーム・上司の一致"],["RIASEC","6つの職業興味タイプ"],["満足化","基準を満たせば決める選び方"],["事前検死","失敗した未来を想像して原因を洗い出す"],["ジョブ・クラフティング","仕事のやり方・関係・意味を自分で工夫"]];
+const SRC=[["Schwartz 基本的人間価値理論","https://scholarworks.gvsu.edu/orpc/vol2/iss1/11/"],["Miller et al.(2001)Personal Values Card Sort",""],["Wu, Spreckelsen & Cohen(2021)価値観アファメーションのメタ分析","https://ouci.dntb.gov.ua/en/works/legZObk7/"],["Sheldon & Elliot(1999)自己一致モデル",""],["Eurich(2017, 2018)自己認識の研究","https://hbr.org/podcast/2018/06/how-to-become-more-self-aware"],["Trapnell & Campbell(1999)反芻と内省",""],["Grossmann & Kross(2014)ソロモンのパラドックス",""],["Leary et al.(2017)知的謙虚さ",""],["Kivimäki et al.(2015, Lancet)長時間労働","https://www.thelancet.com/pdfs/journals/lancet/PIIS0140-6736(15)60295-1.pdf"],["Pega et al.(2021)WHO/ILO推計","https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8204267/"],["Madsen et al.(2017)ジョブストレインとうつ病","https://www.cambridge.org/core/journals/psychological-medicine/article/job-strain-as-a-risk-factor-for-clinical-depression-systematic-review-and-metaanalysis-with-additional-individual-participant-data/9EF85F9574FF0B929E01184B7B40B47D"],["Rugulies et al.(2017)努力-報酬不均衡とうつ病",""],["Namin et al.(2021)職場の無礼と離職意図","https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8751201/"],["Verkuil et al.(2015)いじめと精神的健康","https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0135225"],["Sverke et al.(2002)雇用不安","https://www.semanticscholar.org/paper/No-security:-a-meta-analysis-and-review-of-job-and-Sverke-Hellgren/2a5fea74ecc95113adf0385104adcb18a8c0333c"],["Humphrey et al.(2007)職務特性のメタ分析","http://www.morgeson.com/downloads/humphrey_nahrgang_morgeson_2007.pdf"],["自己決定理論と職場のメタ分析","https://escholarship.org/uc/item/655196mt"],["Kristof-Brown et al.(2005)適合のメタ分析","https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1744-6570.2005.00672.x"],["Verquer et al.(2003)組織適合のメタ分析","https://www.sciencedirect.com/science/article/abs/pii/S0001879102000362"],["Oh et al.(2014)適合の国際比較",""],["Judge et al.(2010)給与と満足",""],["Iyengar, Wells & Schwartz(2006)最大化と満足",""],["Schmidt & Hunter(1998)選考方法の妥当性",""],["Rudolph et al.(2017)ジョブ・クラフティング",""],["厚生労働省 新規学卒就職者の離職状況(令和4年3月卒)","https://www.rodo.co.jp/column/206987/"],["厚生労働省 令和5年若年者雇用実態調査","https://jinjibu.jp/news/detl/24261/"]];
+
+function toc(){const h=`<section class="hero" style="padding-top:4px">
+ <div class="guide"><span class="cv alive" data-m="cheer" data-w="58"></span><p class="bubble">66ページのブックから、判断や行動に直結するところだけを図にしたよ</p></div>
+ <h1>ブックの大事なところを<br><span class="mk">図で読む</span></h1></section>
+ <div class="gtoc">${CHS.map((c,i)=>`<a class="gc g${i}" href="#/c/${i}"><span class="no">${i===0?"はじめに":i===11?"付録":"第"+i+"章"}</span><b>${esc(c.t)}</b><span>${esc(c.s)}</span></a>`).join("")}</div>
+ <div class="btns"><a class="b wide" href="index.html">診断をはじめる</a><a class="b sec wide" href="${pdf(1)}" target="_blank" rel="noopener">詳細資料へのリンク(ブック全66ページ・PDF)↗</a></div>
+ <p class="small">詳細資料へのリンクは、パソコンのブラウザならブックの該当ページが直接開きます。iPhoneのSafariでは1ページ目から開くので、リンクの横のページ番号を目印にしてください。</p>`;
+ return{h,title:"目次"};}
+function chapter(i){const c=CHS[i];if(!c)return toc();
+ const h=`<p class="small" style="margin:8px 0 0">${i===0?"はじめに":i===11?"付録":"第"+i+"章"}</p><h1 class="q" style="margin-top:0">${esc(c.t)}</h1>
+ <div class="memo"><h3>一言まとめ</h3><p style="margin:0;font-size:18px">${esc(c.s)}</p></div>
+ <div class="gfig">${c.fig()}</div>
+ <div class="card"><h3>要点3つ</h3><ol class="pts3">${c.pts.map(p=>`<li>${esc(p)}</li>`).join("")}</ol></div>
+ ${c.go.length?`<div class="btns">${c.go.map((g,k)=>`<a class="b ${k?"sec ":""}wide" href="index.html#/${g[1]}">診断でやってみる:${esc(g[0])}</a>`).join("")}</div>`:""}
+ <p class="pdfl"><a href="${pdf(c.p)}" target="_blank" rel="noopener">詳細資料へのリンク(${esc(c.pl)})↗</a></p>
+ <nav class="chnav">${i>0?`<a class="b sec small" href="#/c/${i-1}">← ${esc(CHS[i-1].t)}</a>`:"<span></span>"}${i<CHS.length-1?`<a class="b sec small" href="#/c/${i+1}">${esc(CHS[i+1].t)} →</a>`:""}</nav>`;
+ return{h,title:c.t,after:c.after};}
+function render(){const m=(location.hash||"").match(/^#\/c\/(\d+)/);const r=m?chapter(+m[1]):toc();
+ $("#app").innerHTML=`<div class="screen">${r.h}</div>`;document.title=`${r.title} | 価値観マップ 図解ガイド`;CH.paint(document);window.scrollTo(0,0);if(r.after)r.after();}
+window.addEventListener("hashchange",render);render();
+})();
+</script>
+</body>
+</html>

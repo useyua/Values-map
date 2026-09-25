@@ -134,7 +134,7 @@ SCREENS.top=()=>{const rs=resumeText();
  h+=`<div class="btns">`;
  if(rs)h+=`<a class="b wide" href="#/program">プログラムのつづきへ</a><button type="button" class="resume" id="resume">${mascot("normal",40)}<span><b>続きから:${esc(rs.t)}</b>${esc(rs.s)}</span></button>`;
  else h+=`<a class="b wide" href="#/q/1">診断をはじめる</a>`;
- h+=`<button type="button" class="b sec wide" aria-disabled="true" id="guideSoon">図解ガイドを読む</button><p class="soon-note" style="margin:-6px 0 0">図解ガイドは次の段階で公開します</p></div>`;
+ h+=`<a class="b sec wide" href="guide.html">図解ガイドを読む</a></div>`;
  h+=`<div class="parade" aria-hidden="true">${parade.map(c=>cv(c,64,"alive")).join("")}</div><p class="hand small" style="text-align:center;margin:4px 0 0">90体のキャラのうち、あなたの1体が見つかるよ</p>`;
  h+=`<div class="foot"><p>入力した内容は、この端末のブラウザにだけ保存されます。外部には送信しません。</p>
  <p><a href="${encodeURI(BOOK)}" target="_blank" rel="noopener">詳細資料:価値観マップと科学的職場選び 解説実践ブック(PDF・66ページ)</a></p>
@@ -143,7 +143,6 @@ SCREENS.top=()=>{const rs=resumeText();
  return{html:h,after(){
   const mo=$("#migOk");if(mo)mo.onclick=()=>{S.migSeen=true;save();mo.closest(".card").remove();};
   const re=$("#resume");if(re)re.onclick=()=>{const m=nextMod();go(m&&IMPL[m]?m:"program");};
-  $("#guideSoon").onclick=()=>toast("図解ガイドは次の段階で公開します");
   const rt=$("#redoTri");if(rt)rt.onclick=()=>go("q/1");
   $("#resetAll").onclick=()=>{if(!confirm("入力した内容をすべて消します。よろしいですか?"))return;S=fresh();S.migSeen=true;saveNow();go("",true);toast("入力を消しました");};}};};
 
@@ -392,9 +391,12 @@ function m1Result(){const A=analysis();if(!A.t.length||!A.ch){go("m1",true);retu
    Object.keys(CAT).concat(S.custom).forEach(c=>delete S.cards[c]);S.rank=[];S.m1=Object.assign(fresh().m1,{short:S.tri[1]===0});S.done.m1=false;save();go("m1");};}};}
 
 /* ---------- 共通:つぎへ・ミッション・入力欄 ---------- */
+// 診断の結果から、図解ガイドの該当する章へ
+const GUIDE_CH={m1:1,m2:4,m3:3,m4:4,m5:5,m6:6,m7:8,m8:9};
+const whyLink=m=>GUIDE_CH[m]!=null?`<a class="linkb why2" href="guide.html#/c/${GUIDE_CH[m]}">なぜそう言える?図解ガイドで読む →</a>`:"";
 function nextBtn(cur){const P=S.prog;const nx=P?P.mods.find(m=>!S.done[m]&&m!==cur):null;
- if(nx&&IMPL[nx])return `<a class="b wide" href="#/${nx}">つぎは ${esc(MODS[nx].n)}(${esc(MODS[nx].t)})</a><a class="b sec wide" href="#/program">プログラムにもどる</a>`;
- return `<a class="b wide" href="#/program">プログラムにもどる</a>`;}
+ if(nx&&IMPL[nx])return `<a class="b wide" href="#/${nx}">つぎは ${esc(MODS[nx].n)}(${esc(MODS[nx].t)})</a><a class="b sec wide" href="#/program">プログラムにもどる</a>`+whyLink(cur);
+ return `<a class="b wide" href="#/program">プログラムにもどる</a>`+whyLink(cur);}
 function finishMod(m){if(!S.done[m]){S.done[m]=true;S.stampNew=m;}save();}
 function missionHTML(list){if(!list.length)return "";const all=list.every(x=>S.missions.some(y=>y.t===x.t));
  return `<div class="card mis"><h3>今週のミッション(${list.length}つ)</h3><ul class="mislist">${list.map(x=>`<li>${esc(x.t)}</li>`).join("")}</ul>${all?`<p class="small">受け取り済み。プログラム画面でチェックできます。</p>`:`<button type="button" class="b small" id="takeMis" data-mis="${esc(JSON.stringify(list))}">ミッションを受け取る</button>`}</div>`;}
