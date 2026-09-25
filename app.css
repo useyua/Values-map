@@ -413,6 +413,54 @@ details.acc .in{padding:0 16px 14px;font-size:15px}
 .funnel{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 12px}
 .funnel span{display:block;background:var(--soda-soft);border:2px solid var(--outline);border-radius:10px;padding:6px 8px;text-align:center;font:700 13px/1.4 var(--round)}
 
+/* ---------- 会社を選ぶ診断(M7・M8)・候補ファイル ---------- */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+.seg button{font:700 15px/1.2 var(--round);border:2px solid var(--outline);border-radius:12px;background:var(--card);color:var(--ink);min-height:44px;cursor:pointer;box-shadow:0 3px 0 var(--shadow);transition:transform .09s,box-shadow .09s,background .15s;padding:4px 2px}
+.seg button small{font-size:11px;color:var(--sub);margin-left:1px}
+.seg button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--shadow)}
+.seg button[aria-pressed="true"]{background:var(--lemon);color:var(--on-lemon)}
+.field.sm{font-size:14px;padding:8px 10px;margin-top:8px}
+.wt{font:700 12px/1.4 var(--round);color:var(--sub);white-space:nowrap}
+.colist{display:flex;flex-direction:column;gap:10px;margin:8px 0 12px}
+.coitem{display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:center;text-decoration:none;color:var(--ink);background:var(--card);border:2px solid var(--outline);border-radius:14px;padding:10px 14px;box-shadow:0 3px 0 var(--shadow);min-height:56px}
+.coitem b{font:700 16px/1.4 var(--round)}
+.coitem .go{grid-row:1/3;grid-column:2;font:700 13px/1 var(--round);color:var(--tomato)}
+.chk{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:8px 0;font:700 15px/1.4 var(--round);color:var(--ink);cursor:pointer;text-align:left;min-height:44px}
+.chk i{flex:none;width:24px;height:24px;border:2px solid var(--outline);border-radius:7px;background:var(--card);position:relative}
+.chk[aria-pressed="true"] i{background:var(--mint)}
+.chk[aria-pressed="true"] i::after{content:"";position:absolute;left:7px;top:2px;width:6px;height:12px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(40deg)}
+.scorebox{position:sticky;bottom:10px;display:flex;justify-content:space-between;align-items:center;background:var(--ink);color:var(--ground);border-radius:14px;padding:10px 16px;font:700 15px/1 var(--round);margin:14px 0}
+.scorebox b{font-size:22px}
+.mbars{display:flex;flex-direction:column;gap:10px;background:var(--card);border:2px solid var(--outline);border-radius:16px;padding:12px 14px;margin:14px 0}
+.mbars div{display:grid;grid-template-columns:1fr 3.4em;gap:4px 8px;align-items:center}
+.mbars b{grid-column:1/-1;font:700 15px/1.3 var(--round)}
+.mbars i{display:block;height:14px;border-radius:7px;background:var(--ground);border:1.5px solid var(--outline);overflow:hidden}
+.mbars u{display:block;height:100%;background:var(--soda)}
+.mbars div:first-child u{background:var(--tomato)}
+.mbars em{font-style:normal;font-weight:700;text-align:right;font-size:14px}
+.mbars .tag{grid-column:1/-1;justify-self:start}
+.mbars .out{opacity:.6}
+.verdict{border-radius:14px;padding:12px 14px;font-weight:700;margin:12px 0;border:2px solid var(--outline);background:var(--card)}
+.verdict.ok{background:var(--mint-soft)}.verdict.mid{background:var(--lemon-soft)}.verdict.ng{background:var(--tomato-soft)}
+.coname{font:700 14px/1.4 var(--round);color:var(--tomato);margin:4px 0 0}
+details.qd{margin-top:6px}
+details.qd summary{font:700 12.5px/1.4 var(--round);color:var(--sub);cursor:pointer;min-height:32px;display:flex;align-items:center}
+details.qd p{margin:2px 0 0}
+.dif{font:900 16px/1 var(--round);min-width:2.2em;text-align:right}
+.b4row .evh .small{flex:none}
+.verd{position:relative;border:2px solid var(--outline);border-radius:20px;background:var(--card);padding:14px;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;box-shadow:0 5px 0 var(--shadow);margin:26px 0 12px}
+.vco{font:900 22px/1.3 var(--round)}
+.stampv{position:absolute;right:-6px;top:-18px;border:3px solid var(--tomato);color:var(--tomato);font:900 17px/1.2 var(--round);padding:3px 10px;border-radius:10px;background:var(--card);transform:rotate(8deg);animation:stampIn .35s cubic-bezier(.3,1.6,.6,1) both;z-index:1}
+.stampv.ok{border-color:var(--mint);color:var(--mint)}.stampv.mid,.stampv.hold{border-color:#C77F00;color:#C77F00}
+.minechips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.minechips span{font:700 12.5px/1.4 var(--round);border-radius:8px;padding:3px 8px;border:1.5px solid var(--outline);background:var(--card)}
+.minechips .ok{background:var(--mint-soft)}.minechips .bad{background:var(--tomato-soft);border-color:var(--tomato)}.minechips .unk{background:var(--lemon-soft)}
+.cofile{display:grid;gap:18px;margin:18px 0}
+.cocard{position:relative;background:var(--card);border:2px solid var(--outline);border-radius:6px 18px 18px 18px;padding:14px 16px;box-shadow:0 5px 0 var(--shadow);transform:rotate(var(--r,0deg))}
+.cocard::before{content:"";position:absolute;left:-2px;top:-14px;width:84px;height:14px;background:var(--card);border:2px solid var(--outline);border-bottom:none;border-radius:8px 8px 0 0}
+.cocard b{font:900 19px/1.35 var(--round)}
+.row2{display:flex;gap:10px;flex-wrap:wrap}
+
 /* ---------- 保存ダイアログ ---------- */
 dialog.dlg{border:2px solid var(--outline);border-radius:20px;background:var(--card);color:var(--ink);padding:18px;width:min(460px,calc(100% - 32px));box-shadow:0 6px 0 var(--shadow)}
 dialog.dlg::backdrop{background:rgba(21,32,51,.45)}

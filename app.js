@@ -1,13 +1,13 @@
 /* 価値観マップ診断:画面の進行、保存、価値観診断 */
 (function(){
 "use strict";
-const {VALS,QN,CARDS,TRIAGE,MODS,PROGRAMS,HOKUTO,EVIDENCE,BOOK,EPIS,DEF_EX,SELF_Q,LIKERT,SELF_T,WHY_WHAT,ASK5,ACT_EX,MINES,MINE_OPT,OT,REDFLAGS,CONDS,COND_OPT,HEX,RIASEC_Q,RI_OPT,DIRS,SOURCES}=window.Content;
+const {VALS,QN,CARDS,TRIAGE,MODS,PROGRAMS,HOKUTO,EVIDENCE,BOOK,EPIS,DEF_EX,SELF_Q,LIKERT,SELF_T,WHY_WHAT,ASK5,ACT_EX,MINES,MINE_OPT,OT,REDFLAGS,CONDS,COND_OPT,HEX,RIASEC_Q,RI_OPT,DIRS,SOURCES,AX,B0,B0G,VERDICT}=window.Content;
 const CH=window.Chara;
 const $=(s,r)=>(r||document).querySelector(s),$$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const reduce=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 const KEY="vmap-shindan-v2",OLD="vmap-visual-v1";
-const IMPL={m1:true,m2:true,m3:true,m4:true,m5:true,m6:true};// 実装済みの診断
+const IMPL={m1:true,m2:true,m3:true,m4:true,m5:true,m6:true,m7:true,m8:true};// 実装済みの診断
 
 /* ---------- カードの辞書 ---------- */
 const CAT={},EX={};
@@ -19,7 +19,7 @@ const DECK_N=VALS.length*6;
 function fresh(){return{v:2,tri:[],prog:null,done:{},stampNew:null,cards:{},custom:[],rank:[],ev:{},def:{},gap:{},f:{},flags:[],
  mines:[null,null,null,null,null,null,null],ax:Array(12).fill(3),b0:[],b3:{},b4:{},
  sc:{w:{},co:[{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}}]},
- m1:{phase:null,order:null,pos:0,short:false,duel:null,dh:[]},m3:[],m5:{mines:[],ot:null},m6:{order:null,c:{},ri:[]},missions:[],migrated:false,migSeen:false};}
+ m1:{phase:null,order:null,pos:0,short:false,duel:null,dh:[]},m3:[],m5:{mines:[],ot:null},m6:{order:null,c:{},ri:[]},cos:[],m8cur:null,missions:[],migrated:false,migSeen:false};}
 const isObj=o=>o&&typeof o==="object"&&!Array.isArray(o);
 const badName=v=>typeof v!=="string"||!v.trim()||/[|]/.test(v)||v in Object.prototype||v.length>30;
 let S=fresh();
@@ -28,7 +28,7 @@ function load(){let raw=null;try{raw=localStorage.getItem(KEY);}catch(e){}
  else{let old=null;try{old=JSON.parse(localStorage.getItem(OLD)||"null");}catch(e){}if(isObj(old))migrate(old);}
  S.custom=(Array.isArray(S.custom)?S.custom:[]).filter(c=>!badName(c));
  ["cards","ev","def","gap","f","b3","b4","done"].forEach(k=>{if(!isObj(S[k]))S[k]={};});
- ["tri","rank","flags","b0","m3","missions"].forEach(k=>{if(!Array.isArray(S[k]))S[k]=[];});
+ ["tri","rank","flags","b0","m3","missions","cos"].forEach(k=>{if(!Array.isArray(S[k]))S[k]=[];});
  const F=fresh();["m5","m6"].forEach(k=>{S[k]=Object.assign(F[k],isObj(S[k])?S[k]:{});});
  if(!Array.isArray(S.m5.mines))S.m5.mines=[];if(!isObj(S.m6.c))S.m6.c={};if(!Array.isArray(S.m6.ri))S.m6.ri=[];
  S.rank=S.rank.filter(c=>typeof c==="string"&&S.cards[c]===3);}
@@ -37,6 +37,13 @@ function migrate(o){const pick=(k,t)=>{if(t==="arr"?Array.isArray(o[k]):isObj(o[
  ["cards","ev","def","gap","f","b3","b4","sc"].forEach(k=>pick(k,"obj"));["custom","rank","flags","mines","ax","b0"].forEach(k=>pick(k,"arr"));
  const starred=Array.isArray(S.rank)?S.rank.filter(c=>isObj(S.cards)&&S.cards[c]===3):[];
  if(starred.length>=2){S.m1.phase="done";S.done.m1=true;}
+ const cos=[],nid=j=>"old"+j;
+ if(isObj(o.sc)&&Array.isArray(o.sc.co))o.sc.co.forEach((c,j)=>{if(!isObj(c))return;const used=c.n||c.ng||c.must||(isObj(c.s)&&Object.keys(c.s).length);if(!used)return;
+  cos.push({id:nid(j),n:String(c.n||`会社${j+1}`).slice(0,30),m7:{s:isObj(c.s)?c.s:{},note:{},ng:!!c.ng,must:!!c.must},m8:null});});
+ const f=isObj(o.f)?o.f:{};const vUsed=f.v_name||(Array.isArray(o.b0)&&o.b0.length)||(isObj(o.b3)&&Object.keys(o.b3).length)||f.v_premortem||f.v_friend;
+ if(vUsed){const n=String(f.v_name||"検証した会社").slice(0,30);let c=cos.find(x=>x.n===n);if(!c){c={id:"oldv",n,m7:{s:{},note:{},ng:false,must:false},m8:null};cos.push(c);}
+  c.m8={b0:Array.isArray(o.b0)?o.b0.filter(x=>typeof x==="string"):[],mines:Array.isArray(o.mines)?o.mines.slice(0,7):[null,null,null,null,null,null,null],ax:Array.isArray(o.ax)&&o.ax.length===12?o.ax.map(x=>+x||3):Array(12).fill(3),b3:isObj(o.b3)?o.b3:{},b4:isObj(o.b4)?o.b4:{},pre:String(f.v_premortem||""),friend:String(f.v_friend||""),step:"b0"};}
+ S.cos=cos;
  S.migrated=true;saveNow();}
 let tmr=null,warned=false;
 function saveNow(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){if(!warned){warned=true;toast("この端末に保存できませんでした(プライベートブラウズなど)。画面を閉じると入力が消えます");}}}
@@ -132,7 +139,7 @@ SCREENS.top=()=>{const rs=resumeText();
  h+=`<div class="foot"><p>入力した内容は、この端末のブラウザにだけ保存されます。外部には送信しません。</p>
  <p><a href="${encodeURI(BOOK)}" target="_blank" rel="noopener">詳細資料:価値観マップと科学的職場選び 解説実践ブック(PDF・66ページ)</a></p>
  ${rs?`<button type="button" class="linkb" id="redoTri">入口の質問からやり直す</button>`:""}
- ${S.done.m1?`<p><a href="#/zukan">価値キャラ図鑑</a></p>`:""}<button type="button" class="linkb" id="resetAll">入力をすべて消す</button></div>`;
+ ${S.done.m1?`<p><a href="#/zukan">価値キャラ図鑑</a></p>`:""}${S.cos.length?`<p><a href="#/file">候補ファイル</a></p>`:""}<button type="button" class="linkb" id="resetAll">入力をすべて消す</button></div>`;
  return{html:h,after(){
   const mo=$("#migOk");if(mo)mo.onclick=()=>{S.migSeen=true;save();mo.closest(".card").remove();};
   const re=$("#resume");if(re)re.onclick=()=>{const m=nextMod();go(m&&IMPL[m]?m:"program");};
@@ -184,7 +191,7 @@ SCREENS.program=()=>{if(!S.prog){go("q/1",true);return false;}
  ${S.done.m1?`<a class="b sec wide" href="#/m1/result">価値観診断の結果を見る</a>`:""}</div>
  ${nx&&!nxImpl?`<p class="soon-note">この診断は次の段階で作ります。いまは価値観診断まで遊べます</p>`:""}
  ${misBox()}
- ${S.done.m1?`<a class="b sec wide" href="#/zukan" style="margin-top:4px">価値キャラ図鑑</a>`:""}
+ ${S.done.m1?`<a class="b sec wide" href="#/zukan" style="margin-top:4px">価値キャラ図鑑</a>`:""}${S.cos.length?`<a class="b sec wide" href="#/file" style="margin-top:14px">候補ファイル(${S.cos.length}社)</a>`:""}
  <h2 style="font-size:18px;margin:28px 0 6px">このプログラムの診断</h2>
  <div class="modlist">${P.mods.map(m=>`<div class="moditem"><b>${esc(MODS[m].n)}</b><span class="tag ${S.done[m]?"ok":IMPL[m]?"go":"soon"}">${S.done[m]?"クリア":IMPL[m]?MODS[m].t:"準備中"}</span><span class="small">${esc(MODS[m].d)}</span></div>`).join("")}</div>
  ${P.later.length?`<details class="acc"><summary>ほかの診断(あとでできる)</summary><div class="in"><div class="modlist">${P.later.map(m=>`<div class="moditem"><b>${esc(MODS[m].n)}</b><span class="tag soon">${IMPL[m]?MODS[m].t:"準備中"}</span><span class="small">${esc(MODS[m].d)}</span></div>`).join("")}</div></div></details>`:""}
@@ -698,6 +705,151 @@ function m6Result(){const L=m6Lists(),code=riCode(),ch=S.done.m1?charPick():null
  <div class="gorow">${nextBtn("m6")}<button type="button" class="b sec wide" id="save6">結果を保存(テキスト/PDF)</button><a class="linkb" href="#/m6/cond/1">条件カードを選び直す</a></div>`;
  return{html:h,title:"理想の職場の結果",bar:progBtn,after(){bindMissions();$("#save6").onclick=()=>openSave("m6");}};}
 
+/* ---------- 候補の会社(M7・M8・候補ファイルで共通) ---------- */
+const coById=id=>S.cos.find(c=>c.id===id);
+function newCo(name){const n=String(name||"").trim();if(!n)return{err:"会社名を入れてね"};if(n.length>30)return{err:"会社名は30文字までにしてね"};
+ if(S.cos.length>=20)return{err:"候補は20社までです。いらない会社を消してから追加してね"};if(S.cos.some(c=>c.n===n))return{err:"同じ名前の会社がもうあります"};
+ const c={id:Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),n,m7:{s:{},note:{},ng:false,must:false},m8:null};S.cos.push(c);save();return{c};}
+const addCoHTML=(ph)=>`<div class="addrow"><input class="field" type="text" id="coName" maxlength="30" placeholder="${esc(ph||"会社名(例:〇〇株式会社)")}" aria-label="追加する会社名"><button type="button" class="b sec small" id="coAdd">追加</button></div><p class="small" id="coMsg" role="status"></p>`;
+function bindAddCo(after){const b=$("#coAdd");if(!b)return;const inp=$("#coName");
+ b.onclick=()=>{const r=newCo(inp.value);if(r.err){$("#coMsg").textContent=r.err;return;}inp.value="";after(r.c);};inp.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();b.click();}};}
+const seg=(attr,val,opts,label)=>`<div class="seg" role="group" aria-label="${esc(label)}">${opts.map(([v,t])=>`<button type="button" ${attr}="${v}" aria-pressed="${val===v}">${t}</button>`).join("")}</div>`;
+function bindSeg(root,attr,onPick){$$(`[${attr}]`,root).forEach(b=>b.onclick=()=>{const g=b.parentElement;$$("button",g).forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");onPick(b.getAttribute(attr),b);});}
+
+/* ---------- M7 企業マッチ度 ---------- */
+// 評価軸:トップ5の価値(重み 5,4,4,3,3)と、誰にとっても大切な3つの軸(重み3)
+function scoreAxes(){const t=top5(),dw=[5,4,4,3,3];
+ return t.map((c,i)=>({k:"v:"+c,l:c,w:dw[i],h:CAT[c]?VALS[VI[CAT[c]]].w:""})).concat([{k:"c:rel",l:"人間関係・心理的安全性",w:3,h:"困ったときに相談できるか、意見を言えるか"},{k:"c:fair",l:"公正な評価と報酬",w:3,h:"評価基準の公開、努力が報われるか"},{k:"c:time",l:"労働時間・働き方",w:3,h:"残業時間、休日、転勤"}]);}
+function coScore(c){const ax=scoreAxes();let s=0,m=0;ax.forEach(a=>{const v=+c.m7.s[a.k]||3;s+=a.w*v;m+=a.w*5;});return{s,m,rated:Object.keys(c.m7.s).length>0};}
+function m7Results(){const res=S.cos.map(c=>Object.assign({c},coScore(c),{ng:!!c.m7.ng,must:!!c.m7.must})).filter(r=>r.rated||r.ng||r.must);
+ const ok=res.filter(r=>!r.ng&&r.must).sort((a,b)=>b.s-a.s),out=res.filter(r=>r.ng);let msg,cls;
+ if(!res.length){msg="まだ採点した会社がありません。";cls="mid";}
+ else if(ok.length){msg=`有力候補:${ok[0].c.n}(${ok[0].s}点)`+(ok[1]&&ok[0].s-ok[1].s<=5?`。${ok[1].c.n}と僅差です。トップ1・2の価値の点数が高いほうを優先し、1社検証で両方を確かめよう。`:"。次は1社検証で本当に合うか確かめよう。");cls="ok";}
+ else if(out.length===res.length){msg="すべてNGに当てはまりました。候補を広く集め直そう。";cls="ng";}
+ else{msg="「必須条件をすべて満たす」会社がまだありません。情報が足りなければOB・OG訪問などで確かめ、足りていれば必須条件を見直そう(3つ以内)。";cls="mid";}
+ if(out.length&&cls!=="ng")msg+=` NGに当てはまり除外:${out.map(r=>r.c.n).join("、")}。`;
+ return{res:res.sort((a,b)=>(a.ng-b.ng)||(b.s-a.s)),msg,cls};}
+SCREENS.m7=(a)=>{if(!S.done.m1||!top5().length)return needM1("企業マッチ度");
+ if(a[0]==="co"){const c=coById(a[1]);if(!c){go("m7",true);return false;}return m7Co(c);}
+ if(a[0]==="result")return m7Result();return m7Home();};
+function m7Home(){const ax=scoreAxes();
+ const h=`${modHead("企業マッチ度",0,0)}<h1 class="q">候補の会社を、同じ物差しで比べよう</h1>
+ ${guideHTML("あなたのトップ5を重みにして点数をつけるよ。根拠(事実)がない軸は3点のままにしておくのがルール","normal")}
+ <details class="acc"><summary>評価の軸と重み(${ax.length}軸)</summary><div class="in">${ax.map(x=>`<div class="cond"><b>×${x.w}</b><span><b>${esc(x.l)}</b>${x.h?`<br><span class="small">${esc(x.h)}</span>`:""}</span></div>`).join("")}<p class="small">1位の価値は重み5、誰にとっても大切な軸は3。合計=重み×点数(1〜5)。</p></div></details>
+ <h2 class="h2s">候補の会社</h2>
+ <div class="colist">${S.cos.map(c=>{const r=coScore(c);return `<a class="coitem" href="#/m7/co/${c.id}"><b>${esc(c.n)}</b><span class="small">${c.m7.ng?"NGに当てはまる":r.rated?`${r.s} / ${r.m}点`:"まだ採点していない"}</span><span class="go">採点する →</span></a>`;}).join("")||`<p class="small">まだ会社がありません。気になる会社を追加しよう。</p>`}</div>
+ ${addCoHTML()}
+ <div class="btns"><a class="b wide" href="#/m7/result" ${S.cos.some(c=>coScore(c).rated)?"":`aria-disabled="true" id="noRes"`}>比べた結果を見る</a><a class="b sec wide" href="#/file">候補ファイルを見る</a></div>`;
+ return{html:h,title:"企業マッチ度",bar:progBtn,after(){bindAddCo(c=>go("m7/co/"+c.id));const n=$("#noRes");if(n)n.onclick=e=>{e.preventDefault();toast("まず1社、採点してみよう");};}};}
+function m7Co(c){const ax=scoreAxes(),L=S.done.m6?m6Lists():{must:[],ng:[]},ngs=L.ng.map(C=>C.n).concat(S.done.m5?m5NG():[]);
+ const h=`${modHead("企業マッチ度 ・ 採点",0,0)}<h1 class="q">${esc(c.n)}</h1>
+ <p class="small">分かる軸だけでOK。根拠がない軸は「3(分からない)」のままにしよう。</p>
+ ${ax.map(x=>{const v=+c.m7.s[x.k]||3;return `<div class="evcard axrow" data-k="${esc(x.k)}"><div class="evh"><b>${esc(x.l)}</b><span class="wt">重み×${x.w}</span></div>${x.h?`<p class="small" style="margin:0 0 6px">${esc(x.h)}</p>`:""}
+  ${seg("data-sv",String(v),[["1","1"],["2","2"],["3","3<small>?</small>"],["4","4"],["5","5"]],x.l)}
+  <input class="field sm" type="text" data-note="${esc(x.k)}" maxlength="80" placeholder="根拠となる事実(例:2年目から案件の一部を担当)" aria-label="${esc(x.l)}の根拠"></div>`;}).join("")}
+ <div class="evcard"><button type="button" class="chk" id="ckNg" aria-pressed="${!!c.m7.ng}"><i></i>NG条件に当てはまる</button>${ngs.length?`<p class="small">あなたのNG:${esc(ngs.join("、"))}</p>`:""}
+  <button type="button" class="chk" id="ckMust" aria-pressed="${!!c.m7.must}"><i></i>必須条件をすべて満たす</button>${L.must.length?`<p class="small">あなたの必須:${esc(L.must.map(C=>C.n).join("、"))}</p>`:""}</div>
+ <div class="scorebox"><span>合計</span><b id="tot"></b></div>
+ <div class="btns"><a class="b wide" href="#/m7/result">結果を見る</a><a class="b sec wide" href="#/m7">ほかの会社を採点する</a><button type="button" class="linkb" id="delCo">この会社を候補から消す</button></div>`;
+ return{html:h,title:"企業マッチ度",bar:progBtn,after(m){const tot=()=>{const r=coScore(c);$("#tot").textContent=`${r.s} / ${r.m}`;};tot();
+  $$(".axrow",m).forEach(row=>{const k=row.dataset.k;bindSeg(row,"data-sv",v=>{c.m7.s[k]=+v;save();tot();});});
+  $$("[data-note]",m).forEach(el=>{const k=el.dataset.note;el.value=c.m7.note[k]||"";el.addEventListener("input",()=>{c.m7.note[k]=el.value;save();});});
+  const tg=(id,key)=>{const b=$("#"+id);b.onclick=()=>{c.m7[key]=!c.m7[key];b.setAttribute("aria-pressed",String(c.m7[key]));save();};};tg("ckNg","ng");tg("ckMust","must");
+  $("#delCo").onclick=()=>{if(!confirm(`「${c.n}」を候補から消します。採点や検証の内容も消えます。よろしいですか?`))return;S.cos=S.cos.filter(x=>x!==c);save();go("m7");};}};}
+function m7Result(){const R=m7Results();if(R.res.length)finishMod("m7");
+ const top=R.res[0];
+ const h=`<div class="reshead"><p class="kick">企業マッチ度の結果</p>${myChar(R.cls==="ok"?"happy":"think",140,"alive")}</div>
+ <div class="mbars">${R.res.map(r=>`<div class="${r.ng?"out":""}"><b>${esc(r.c.n)}</b><i><u style="width:${r.ng?0:(r.s/r.m*100).toFixed(0)}%"></u></i><em>${r.ng?"除外":r.s+"点"}</em>${r.must&&!r.ng?`<span class="tag ok">必須OK</span>`:""}</div>`).join("")||`<p class="small">まだ採点した会社がありません。</p>`}</div>
+ <div class="verdict ${R.cls}">${esc(R.msg)}</div>
+ <div class="memo"><h3>点数は結論ではなく、話し合いの材料</h3><p style="margin:0">合計点が高くても、NG条件に当たるなら除外。点数が近いときは、トップ1・2の価値の点数が高いほうを優先しよう。</p></div>
+ ${missionHTML([{t:"3点(分からない)の軸を1つ、OB・OG訪問や説明会で確かめる",from:"m7"}])}
+ <div class="gorow">${top&&!top.ng?`<a class="b wide" href="#/m8/${top.c.id}">${esc(top.c.n)}を1社検証する</a>`:""}${nextBtn("m7").replace('class="b wide"',top&&!top.ng?'class="b sec wide"':'class="b wide"')}<a class="b sec wide" href="#/m7">採点を続ける</a><button type="button" class="b sec wide" id="save7">結果を保存(テキスト/PDF)</button></div>`;
+ return{html:h,title:"企業マッチ度の結果",bar:progBtn,after(){bindMissions();$("#save7").onclick=()=>openSave("m7");}};}
+
+/* ---------- M8 1社検証 ---------- */
+const M8STEPS=["b0","b1","b2","b3","b4","b5","b6"];
+const M8T={b0:"惹かれている理由",b1:"地雷チェック",b2:"12の軸で採点",b3:"トップ5の根拠",b4:"価値のずれ",b5:"3年後の後悔",b6:"親友なら何と言う?"};
+const m8Of=c=>{if(!c.m8)c.m8={b0:[],mines:[null,null,null,null,null,null,null],ax:Array(12).fill(3),b3:{},b4:{},pre:"",friend:"",step:"b0"};return c.m8;};
+// 自分の重要度(1〜5):カードの仕分けとトップ5から計算する
+function selfImp(){const t=top5(),imp={};VALS.forEach(v=>{let m=1;CARDS[v.n].forEach(([c])=>{const s=S.cards[c]||0;if(s===2)m=Math.max(m,2);if(s===3)m=Math.max(m,3);});imp[v.n]=m;});t.forEach((c,i)=>{const k=CAT[c];if(k)imp[k]=Math.max(imp[k],i<2?5:4);});return imp;}
+function m8Verdict(c){const B=m8Of(c),t=top5(),imp=selfImp();
+ const mineYes=B.mines.filter(x=>x===2).length,mineUnk=B.mines.filter(x=>x!==0&&x!==2).length;
+ const yes=t.filter(v=>B.b3[v]&&B.b3[v].ok).length,top1=!!(t[0]&&B.b3[t[0]]&&B.b3[t[0]].ok);
+ const cats=[...new Set(t.map(v=>CAT[v]).filter(Boolean))].slice(0,3);const worst=cats.length?Math.min(...cats.map(k=>(B.b4[k]||3)-imp[k])):0;
+ const surf=B.b0.filter(k=>k[0]==="0"||k[0]==="1").length,daily=B.b0.filter(k=>k[0]==="2").length,unk=B.ax.filter(x=>x===3).length;
+ let k,why;
+ if(mineYes){k="ng";why=`地雷「あり」が${mineYes}つ。配属先で当てはまらないと確かめられない限り、見送ろう。`;}
+ else if(mineUnk>=3){k="hold";why=`地雷の「不明」が${mineUnk}つ。OB・OG訪問や青少年雇用情報で先に確かめよう。`;}
+ else if(yes>=4&&top1&&worst>=-1){k="ok";why="地雷がなく、トップ5のうち4つ以上に事実の根拠がある。見つけた後悔のリスクに備えて進もう。";}
+ else if(yes>=3&&worst>=-2){k="mid";why=`根拠のある価値が${yes}つ。${top1?"":"1位の価値の根拠がまだ書けていないよ。"}ずれ(最大 ${worst})について追加で情報を取ろう。`;}
+ else{k="gap";why=`根拠を書けた価値は${yes}/5、トップの価値のずれは最大 ${worst}。「良い」と感じる理由を見直して、ほかの候補とも比べよう。`;}
+ const notes=[];if(surf>daily)notes.push("惹かれる理由が、表面的な理由や選考体験にかたよっています(ハロー効果に注意)。");if(unk>=6)notes.push(`12の軸のうち${unk}軸が3点(分からない)。質問集で情報を取りに行こう。`);
+ return{k,why,notes,yes,worst,top1};}
+SCREENS.m8=(a)=>{if(!S.done.m1||!top5().length)return needM1("1社検証");
+ if(!a[0])return m8Home();const c=coById(a[0]);if(!c){go("m8",true);return false;}
+ const B=m8Of(c),st=a[1];if(!st){go(`m8/${c.id}/${c.verdict?"result":B.step||"b0"}`,true);return false;}
+ if(st==="result"){if(!c.verdict){go(`m8/${c.id}/${B.step||"b0"}`,true);return false;}return m8Result(c);}
+ if(!M8STEPS.includes(st)){go("m8/"+c.id,true);return false;}B.step=st;S.m8cur=c.id;save();return m8Step(c,st);};
+function m8Home(){const h=`${modHead("1社検証",0,0)}<h1 class="q">「いいな」と感じる会社は、本当に合う?</h1>
+ ${guideHTML("直感を否定するんじゃなくて、事実で確かめる手順だよ。7つのステップで、1社15分くらい","normal")}
+ <h2 class="h2s">どの会社を検証する?</h2>
+ <div class="colist">${S.cos.map(c=>`<a class="coitem" href="#/m8/${c.id}"><b>${esc(c.n)}</b><span class="small">${c.verdict?"判定:"+esc(VERDICT[c.verdict].n):c.m8?`途中(${esc(M8T[c.m8.step]||"")})`:"まだ検証していない"}</span><span class="go">検証する →</span></a>`).join("")||`<p class="small">まだ会社がありません。</p>`}</div>
+ ${addCoHTML(S.prog&&S.prog.q1===4?"今の会社の名前":"")}`;
+ return{html:h,title:"1社検証",bar:progBtn,after(){bindAddCo(c=>go("m8/"+c.id));}};}
+function m8Step(c,st){const B=m8Of(c),i=M8STEPS.indexOf(st),t=top5(),imp=selfImp();let body="";
+ if(st==="b0")body=`<h1 class="q">この会社のどこに惹かれている?</h1><p class="qhint">あてはまるものを全部タップ</p>
+  ${B0.map((g,gi)=>`<div class="picksec"><h3>${esc(B0G[gi][0])}</h3><p class="small" style="margin:-6px 0 6px">${esc(B0G[gi][1])}</p><div class="srcs">${g.map((x,ti)=>`<button type="button" class="src" data-b0="${gi}-${ti}" aria-pressed="${B.b0.includes(gi+"-"+ti)}"><b>${esc(x)}</b></button>`).join("")}</div></div>`).join("")}
+  <p class="small">1つ目立つ良い特徴があると、ほかの特徴まで良く見える「ハロー効果」が起きやすいことが知られています。</p>`;
+ if(st==="b1")body=`<h1 class="q">7つの地雷はある?</h1><p class="qhint">「たぶん大丈夫」ではなく、事実で答えよう。分からなければ「不明」</p>
+  ${MINES.map((M,k)=>`<div class="evcard mrow" data-i="${k}"><div class="evh"><b>${esc(M.n)}</b></div><p class="small" style="margin:0 0 6px">見分け方:${esc(M.look[0])}</p>${seg("data-mv",B.mines[k]==null?"":String(B.mines[k]),[["0","なし"],["1","不明"],["2","あり"]],M.n)}</div>`).join("")}`;
+ if(st==="b2")body=`<h1 class="q">12の軸で、点数をつけよう</h1><p class="qhint">根拠(事実)がない軸は3のまま</p>
+  ${AX.map((x,k)=>`<div class="evcard arow" data-i="${k}"><div class="evh"><b>${k+1} ${esc(x.n)}</b></div>${seg("data-av",String(B.ax[k]),[["1","1"],["2","2"],["3","3<small>?</small>"],["4","4"],["5","5"]],x.n)}<details class="qd"><summary>確かめる質問</summary><p class="small">${esc(x.q)}</p></details></div>`).join("")}`;
+ if(st==="b3")body=`<h1 class="q">トップ5は、この会社で満たされる?</h1><p class="qhint">「満たされる」と言える具体的な事実を書こう</p>
+  ${t.map((v,k)=>{const o=B.b3[v]||{};return `<div class="evcard b3row" data-v="${esc(v)}"><div class="evh"><span class="no">${k+1}</span><b>${esc(v)}</b></div><input class="field" type="text" data-b3t maxlength="100" value="${esc(o.t||"")}" placeholder="${k===0?"例:2年目から案件の一部を任されると社員の方から聞いた":"この会社で満たされると言える事実"}" aria-label="${esc(v)}が満たされる事実"><button type="button" class="chk" data-b3ok aria-pressed="${!!o.ok}"><i></i>具体的な事実で書けた</button></div>`;}).join("")}`;
+ if(st==="b4")body=`<h1 class="q">あなたと会社の「大事」は、ずれてない?</h1><p class="qhint">会社がそれぞれの価値をどれくらい大事にしているか、制度や社員の行動から1〜5で</p>
+  ${VALS.map(v=>{const me=imp[v.n],co=B.b4[v.n]||3;return `<div class="evcard b4row" data-v="${esc(v.n)}"><div class="evh"><b>${esc(v.n)}</b><span class="small">あなた ${"●".repeat(me)}${"○".repeat(5-me)}</span><span class="dif" style="color:${diffCol(co-me)}">${co-me>0?"+":""}${co-me}</span></div>${seg("data-cv",String(co),[["1","1"],["2","2"],["3","3"],["4","4"],["5","5"]],v.n+"の会社での実態")}</div>`;}).join("")}
+  <p class="small">差(会社−あなた)が−2以下の価値は、大切なのに満たされにくい価値。+2以上は、窮屈さの原因になりうる価値です。</p>`;
+ if(st==="b5")body=`<h1 class="q">3年後、この会社を辞めて後悔している。なぜ?</h1><p class="qhint">あえて失敗した未来を想像すると、見落としていたリスクが見つかりやすい(事前検死)</p>
+  <textarea class="field" id="pre" rows="6" placeholder="例:配属先で裁量がなく、指示待ちの仕事しかなかった → 配属の決まり方をOB訪問で聞く → 社内公募制度があるか確かめる"></textarea>
+  <p class="small">理由ごとに「確かめる方法」と「起きたときの対処」も書いておこう。</p>`;
+ if(st==="b6")body=`<h1 class="q">親友がこの結果を持って相談してきたら、何と言う?</h1><p class="qhint">自分のことより、人のことのほうが賢く判断できる(ソロモンのパラドックス)</p>
+  <textarea class="field" id="fr" rows="5" placeholder="例:安定と家族の面は良い。でも一番大事な自律が満たされにくいなら、配属と社内公募を確かめてから決めたほうがいい"></textarea>`;
+ const h=`${modHead(`1社検証 ・ ${M8T[st]}`,i+1,7)}<p class="coname">${esc(c.n)}</p>${body}
+ <div class="btns"><button type="button" class="b wide" id="nx">${i<6?"次へ":"判定を見る"}</button>${i>0?`<button type="button" class="linkb" id="bk">← ひとつ前へ</button>`:`<a class="linkb" href="#/m8">← 会社を選び直す</a>`}</div>`;
+ return{html:h,title:"1社検証",bar:progBtn,after(m){
+  $$("[data-b0]",m).forEach(b=>b.onclick=()=>{const k=b.dataset.b0,on=B.b0.includes(k);B.b0=on?B.b0.filter(x=>x!==k):B.b0.concat(k);b.setAttribute("aria-pressed",String(!on));save();});
+  $$(".mrow",m).forEach(r=>bindSeg(r,"data-mv",v=>{B.mines[+r.dataset.i]=+v;save();}));
+  $$(".arow",m).forEach(r=>bindSeg(r,"data-av",v=>{B.ax[+r.dataset.i]=+v;save();}));
+  $$(".b3row",m).forEach(r=>{const v=r.dataset.v;const o=()=>B.b3[v]=Object.assign({},B.b3[v]||{});$("[data-b3t]",r).addEventListener("input",e=>{o().t=e.target.value;save();});
+   const ok=$("[data-b3ok]",r);ok.onclick=()=>{const x=o();x.ok=!x.ok;ok.setAttribute("aria-pressed",String(x.ok));save();};});
+  $$(".b4row",m).forEach(r=>{const v=r.dataset.v;bindSeg(r,"data-cv",x=>{B.b4[v]=+x;save();const d=+x-imp[v],el=$(".dif",r);el.textContent=(d>0?"+":"")+d;el.style.color=diffCol(d);});});
+  const pre=$("#pre");if(pre){pre.value=B.pre||"";grow(pre);pre.addEventListener("input",()=>{B.pre=pre.value;save();grow(pre);});}
+  const fr=$("#fr");if(fr){fr.value=B.friend||"";grow(fr);fr.addEventListener("input",()=>{B.friend=fr.value;save();grow(fr);});}
+  $("#nx").onclick=()=>{if(i<6)go(`m8/${c.id}/${M8STEPS[i+1]}`);else{c.verdict=m8Verdict(c).k;finishMod("m8");go(`m8/${c.id}/result`);}};
+  const bk=$("#bk");if(bk)bk.onclick=()=>go(`m8/${c.id}/${M8STEPS[i-1]}`);}};}
+const diffCol=d=>d<=-2?"var(--tomato)":d>=2?"#C77F00":"var(--mint)";
+function m8Asks(c){const B=m8Of(c),L=[];B.mines.forEach((x,k)=>{if(x!==0&&x!==2)L.push(`【${MINES[k].n}】${MINES[k].look[0]}を確かめる`);});B.ax.forEach((x,k)=>{if(x===3)L.push(`【${AX[k].n}】${AX[k].q}`);});return L;}
+function m8Result(c){const V=m8Verdict(c);c.verdict=V.k;save();const T=VERDICT[V.k],B=m8Of(c),asks=m8Asks(c);S.m8cur=c.id;
+ const askTxt=`${c.n}のOB・OG訪問で聞きたいこと\n\n`+asks.map((q,i)=>`${i+1}. ${q.replace(/^【[^】]+】/,"")}`).join("\n");
+ const h=`<div class="reshead"><p class="kick">1社検証の結果</p></div>
+ <div class="verd"><span class="stampv ${V.k}">${esc(T.n)}</span>${myChar(T.e,90,"alive")}<div><b class="vco">${esc(c.n)}</b><p style="margin:2px 0 0;font-weight:700">${esc(T.l)}</p></div></div>
+ <p>${esc(V.why)}</p>${V.notes.map(n=>`<p class="small">・${esc(n)}</p>`).join("")}
+ <div class="minechips">${MINES.map((M,k)=>{const x=B.mines[k];return `<span class="${x===2?"bad":x===0?"ok":"unk"}">${esc(M.n)} ${x===2?"あり":x===0?"なし ✓":"不明 ?"}</span>`;}).join("")}</div>
+ <details class="acc" ${asks.length?"open":""}><summary>次に聞くこと(${asks.length})</summary><div class="in">${asks.length?`<ol class="rf">${asks.map(q=>`<li>${esc(q)}</li>`).join("")}</ol><button type="button" class="b small" id="cpAsk">OB・OG訪問の質問をコピー</button><p class="small" id="askMsg" role="status"></p>`:`<p class="small">不明な地雷や、3点のままの軸はありません。</p>`}</div></details>
+ <details class="acc"><summary>3年後に後悔するとしたら</summary><div class="in">${rpText(B.pre)}</div></details>
+ <details class="acc"><summary>親友へのアドバイス</summary><div class="in">${rpText(B.friend)}</div></details>
+ ${missionHTML([{t:`${c.n}について「次に聞くこと」を1つ、OB・OG訪問や説明会で聞く`,from:"m8"}])}
+ <div class="gorow">${nextBtn("m8")}<a class="b sec wide" href="#/file">候補ファイルを見る</a><button type="button" class="b sec wide" id="save8">結果を保存(テキスト/PDF)</button><a class="linkb" href="#/m8/${c.id}/b0">答え直す</a><a class="linkb" href="#/m8">ほかの会社を検証する</a></div>`;
+ return{html:h,title:"1社検証の結果",bar:progBtn,after(){bindMissions();$("#save8").onclick=()=>openSave("m8");const cp=$("#cpAsk");if(cp)cp.onclick=()=>copyText(askTxt,$("#askMsg"));}};}
+
+/* ---------- 候補ファイル ---------- */
+SCREENS.file=()=>{const h=`<h1 class="q" style="margin-top:6px">候補ファイル</h1><p class="small">調べた会社がカードになってたまっていくよ。判定のスタンプは1社検証で押されます。</p>
+ <div class="cofile">${S.cos.map((c,i)=>{const r=coScore(c),v=c.verdict;return `<div class="cocard" style="--r:${[-1.2,.8,-.4,1.1][i%4]}deg">${v?`<span class="stampv ${v}">${esc(VERDICT[v].n)}</span>`:""}<b>${esc(c.n)}</b>
+  <p class="small" style="margin:2px 0 8px">${c.m7.ng?"NGに当てはまる":r.rated?`マッチ度 ${r.s} / ${r.m}点`:"マッチ度:まだ"}${v?` ・ ${esc(VERDICT[v].l)}`:""}</p>
+  <div class="row2"><a class="b sec small" href="#/m7/co/${c.id}">マッチ度</a><a class="b sec small" href="#/m8/${c.id}">1社検証</a></div></div>`;}).join("")||`<p class="small">まだ会社がありません。</p>`}</div>
+ ${addCoHTML()}`;
+ return{html:h,title:"候補ファイル",bar:S.prog?progBtn:`<a class="iconb" href="#/">トップ</a>`,after(){bindAddCo(()=>keepScroll());}};};
+
 /* ---------- キャラを画像にする(友達と共有する用) ---------- */
 function loadImg(src){return new Promise((ok,ng)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=ng;im.src=src;});}
 async function shareImage(A,I){const W=900,H=1200,cv2=document.createElement("canvas");cv2.width=W;cv2.height=H;const g=cv2.getContext("2d");
@@ -787,8 +939,32 @@ const SEC={
    `## 興味のタイプ\n- コード:${code||"(なし)"}${code?"\n"+code.split("").map(k=>`- ${k} ${HEX[k][0]}:${HEX[k][1]}(文系の例:${HEX[k][2]} / 理系の例:${HEX[k][3]})`).join("\n"):""}`];},
   html(){const L=m6Lists(),code=riCode();return `<div class="rp-box"><p style="margin:0"><b>◎ 必須:</b>${esc(L.must.map(C=>C.n).join("、")||"なし")}</p><p style="margin:4px 0 0"><b>○ 歓迎:</b>${esc(L.want.map(C=>C.n).join("、")||"なし")}</p><p style="margin:4px 0 0"><b>× NG:</b>${esc(L.ng.map(C=>C.n).concat(S.done.m5?m5NG():[]).join("、")||"なし")}</p></div>
    <h3>条件の確かめ方</h3><table><tr><th>区分</th><th>条件</th><th>確かめる事実</th></tr>${L.must.concat(L.want).map(C=>`<tr><td>${S.m6.c[C.id]===3?"必須":"歓迎"}</td><td><b>${esc(C.n)}</b></td><td>${esc(C.chk)}</td></tr>`).join("")}</table>
-   <h3>興味のタイプ ${esc(code)}</h3><div style="display:grid;grid-template-columns:240px 1fr;gap:12px;align-items:center;break-inside:avoid"><div>${hexSVG()}</div><div>${code.split("").map(k=>`<p style="margin:4px 0"><b>${k} ${HEX[k][0]}</b>:${esc(HEX[k][1])}<br><span class="small">文系:${esc(HEX[k][2])} / 理系:${esc(HEX[k][3])}</span></p>`).join("")}</div></div>`;}}};
-const fileBase=k=>(SEC[k].file+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
+   <h3>興味のタイプ ${esc(code)}</h3><div style="display:grid;grid-template-columns:240px 1fr;gap:12px;align-items:center;break-inside:avoid"><div>${hexSVG()}</div><div>${code.split("").map(k=>`<p style="margin:4px 0"><b>${k} ${HEX[k][0]}</b>:${esc(HEX[k][1])}<br><span class="small">文系:${esc(HEX[k][2])} / 理系:${esc(HEX[k][3])}</span></p>`).join("")}</div></div>`;}},
+ m7:{title:"企業マッチ度の結果",file:"企業マッチ度",
+  md(){const R=m7Results(),ax=scoreAxes();if(!R.res.length)return["(まだ採点した会社がありません)"];
+   return[mdTable(["評価軸","重み",...R.res.map(r=>r.c.n)],ax.map(a=>[a.l,a.w,...R.res.map(r=>(r.c.m7.s[a.k]||3)+(r.c.m7.note[a.k]?`(${r.c.m7.note[a.k]})`:""))]).concat([["NG条件に当てはまる","—",...R.res.map(r=>r.ng?"当てはまる(除外)":"—")],["必須条件をすべて満たす","—",...R.res.map(r=>r.must?"満たす":"未確認")],["合計(重み×点数)","—",...R.res.map(r=>`${r.s}/${r.m}`)]])),`**判定:**${R.msg}`];},
+  html(){const R=m7Results(),ax=scoreAxes();if(!R.res.length)return `<p>(まだ採点した会社がありません)</p>`;
+   return `<table><tr><th>評価軸</th><th>重み</th>${R.res.map(r=>`<th>${esc(r.c.n)}</th>`).join("")}</tr>${ax.map(a=>`<tr><td>${esc(a.l)}</td><td>${a.w}</td>${R.res.map(r=>`<td><b>${r.c.m7.s[a.k]||3}</b>${r.c.m7.note[a.k]?`<br><span class="small">${esc(r.c.m7.note[a.k])}</span>`:""}</td>`).join("")}</tr>`).join("")}
+   <tr><td>NG条件</td><td></td>${R.res.map(r=>`<td>${r.ng?"当てはまる(除外)":"—"}</td>`).join("")}</tr><tr><td>必須条件</td><td></td>${R.res.map(r=>`<td>${r.must?"満たす":"未確認"}</td>`).join("")}</tr><tr><td><b>合計</b></td><td></td>${R.res.map(r=>`<td><b>${r.s}</b> / ${r.m}</td>`).join("")}</tr></table>
+   <div class="rp-box"><b>判定:</b>${esc(R.msg)}</div>`;}},
+ m8:{title:"1社検証の結果",file:"1社検証",
+  md(){const c=coById(S.m8cur);if(!c||!c.verdict)return["(まだ結果がありません)"];const B=m8Of(c),V=m8Verdict(c),t=top5(),imp=selfImp();
+   return[`## ${c.n}:${VERDICT[V.k].l}`,V.why+(V.notes.length?"\n\n"+V.notes.map(n=>`- ${n}`).join("\n"):""),
+    "## B0 惹かれている理由",B0.map((g,gi)=>`- ${B0G[gi][0]}:${g.filter((x,ti)=>B.b0.includes(gi+"-"+ti)).join("、")||"なし"}`).join("\n"),
+    "## B1 7つの地雷",mdTable(["地雷","判定"],MINES.map((M,k)=>[M.n,B.mines[k]===2?"あり":B.mines[k]===0?"なし":"不明"])),
+    "## B2 12の軸(1〜5、根拠がなければ3)",mdTable(["軸","点数"],AX.map((x,k)=>[`${k+1} ${x.n}`,B.ax[k]])),
+    "## B3 トップ5が満たされる事実",t.map((v,k)=>{const o=B.b3[v]||{};return `${k+1}. ${v}(${o.ok?"事実で書けた":"未確認"}):${o.t||"(未記入)"}`;}).join("\n"),
+    "## B4 あなたと会社の価値のずれ",mdTable(["価値","あなた","会社","差"],VALS.map(v=>{const co=B.b4[v.n]||3;return[v.n,imp[v.n],co,(co-imp[v.n]>0?"+":"")+(co-imp[v.n])];})),
+    "## B5 3年後に後悔するとしたら",quoteMd(B.pre),"## B6 親友へのアドバイス",quoteMd(B.friend),"## 次に聞くこと",m8Asks(c).map(q=>`- ${q}`).join("\n")||"(なし)"];},
+  html(){const c=coById(S.m8cur);if(!c||!c.verdict)return `<p>(まだ結果がありません)</p>`;const B=m8Of(c),V=m8Verdict(c),t=top5(),imp=selfImp();
+   return `<div class="rp-char">${myChar(VERDICT[V.k].e,120)}<div><h2>${esc(c.n)}</h2><p style="margin:2px 0"><b>${esc(VERDICT[V.k].l)}</b></p><p class="small" style="margin:0">${esc(V.why)}</p></div></div>
+   <h3>B1 7つの地雷</h3><p>${MINES.map((M,k)=>`${esc(M.n)}:<b>${B.mines[k]===2?"あり":B.mines[k]===0?"なし":"不明"}</b>`).join(" / ")}</p>
+   <h3>B2 12の軸</h3><table>${AX.map((x,k)=>`<tr><td>${k+1} ${esc(x.n)}</td><td><b>${B.ax[k]}</b></td></tr>`).join("")}</table>
+   <h3>B3 トップ5が満たされる事実</h3><table>${t.map((v,k)=>{const o=B.b3[v]||{};return `<tr><td><b>${k+1}. ${esc(v)}</b></td><td>${esc(o.t||"(未記入)")}</td><td>${o.ok?"○":"×"}</td></tr>`;}).join("")}</table>
+   <h3>B4 価値のずれ(会社−あなた)</h3><p>${VALS.map(v=>{const d=(B.b4[v.n]||3)-imp[v.n];return `${esc(v.n)} <b>${d>0?"+":""}${d}</b>`;}).join(" / ")}</p>
+   <h3>B5 3年後に後悔するとしたら</h3>${rpText(B.pre)}<h3>B6 親友へのアドバイス</h3>${rpText(B.friend)}
+   <h3>次に聞くこと</h3><ol>${m8Asks(c).map(q=>`<li>${esc(q)}</li>`).join("")}</ol>`;}}};
+const fileBase=k=>(SEC[k].file+(k==="m8"&&coById(S.m8cur)?"_"+coById(S.m8cur).n:"")+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
 function buildMD(k){return[`# ${SEC[k].title}`,`> 出力日:${today()} / 価値観マップ診断`,...SEC[k].md()].join("\n\n")+"\n";}
 function buildReport(k){return `<header class="rp-head"><h1>${esc(SEC[k].title)}</h1><p class="small" style="margin:0">出力日 ${today()} ・ 価値観マップ診断</p></header><section class="rp-sec">${SEC[k].html()}</section>`;}
 let saveKey="m1",reportMode=false,titleBak=null,scrollBak=0;
