@@ -1,13 +1,13 @@
 /* 価値観マップ診断:画面の進行、保存、価値観診断 */
 (function(){
 "use strict";
-const {VALS,QN,CARDS,TRIAGE,MODS,PROGRAMS,HOKUTO,EVIDENCE,BOOK,EPIS,DEF_EX,SELF_Q,LIKERT,SELF_T,WHY_WHAT,ASK5,ACT_EX}=window.Content;
+const {VALS,QN,CARDS,TRIAGE,MODS,PROGRAMS,HOKUTO,EVIDENCE,BOOK,EPIS,DEF_EX,SELF_Q,LIKERT,SELF_T,WHY_WHAT,ASK5,ACT_EX,MINES,MINE_OPT,OT,REDFLAGS,CONDS,COND_OPT,HEX,RIASEC_Q,RI_OPT,DIRS,SOURCES}=window.Content;
 const CH=window.Chara;
 const $=(s,r)=>(r||document).querySelector(s),$$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const reduce=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 const KEY="vmap-shindan-v2",OLD="vmap-visual-v1";
-const IMPL={m1:true,m2:true,m3:true,m4:true};// 実装済みの診断
+const IMPL={m1:true,m2:true,m3:true,m4:true,m5:true,m6:true};// 実装済みの診断
 
 /* ---------- カードの辞書 ---------- */
 const CAT={},EX={};
@@ -19,7 +19,7 @@ const DECK_N=VALS.length*6;
 function fresh(){return{v:2,tri:[],prog:null,done:{},stampNew:null,cards:{},custom:[],rank:[],ev:{},def:{},gap:{},f:{},flags:[],
  mines:[null,null,null,null,null,null,null],ax:Array(12).fill(3),b0:[],b3:{},b4:{},
  sc:{w:{},co:[{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}}]},
- m1:{phase:null,order:null,pos:0,short:false,duel:null,dh:[]},m3:[],missions:[],migrated:false,migSeen:false};}
+ m1:{phase:null,order:null,pos:0,short:false,duel:null,dh:[]},m3:[],m5:{mines:[],ot:null},m6:{order:null,c:{},ri:[]},missions:[],migrated:false,migSeen:false};}
 const isObj=o=>o&&typeof o==="object"&&!Array.isArray(o);
 const badName=v=>typeof v!=="string"||!v.trim()||/[|]/.test(v)||v in Object.prototype||v.length>30;
 let S=fresh();
@@ -29,6 +29,8 @@ function load(){let raw=null;try{raw=localStorage.getItem(KEY);}catch(e){}
  S.custom=(Array.isArray(S.custom)?S.custom:[]).filter(c=>!badName(c));
  ["cards","ev","def","gap","f","b3","b4","done"].forEach(k=>{if(!isObj(S[k]))S[k]={};});
  ["tri","rank","flags","b0","m3","missions"].forEach(k=>{if(!Array.isArray(S[k]))S[k]=[];});
+ const F=fresh();["m5","m6"].forEach(k=>{S[k]=Object.assign(F[k],isObj(S[k])?S[k]:{});});
+ if(!Array.isArray(S.m5.mines))S.m5.mines=[];if(!isObj(S.m6.c))S.m6.c={};if(!Array.isArray(S.m6.ri))S.m6.ri=[];
  S.rank=S.rank.filter(c=>typeof c==="string"&&S.cards[c]===3);}
 // 前のページ(vmap-visual-v1)の入力を引き継ぐ。形式が同じ項目はそのまま使う
 function migrate(o){const pick=(k,t)=>{if(t==="arr"?Array.isArray(o[k]):isObj(o[k]))S[k]=o[k];};
@@ -77,7 +79,7 @@ function analysis(){const t=top5();
  const center=!cnt[mx[0]]?"判定なし":QN[mx[0]]+(cnt[mx[1]]>0&&cnt[mx[1]]>=cnt[mx[0]]*.6?" と "+QN[mx[1]]:"");
  const zero=Object.keys(cnt).filter(k=>cnt[k]===0).map(k=>QN[k]);
  const conf=[];if(cnt.open&&cnt.cons)conf.push(["開放性","保守","挑戦と安定"]);if(cnt.enh&&cnt.trans)conf.push(["自己高揚","自己超越","成果・報酬と貢献"]);
- return{t,hl,center,zero,conf,ch:charPick()};}
+ return{t,hl,center,zero,conf,qs:mx.filter(k=>cnt[k]>0),ch:charPick()};}
 const exOf=c=>EX[c]?EX[c]:`「${c}」`;
 function summary3(A){const t=A.t,L=[];
  if(t[0])L.push(`${exOf(t[0])}が、一番の条件`);
@@ -578,6 +580,124 @@ SCREENS.zukan=(a)=>{const t=top5(),ch=S.done.m1?charPick():null;
  <div class="btns">${S.done.m1?`<a class="b sec wide" href="#/m1/result">価値観診断の結果にもどる</a>`:`<a class="b wide" href="#/m1">価値観診断をする</a>`}</div>`;
  return{html:h,title:"価値キャラ図鑑",bar:S.prog?progBtn:`<a class="iconb" href="#/">トップ</a>`,after(){$$("[data-z]").forEach(b=>b.onclick=()=>{go("zukan/"+b.dataset.z,true);const z=$("#zinfo");if(z&&z.scrollIntoView)z.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"});});}};};
 
+/* ---------- M5 地雷センサー ---------- */
+const m5Next=()=>{const i=MINES.findIndex((x,k)=>S.m5.mines[k]==null);return i>=0?"m5/card/"+(i+1):S.m5.ot==null?"m5/ruler":"m5/result";};
+SCREENS.m5=(a)=>{const sub=a[0];
+ if(sub==="card")return m5Card(Math.min(7,Math.max(1,+a[1]||1)));
+ if(sub==="ruler")return m5Ruler();
+ if(sub==="result"){if(!S.done.m5){go(m5Next(),true);return false;}return m5Result();}
+ go(S.done.m5?"m5/result":m5Next(),true);return false;};
+function m5Card(n){const M=MINES[n-1],cur=S.m5.mines[n-1];
+ const h=`${modHead("地雷センサー",n,7)}
+ ${n===1?guideHTML("合う職場を探す前に、誰にとっても健康を損なう条件を知っておこう。カードをタップすると、根拠と見分け方が見られるよ","normal"):""}
+ <button type="button" class="flip" id="flip" aria-pressed="false" aria-label="${esc(M.n)}のカード。タップで裏返す"><span class="inner">
+  <span class="face front"><span class="mtag">地雷 ${n}</span><b>${esc(M.n)}</b><span class="md">${esc(M.d)}</span><span class="turn">タップで裏返す ↻</span></span>
+  <span class="face back"><span class="mtag">根拠</span><b class="risk">${esc(M.risk)}</b><span class="small">${esc(M.src)}</span><span class="lk">見分け方</span><span class="lks">${M.look.map(x=>`<span>・${esc(x)}</span>`).join("")}</span></span></span></button>
+ <h2 class="q" style="font-size:20px">あなたにとって、この条件は?</h2>
+ <div class="opts" role="group">${MINE_OPT.map((o,i)=>`<button type="button" class="opt" data-v="${2-i}" aria-pressed="${cur===2-i}">${esc(o)}${CIRC}</button>`).join("")}</div>
+ ${n>1?`<button type="button" class="linkb" id="qBack" style="margin-top:16px">← ひとつ前へ</button>`:""}`;
+ return{html:h,title:"地雷センサー",bar:progBtn,after(){const f=$("#flip");f.onclick=()=>{const on=f.getAttribute("aria-pressed")!=="true";f.setAttribute("aria-pressed",String(on));};
+  let busy=false;$$(".opt").forEach(b=>b.onclick=()=>{if(busy)return;busy=true;$$(".opt").forEach(x=>{x.classList.remove("on");x.setAttribute("aria-pressed","false");});void b.offsetWidth;b.classList.add("on");b.setAttribute("aria-pressed","true");spark(b);
+   const v=+b.dataset.v;S.m5.mines[n-1]=v;save();if(v===0)peek("これは誰の健康にも関わる条件だよ。気にならなくても、確かめてはおこう","think");
+   later(()=>go(n<7?"m5/card/"+(n+1):"m5/ruler"),v===0?1300:420);});
+  const bk=$("#qBack");if(bk)bk.onclick=()=>go("m5/card/"+(n-1));}};}
+const otRuler=sel=>`<div class="ruler" aria-hidden="true"><div class="zones"><i style="flex:20" class="z1"></i><i style="flex:25" class="z2"></i><i style="flex:35" class="z3"></i><i style="flex:20" class="z4"></i></div>
+ <div class="ticks"><span style="left:0">0</span><span style="left:20%">20</span><span style="left:45%">45</span><span style="left:80%">80</span><span style="left:100%">100h</span></div>
+ <div class="zl"><span style="flex:20">健全</span><span style="flex:25">原則の上限</span><span style="flex:35">要警戒</span><span style="flex:20">過労死ライン</span></div>${sel?`<b class="pin" style="left:${sel}%">▼ あなた</b>`:""}</div>`;
+function m5Ruler(){const cur=S.m5.ot;
+ const h=`${modHead("地雷センサー ・ 残業のものさし",0,0)}<h1 class="q">残業は、月何時間までならOK?</h1>
+ ${guideHTML("日本の法律では、残業は原則月45時間まで。月80時間を超えると「過労死ライン」と呼ばれる水準だよ","think")}
+ ${otRuler(cur)}
+ <div class="opts" role="group" style="margin-top:18px">${OT.map(o=>`<button type="button" class="opt" data-h="${o.h}" aria-pressed="${cur===o.h}"><b style="font-family:var(--round)">${esc(o.n)}</b><br><span class="small">${esc(o.d)}</span>${CIRC}</button>`).join("")}</div>
+ <p class="small">月80時間を超える働き方は、健康への影響がはっきりしているため選択肢に入れていません。</p>
+ <button type="button" class="linkb" id="qBack">← ひとつ前へ</button>`;
+ return{html:h,title:"地雷センサー",bar:progBtn,after(){let busy=false;$$(".opt").forEach(b=>b.onclick=()=>{if(busy)return;busy=true;$$(".opt").forEach(x=>{x.classList.remove("on");x.setAttribute("aria-pressed","false");});void b.offsetWidth;b.classList.add("on");b.setAttribute("aria-pressed","true");spark(b);
+  S.m5.ot=+b.dataset.h;finishMod("m5");later(()=>go("m5/result"),420);});$("#qBack").onclick=()=>go("m5/card/7");}};}
+function m5NG(){const L=[];MINES.forEach((M,i)=>{if(S.m5.mines[i]===2)L.push(M.n);});if(S.m5.ot!=null)L.push(`残業が月${S.m5.ot}時間を超える`);return L;}
+const riskBars=()=>`<div class="rbars">${[["長時間労働 → 脳卒中",1.33],["高ストレイン → うつ病",1.27],["努力が報われない → うつ病",1.49],["高ストレイン → 心臓の病気",1.23],["長時間労働 → 心臓の病気",1.13]].map(([l,x])=>`<div><span>${l}</span><i><u style="width:${((x-1)/.6*100).toFixed(0)}%"></u></i><em>${x}倍</em></div>`).join("")}</div><p class="small">バーは、その条件がない人と比べたリスクの高さ。1つ1つは「3割増し」ほどでも、何十年も働く中で積み重なります。</p>`;
+function m5Result(){const ng=m5NG(),chk=MINES.filter((M,i)=>S.m5.mines[i]===1).map(M=>M.n),ok=MINES.filter((M,i)=>S.m5.mines[i]===0).map(M=>M.n);
+ const h=`<div class="reshead"><p class="kick">地雷センサーの結果</p>${myChar("fired",150,"alive")}<h1 style="font-size:28px">あなたのNG条件リスト</h1><p class="small" style="margin:4px 0 0">1つでも当てはまったら、候補から外す条件です</p></div>
+ <div class="nglist">${ng.map(x=>`<span>× ${esc(x)}</span>`).join("")||`<p class="small">「絶対に避けたい」がありません。残業のものさしだけでも、NG条件に入れておこう。</p>`}</div>
+ ${chk.length?`<div class="card"><h3>確かめたいリスト</h3><p class="small">「程度による」と答えた条件。面接やOB・OG訪問で、見分け方の質問をしよう。</p><ul class="mislist">${chk.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:""}
+ ${ok.length?`<p class="small">「あまり気にならない」と答えた条件(${esc(ok.join("、"))})も、健康に関わるため、見分け方だけは確かめておくのがおすすめです。</p>`:""}
+ <h2 class="h2s">残業のものさし</h2>${otRuler(S.m5.ot)}
+ <h2 class="h2s">地雷が健康に与える影響</h2>${riskBars()}
+ <details class="acc"><summary>応募前・面接中に使うチェックリスト</summary><div class="in"><p class="small">1つでも強く当てはまったら、その会社は詳しく確かめよう。</p><ul class="rf">${REDFLAGS.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></details>
+ <details class="acc"><summary>7つの地雷の見分け方</summary><div class="in">${MINES.map(M=>`<p style="margin:8px 0 2px"><b>${esc(M.n)}</b></p><ul class="rf">${M.look.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`).join("")}
+  <p class="small"><a href="${encodeURI(BOOK)}#page=27" target="_blank" rel="noopener">詳細資料へのリンク(第5章 p.27)↗</a></p></div></details>
+ ${missionHTML([{t:"気になる会社1社の青少年雇用情報(残業・離職率・有給)を調べる",from:"m5"}])}
+ <div class="gorow">${nextBtn("m5")}<button type="button" class="b sec wide" id="save5">結果を保存(テキスト/PDF)</button><a class="linkb" href="#/m5/card/1">答え直す</a></div>`;
+ return{html:h,title:"地雷センサーの結果",bar:progBtn,after(){bindMissions();$("#save5").onclick=()=>openSave("m5");}};}
+
+/* ---------- M6 理想の職場 ---------- */
+const condById={};CONDS.forEach(c=>condById[c.id]=c);
+function condRel(C){const t=top5();for(let i=0;i<t.length;i++){const k=CAT[t[i]];if(k&&C.v.includes(k))return{r:i+1,c:t[i],k};}return null;}
+function condOrder(){const w=C=>{const r=condRel(C);return r?r.r:C.c?6:7;};return CONDS.map((C,i)=>({C,i})).sort((a,b)=>w(a.C)-w(b.C)||a.i-b.i).map(x=>x.C.id);}
+const mustN=()=>Object.values(S.m6.c).filter(v=>v===3).length;
+function m6Next(){const M=S.m6;if(!Array.isArray(M.order)||M.order.length!==CONDS.length)M.order=condOrder();
+ const i=M.order.findIndex(id=>M.c[id]==null);if(i>=0)return "m6/cond/"+(i+1);const j=RIASEC_Q.findIndex((q,k)=>M.ri[k]==null);return j>=0?"m6/ri/"+(j+1):"m6/result";}
+SCREENS.m6=(a)=>{const sub=a[0];
+ if(sub==="cond"){if(!Array.isArray(S.m6.order)||S.m6.order.length!==CONDS.length){S.m6.order=condOrder();save();}return m6Cond(Math.min(CONDS.length,Math.max(1,+a[1]||1)));}
+ if(sub==="ri")return m6Ri(Math.min(12,Math.max(1,+a[1]||1)));
+ if(sub==="result"){if(!S.done.m6){go(m6Next(),true);return false;}return m6Result();}
+ go(S.done.m6?"m6/result":m6Next(),true);return false;};
+function m6Cond(n){const N=CONDS.length,C=condById[S.m6.order[n-1]],cur=S.m6.c[C.id],rel=condRel(C),mn=mustN();
+ const why=rel?`あなたの${rel.r}位「${esc(rel.c)}」(${esc(rel.k)})と相性がいい条件だよ`:C.c?"誰にとっても大切な条件だよ。研究で満足や意欲との関係が確かめられている":"";
+ const h=`<div class="qhead">理想の職場 ・ 条件カード ${n}/${N}</div><div class="pbar"><i style="width:${(n-1)/N*100}%"></i></div>
+ ${n===1?guideHTML("条件カードを1枚ずつ、直感で仕分けよう。必須は3つまで。多すぎると、当てはまる会社がほとんどなくなっちゃうんだ","normal"):""}
+ <div class="prof ccard2" id="cc"><div class="ph">${esc(C.n)}</div><div class="pb"><p style="margin:0">${esc(C.d)}</p>${why?`<p class="why">${why}</p>`:""}</div></div>
+ <div class="tri">${COND_OPT.slice().reverse().map(o=>`<button type="button" class="${o.v===3?"mu":o.v===0?"ng":""}" data-v="${o.v}" aria-pressed="${cur===o.v}"><span>${o.s}</span>${esc(o.n)}</button>`).join("")}</div>
+ <p class="pickcount">必須は3つまで。${mn>=3?"もう3つ選んだよ":`あと${3-mn}つ選べるよ`}</p>
+ ${n>1?`<button type="button" class="linkb" id="qBack">← ひとつ前へ</button>`:""}`;
+ return{html:h,title:"理想の職場",bar:progBtn,after(){let busy=false;
+  $$(".tri button").forEach(b=>b.onclick=()=>{if(busy)return;const v=+b.dataset.v;
+   if(v===3&&cur!==3&&mustN()>=3){peek("必須は3つまでにしよう。迷ったら「あると嬉しい」に","think");return;}
+   busy=true;S.m6.c[C.id]=v;save();b.setAttribute("aria-pressed","true");const cc=$("#cc");if(!reduce)cc.classList.add(v===0?"gol":v===3?"gou":"gor");
+   later(()=>go(n<N?"m6/cond/"+(n+1):"m6/ri/1"),260);});
+  const bk=$("#qBack");if(bk)bk.onclick=()=>go("m6/cond/"+(n-1));
+  const key=e=>{const m={"1":0,"2":1,"3":2,"4":3}[e.key];if(m!=null){const b=$(`.tri button[data-v="${m}"]`);if(b)b.click();}};document.addEventListener("keydown",key);cleanup=()=>document.removeEventListener("keydown",key);}};}
+function m6Ri(n){const Q=RIASEC_Q[n-1],cur=S.m6.ri[n-1];
+ const h=`${modHead("理想の職場 ・ 興味",n,12)}
+ ${n===1?guideHTML("次は、どんな作業にわくわくするか。職種の方向を考える手がかりにするよ","normal"):""}
+ <h1 class="q">${esc(Q[1])}</h1><p class="qhint">仕事として、やってみたい?</p>
+ <div class="opts" role="group">${RI_OPT.map((o,i)=>`<button type="button" class="opt" data-v="${2-i}" aria-pressed="${cur===2-i}">${esc(o)}${CIRC}</button>`).join("")}</div>
+ <button type="button" class="linkb" id="qBack" style="margin-top:16px">← ひとつ前へ</button>`;
+ return{html:h,title:"理想の職場",bar:progBtn,after(){let busy=false;
+  $$(".opt").forEach(b=>b.onclick=()=>{if(busy)return;busy=true;$$(".opt").forEach(x=>{x.classList.remove("on");x.setAttribute("aria-pressed","false");});void b.offsetWidth;b.classList.add("on");b.setAttribute("aria-pressed","true");spark(b);
+   S.m6.ri[n-1]=+b.dataset.v;save();later(()=>{if(n<12)go("m6/ri/"+(n+1));else{finishMod("m6");go("m6/result");}},420);});
+  $("#qBack").onclick=()=>go(n>1?"m6/ri/"+(n-1):"m6/cond/"+CONDS.length);}};}
+function riScores(){const s={R:0,I:0,A:0,S:0,E:0,C:0};RIASEC_Q.forEach((q,i)=>{s[q[0]]+=+(S.m6.ri[i]||0);});return s;}
+function riCode(){const s=riScores();return Object.keys(HEX).map((k,i)=>({k,v:s[k],i})).sort((a,b)=>b.v-a.v||a.i-b.i).filter(x=>x.v>0).slice(0,3).map(x=>x.k).join("");}
+function hexSVG(){const s=riScores(),K=Object.keys(HEX),cx=150,cy=132,R=92;const pt=(i,r)=>{const a=(i*60-90)*Math.PI/180;return[cx+r*Math.cos(a),cy+r*Math.sin(a)];};
+ let g="";[1,.5].forEach(f=>{g+=`<polygon points="${K.map((k,i)=>pt(i,R*f).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="var(--hair)" stroke-width="1.5"/>`;});
+ g+=`<polygon points="${K.map((k,i)=>pt(i,R*Math.max(.06,s[k]/4)).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="var(--lemon)" fill-opacity=".75" stroke="var(--outline)" stroke-width="2.4" stroke-linejoin="round"/>`;
+ K.forEach((k,i)=>{const[x,y]=pt(i,R+22);g+=`<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor" font-family="Zen Maru Gothic, sans-serif">${k} ${HEX[k][0]}</text>`;});
+ return `<svg class="wheel" viewBox="0 0 300 264" role="img" aria-label="興味の六角形">${g}</svg>`;}
+function m6Lists(){const by=v=>CONDS.filter(C=>S.m6.c[C.id]===v);return{must:by(3),want:by(2),ng:by(0)};}
+function m6Result(){const L=m6Lists(),code=riCode(),ch=S.done.m1?charPick():null,A=analysis(),qs=A.qs||[];
+ const dirs=DIRS.filter(d=>code.slice(0,2).includes(d.i)&&qs.includes(d.q));
+ const ngAll=L.ng.map(C=>C.n).concat(S.done.m5?m5NG():[]);
+ const h=`<div class="reshead"><p class="kick">理想の職場の結果</p></div>
+ <div class="prof big"><div class="ph">${ch?cv(ch.i+"-"+ch.j,84,"alive"):mascot("cheer",70)}<div><span class="small">${ch?esc(charInfo(ch).name)+"の":"あなたの"}</span><b>理想の職場プロフィール</b></div></div>
+ <div class="pb"><div class="prow"><span class="pk mu">◎ 必須</span><div>${L.must.map(C=>`<span class="pc">${esc(C.n)}</span>`).join("")||`<span class="small">まだありません</span>`}</div></div>
+ <div class="prow"><span class="pk">○ 歓迎</span><div>${L.want.map(C=>`<span class="pc">${esc(C.n)}</span>`).join("")||`<span class="small">なし</span>`}</div></div>
+ <div class="prow"><span class="pk ng">× NG</span><div>${ngAll.map(x=>`<span class="pc">${esc(x)}</span>`).join("")||`<span class="small">なし</span>`}</div></div>
+ ${code?`<div class="prow"><span class="pk">興味</span><div><b class="code">${code}</b> <span class="small">${code.split("").map(k=>HEX[k][0]).join("・")}</span></div></div>`:""}</div></div>
+ ${!L.must.length?`<p class="small">必須がまだありません。トップ1〜3の価値に関わる条件を、1〜3つ必須にしておくと会社を選びやすくなります。</p>`:""}
+ <div class="memo"><h3>十分に良い会社の条件</h3><p style="margin:0">NGがなく、必須をすべて満たし、歓迎が多い会社。「最高の1社」を探し続けるより、満足しやすいことが研究で分かっています。</p></div>
+ <details class="acc"><summary>条件の確かめ方</summary><div class="in">${L.must.concat(L.want).map(C=>`<div class="cond"><b>${S.m6.c[C.id]===3?"◎":"○"}</b><span><b>${esc(C.n)}</b> → ${esc(C.chk)}</span></div>`).join("")||`<p class="small">必須・歓迎の条件がありません。</p>`}</div></details>
+ <details class="acc"><summary>興味と職種の方向</summary><div class="in">${hexSVG()}
+  ${code?code.split("").map(k=>`<p style="margin:6px 0"><b>${k} ${HEX[k][0]}</b>:${esc(HEX[k][1])}<br><span class="small">文系の例:${esc(HEX[k][2])} / 理系の例:${esc(HEX[k][3])}</span></p>`).join(""):`<p class="small">「やってみたい」がなかったため、興味のタイプは出ませんでした。</p>`}
+  ${dirs.length?`<h4 style="margin:12px 0 4px">価値観の重心とあわせると</h4>${dirs.map(d=>`<p style="margin:4px 0">${d.i} × ${esc(QN[d.q])}:${esc(d.b)}<span class="small">(理系:${esc(d.r)})</span></p>`).join("")}`:""}
+  <p class="small">これは「職種の決定」ではなく「調べる方向の仮説」です。厚生労働省の job tag の職業興味検査で、より詳しく確かめられます。</p></div></details>
+ <details class="acc"><summary>候補の集め方と、公的なデータの調べ方</summary><div class="in">
+  <div class="funnel"><span style="width:100%">30〜50社 公開データを確認(1社10分)</span><span style="width:78%">10〜20社 点数をつけて比べる</span><span style="width:56%">3〜5社 1社検証</span></div>
+  ${SOURCES.map(([a,b])=>`<p style="margin:6px 0"><b>${esc(a)}</b><br><span class="small">${esc(b)}</span></p>`).join("")}
+  <p class="small"><a href="${encodeURI(BOOK)}#page=42" target="_blank" rel="noopener">詳細資料へのリンク(第8章 p.42・第10章 p.56)↗</a></p></div></details>
+ ${missionHTML([{t:"必須条件を満たしそうな会社を、しょくばらぼや認定企業の一覧から3社探す",from:"m6"},{t:"job tagの職業興味検査を受けて、興味のタイプを確かめる",from:"m6"}])}
+ <div class="gorow">${nextBtn("m6")}<button type="button" class="b sec wide" id="save6">結果を保存(テキスト/PDF)</button><a class="linkb" href="#/m6/cond/1">条件カードを選び直す</a></div>`;
+ return{html:h,title:"理想の職場の結果",bar:progBtn,after(){bindMissions();$("#save6").onclick=()=>openSave("m6");}};}
+
 /* ---------- キャラを画像にする(友達と共有する用) ---------- */
 function loadImg(src){return new Promise((ok,ng)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=ng;im.src=src;});}
 async function shareImage(A,I){const W=900,H=1200,cv2=document.createElement("canvas");cv2.width=W;cv2.height=H;const g=cv2.getContext("2d");
@@ -655,7 +775,19 @@ const SEC={
    <h3>身近な人に聞く5つの質問</h3><ol>${ASK5.map(q=>`<li>${esc(q)}</li>`).join("")}</ol><h3>もらった答えのメモ</h3>${rpText(S.f.feedback)}`;}},
  m4:{title:"ギャップ診断の結果",file:"ギャップ診断",
   md(){if(!S.done.m4)return["(まだ結果がありません)"];return["## 大切さと今の満たされ方(0〜10)",mdTable(["価値","大切さ","今の満たされ方","差","今週できる小さな行動"],m4Rows().map(r=>[r.c,r.g[0],r.g[1],r.g[0]-r.g[1],r.g[2]]))];},
-  html(){if(!S.done.m4)return `<p>(まだ結果がありません)</p>`;return `<table><tr><th>価値</th><th>大切さ</th><th>今の満たされ方</th><th>差</th><th>今週できる小さな行動</th></tr>${m4Rows().map(r=>`<tr><td><b>${esc(r.c)}</b></td><td>${r.g[0]}</td><td>${r.g[1]}</td><td><b>${r.g[0]-r.g[1]}</b></td><td>${esc(r.g[2]||"—")}</td></tr>`).join("")}</table><p class="small">差が大きい価値は、今の環境で満たされにくい価値。職場選びで特に重視する。</p>`;}}};
+  html(){if(!S.done.m4)return `<p>(まだ結果がありません)</p>`;return `<table><tr><th>価値</th><th>大切さ</th><th>今の満たされ方</th><th>差</th><th>今週できる小さな行動</th></tr>${m4Rows().map(r=>`<tr><td><b>${esc(r.c)}</b></td><td>${r.g[0]}</td><td>${r.g[1]}</td><td><b>${r.g[0]-r.g[1]}</b></td><td>${esc(r.g[2]||"—")}</td></tr>`).join("")}</table><p class="small">差が大きい価値は、今の環境で満たされにくい価値。職場選びで特に重視する。</p>`;}},
+ m5:{title:"地雷センサーの結果",file:"地雷センサー",
+  md(){return["## NG条件リスト",m5NG().map(x=>`- ${x}`).join("\n")||"(なし)","## 7つの地雷への答え",mdTable(["地雷","内容","あなたの答え"],MINES.map((M,i)=>[M.n,M.d,S.m5.mines[i]==null?"未回答":MINE_OPT[2-S.m5.mines[i]]])),
+   `## 残業のものさし\n- 許容できる上限:${S.m5.ot!=null?`月${S.m5.ot}時間`:"未回答"}`,"## 応募前・面接中に使うチェックリスト",REDFLAGS.map(x=>`- [ ] ${x}`).join("\n")];},
+  html(){return `<h3>NG条件リスト</h3><p>${m5NG().map(x=>`<b>× ${esc(x)}</b>`).join("  ")||"(なし)"}</p><h3>7つの地雷への答え</h3><table><tr><th>地雷</th><th>根拠</th><th>あなたの答え</th></tr>${MINES.map((M,i)=>`<tr><td><b>${esc(M.n)}</b><br><span class="small">${esc(M.d)}</span></td><td>${esc(M.risk)}</td><td>${S.m5.mines[i]==null?"未回答":esc(MINE_OPT[2-S.m5.mines[i]])}</td></tr>`).join("")}</table>
+   <h3>残業のものさし</h3><p>許容できる上限:<b>${S.m5.ot!=null?`月${S.m5.ot}時間`:"未回答"}</b>(原則の上限は月45時間、過労死ラインは月80時間)</p><h3>応募前・面接中に使うチェックリスト</h3><ul>${REDFLAGS.map(x=>`<li>☐ ${esc(x)}</li>`).join("")}</ul>`;}},
+ m6:{title:"理想の職場プロフィール",file:"理想の職場",
+  md(){const L=m6Lists(),code=riCode();return["## 条件",[`- 必須:${L.must.map(C=>C.n).join("、")||"なし"}`,`- 歓迎:${L.want.map(C=>C.n).join("、")||"なし"}`,`- NG:${L.ng.map(C=>C.n).concat(S.done.m5?m5NG():[]).join("、")||"なし"}`].join("\n"),
+   "## 条件の確かめ方",mdTable(["区分","条件","確かめる事実"],L.must.concat(L.want).map(C=>[S.m6.c[C.id]===3?"必須":"歓迎",C.n,C.chk])),
+   `## 興味のタイプ\n- コード:${code||"(なし)"}${code?"\n"+code.split("").map(k=>`- ${k} ${HEX[k][0]}:${HEX[k][1]}(文系の例:${HEX[k][2]} / 理系の例:${HEX[k][3]})`).join("\n"):""}`];},
+  html(){const L=m6Lists(),code=riCode();return `<div class="rp-box"><p style="margin:0"><b>◎ 必須:</b>${esc(L.must.map(C=>C.n).join("、")||"なし")}</p><p style="margin:4px 0 0"><b>○ 歓迎:</b>${esc(L.want.map(C=>C.n).join("、")||"なし")}</p><p style="margin:4px 0 0"><b>× NG:</b>${esc(L.ng.map(C=>C.n).concat(S.done.m5?m5NG():[]).join("、")||"なし")}</p></div>
+   <h3>条件の確かめ方</h3><table><tr><th>区分</th><th>条件</th><th>確かめる事実</th></tr>${L.must.concat(L.want).map(C=>`<tr><td>${S.m6.c[C.id]===3?"必須":"歓迎"}</td><td><b>${esc(C.n)}</b></td><td>${esc(C.chk)}</td></tr>`).join("")}</table>
+   <h3>興味のタイプ ${esc(code)}</h3><div style="display:grid;grid-template-columns:240px 1fr;gap:12px;align-items:center;break-inside:avoid"><div>${hexSVG()}</div><div>${code.split("").map(k=>`<p style="margin:4px 0"><b>${k} ${HEX[k][0]}</b>:${esc(HEX[k][1])}<br><span class="small">文系:${esc(HEX[k][2])} / 理系:${esc(HEX[k][3])}</span></p>`).join("")}</div></div>`;}}};
 const fileBase=k=>(SEC[k].file+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
 function buildMD(k){return[`# ${SEC[k].title}`,`> 出力日:${today()} / 価値観マップ診断`,...SEC[k].md()].join("\n\n")+"\n";}
 function buildReport(k){return `<header class="rp-head"><h1>${esc(SEC[k].title)}</h1><p class="small" style="margin:0">出力日 ${today()} ・ 価値観マップ診断</p></header><section class="rp-sec">${SEC[k].html()}</section>`;}
