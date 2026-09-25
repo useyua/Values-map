@@ -1,13 +1,13 @@
 /* 価値観マップ診断:画面の進行、保存、価値観診断 */
 (function(){
 "use strict";
-const {VALS,QN,CARDS,TRIAGE,MODS,PROGRAMS,HOKUTO,EVIDENCE,BOOK}=window.Content;
+const {VALS,QN,CARDS,TRIAGE,MODS,PROGRAMS,HOKUTO,EVIDENCE,BOOK,EPIS,DEF_EX,SELF_Q,LIKERT,SELF_T,WHY_WHAT,ASK5,ACT_EX}=window.Content;
 const CH=window.Chara;
 const $=(s,r)=>(r||document).querySelector(s),$$=(s,r)=>Array.from((r||document).querySelectorAll(s));
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const reduce=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 const KEY="vmap-shindan-v2",OLD="vmap-visual-v1";
-const IMPL={m1:true};// 実装済みの診断
+const IMPL={m1:true,m2:true,m3:true,m4:true};// 実装済みの診断
 
 /* ---------- カードの辞書 ---------- */
 const CAT={},EX={};
@@ -19,7 +19,7 @@ const DECK_N=VALS.length*6;
 function fresh(){return{v:2,tri:[],prog:null,done:{},stampNew:null,cards:{},custom:[],rank:[],ev:{},def:{},gap:{},f:{},flags:[],
  mines:[null,null,null,null,null,null,null],ax:Array(12).fill(3),b0:[],b3:{},b4:{},
  sc:{w:{},co:[{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}},{n:"",ng:false,must:false,s:{}}]},
- m1:{phase:null,order:null,pos:0,short:false,duel:null,dh:[]},migrated:false,migSeen:false};}
+ m1:{phase:null,order:null,pos:0,short:false,duel:null,dh:[]},m3:[],missions:[],migrated:false,migSeen:false};}
 const isObj=o=>o&&typeof o==="object"&&!Array.isArray(o);
 const badName=v=>typeof v!=="string"||!v.trim()||/[|]/.test(v)||v in Object.prototype||v.length>30;
 let S=fresh();
@@ -28,7 +28,7 @@ function load(){let raw=null;try{raw=localStorage.getItem(KEY);}catch(e){}
  else{let old=null;try{old=JSON.parse(localStorage.getItem(OLD)||"null");}catch(e){}if(isObj(old))migrate(old);}
  S.custom=(Array.isArray(S.custom)?S.custom:[]).filter(c=>!badName(c));
  ["cards","ev","def","gap","f","b3","b4","done"].forEach(k=>{if(!isObj(S[k]))S[k]={};});
- ["tri","rank","flags","b0"].forEach(k=>{if(!Array.isArray(S[k]))S[k]=[];});
+ ["tri","rank","flags","b0","m3","missions"].forEach(k=>{if(!Array.isArray(S[k]))S[k]=[];});
  S.rank=S.rank.filter(c=>typeof c==="string"&&S.cards[c]===3);}
 // 前のページ(vmap-visual-v1)の入力を引き継ぐ。形式が同じ項目はそのまま使う
 function migrate(o){const pick=(k,t)=>{if(t==="arr"?Array.isArray(o[k]):isObj(o[k]))S[k]=o[k];};
@@ -59,9 +59,12 @@ function peek(text,e){const old=$(".peek");if(old)old.remove();const d=document.
  d.innerHTML=`${mascot(e||"cheer",54)}<span class="bubble">${esc(text)}</span>`;document.body.appendChild(d);CH.paint(d);setTimeout(()=>d.classList.add("out"),reduce?1600:1500);setTimeout(()=>d.remove(),2000);}
 
 /* ---------- 価値観の分析 ---------- */
-const top5=()=>S.rank.filter(c=>S.cards[c]===3).slice(0,5);
+// 保留にした価値(エピソードが見つからない価値)は、保留でない価値の後ろに回す
+const held=c=>!!(S.ev[c]&&S.ev[c].hold);
+const effRank=()=>{const r=S.rank.filter(c=>S.cards[c]===3);return r.filter(c=>!held(c)).concat(r.filter(held));};
+const top5=()=>effRank().slice(0,5);
 const allCards=()=>Object.keys(CAT).concat(S.custom);
-function charPick(){const cats=S.rank.map(c=>CAT[c]).filter(Boolean);if(!cats.length)return null;
+function charPick(){const cats=effRank().map(c=>CAT[c]).filter(Boolean);if(!cats.length)return null;
  const i=VI[cats[0]];let j=null;for(const c of cats)if(VI[c]!==i){j=VI[c];break;}
  if(j==null){// トップ5がすべて同じ価値のときは、「とても大事」「重要」の枚数が多い価値を2番目にする
   const sc=VALS.map(()=>0);allCards().forEach(c=>{const k=CAT[c];if(!k||VI[k]===i)return;const r=S.cards[c];if(r===3)sc[VI[k]]+=3;else if(r===2)sc[VI[k]]+=1;});
@@ -127,7 +130,7 @@ SCREENS.top=()=>{const rs=resumeText();
  h+=`<div class="foot"><p>入力した内容は、この端末のブラウザにだけ保存されます。外部には送信しません。</p>
  <p><a href="${encodeURI(BOOK)}" target="_blank" rel="noopener">詳細資料:価値観マップと科学的職場選び 解説実践ブック(PDF・66ページ)</a></p>
  ${rs?`<button type="button" class="linkb" id="redoTri">入口の質問からやり直す</button>`:""}
- <button type="button" class="linkb" id="resetAll">入力をすべて消す</button></div>`;
+ ${S.done.m1?`<p><a href="#/zukan">価値キャラ図鑑</a></p>`:""}<button type="button" class="linkb" id="resetAll">入力をすべて消す</button></div>`;
  return{html:h,after(){
   const mo=$("#migOk");if(mo)mo.onclick=()=>{S.migSeen=true;save();mo.closest(".card").remove();};
   const re=$("#resume");if(re)re.onclick=()=>{const m=nextMod();go(m&&IMPL[m]?m:"program");};
@@ -166,7 +169,7 @@ SCREENS.program=()=>{if(!S.prog){go("q/1",true);return false;}
  const slot=(label,sub,state,inner,href)=>`<button type="button" class="slot ${state}" ${href?`data-go="${href}"`:"disabled"}><span class="ring">${inner}</span>${esc(label)}<small>${esc(sub)}</small></button>`;
  let g=slot("入口の質問","クリア","done",stampSVG("クリア",isNew==="tri"),"q/1");
  P.mods.forEach(m=>{const d=S.done[m],impl=IMPL[m];
-  if(d){const ch=m==="m1"?charPick():null;g+=slot(MODS[m].n,"クリア","done",ch?`${cv(ch.i+"-"+ch.j,52)}`+`<span style="position:absolute;right:-18px;bottom:-16px;width:40px">${stampSVG("済",isNew===m)}</span>`:stampSVG("クリア",isNew===m),m);}
+  if(d){const ch=m==="m1"?charPick():null;g+=slot(MODS[m].n,"クリア","done",ch?`${cv(ch.i+"-"+ch.j,52)}`+`<span class="ministamp">${stampSVG("済",isNew===m)}</span>`:stampSVG("クリア",isNew===m),m);}
   else if(!impl)g+=slot(MODS[m].n,MODS[m].t,"soon","準備中",null);
   else g+=slot(MODS[m].n,MODS[m].t,m===nx?"now":"",m===nx?"次":"",m);});
  g+=slot("最終レポート","すべて終えたら","soon","★",null);
@@ -178,6 +181,8 @@ SCREENS.program=()=>{if(!S.prog){go("q/1",true);return false;}
  <div class="btns">${nx?(nxImpl?`<a class="b wide" href="#/${nx}">${esc(MODS[nx].n)}を${nx==="m1"&&S.m1.phase?"つづける":"はじめる"}</a>`:`<button type="button" class="b wide" aria-disabled="true" id="nxSoon">${esc(MODS[nx].n)}は準備中</button>`):""}
  ${S.done.m1?`<a class="b sec wide" href="#/m1/result">価値観診断の結果を見る</a>`:""}</div>
  ${nx&&!nxImpl?`<p class="soon-note">この診断は次の段階で作ります。いまは価値観診断まで遊べます</p>`:""}
+ ${misBox()}
+ ${S.done.m1?`<a class="b sec wide" href="#/zukan" style="margin-top:4px">価値キャラ図鑑</a>`:""}
  <h2 style="font-size:18px;margin:28px 0 6px">このプログラムの診断</h2>
  <div class="modlist">${P.mods.map(m=>`<div class="moditem"><b>${esc(MODS[m].n)}</b><span class="tag ${S.done[m]?"ok":IMPL[m]?"go":"soon"}">${S.done[m]?"クリア":IMPL[m]?MODS[m].t:"準備中"}</span><span class="small">${esc(MODS[m].d)}</span></div>`).join("")}</div>
  ${P.later.length?`<details class="acc"><summary>ほかの診断(あとでできる)</summary><div class="in"><div class="modlist">${P.later.map(m=>`<div class="moditem"><b>${esc(MODS[m].n)}</b><span class="tag soon">${IMPL[m]?MODS[m].t:"準備中"}</span><span class="small">${esc(MODS[m].d)}</span></div>`).join("")}</div></div></details>`:""}
@@ -186,7 +191,11 @@ SCREENS.program=()=>{if(!S.prog){go("q/1",true);return false;}
  return{html:h,title:"あなたのプログラム",bar:`<a class="iconb" href="#/">トップ</a>`,after(){
   $$("[data-go]").forEach(b=>b.onclick=()=>{const m=b.dataset.go;if(m.startsWith("m")&&!IMPL[m])return toast("次の段階で作ります");go(m);});
   const ns=$("#nxSoon");if(ns)ns.onclick=()=>toast("次の段階で作ります");
-  $("#redoTri").onclick=()=>go("q/1");}};};
+  bindMisBox();$("#redoTri").onclick=()=>go("q/1");}};};
+function misBox(){const L=S.missions;if(!L.length)return "";const d=L.filter(x=>x.done).length;
+ return `<div class="card mis" id="misBox"><h3>今週のミッション <span class="small">${d}/${L.length} 完了</span></h3><div class="misl">${L.map((x,i)=>`<button type="button" class="misi" data-mi="${i}" aria-pressed="${!!x.done}"><i aria-hidden="true"></i><span>${esc(x.t)}</span></button>`).join("")}</div>${d?`<button type="button" class="linkb" id="misClr">終わったミッションを片づける</button>`:""}</div>`;}
+function bindMisBox(){$$("[data-mi]").forEach(b=>b.onclick=()=>{const x=S.missions[+b.dataset.mi];if(!x)return;x.done=!x.done;save();if(x.done)peek("ミッション達成!えらい!","cheer");keepScroll();});
+ const c=$("#misClr");if(c)c.onclick=()=>{S.missions=S.missions.filter(x=>!x.done);save();keepScroll();};}
 
 /* ---------- 価値観診断(M1) ---------- */
 SCREENS.m1=(a)=>{const sub=a[0],M=S.m1;
@@ -345,7 +354,7 @@ function confetti(box){if(reduce||!box)return;const cols=["var(--tomato)","var(-
 function m1Result(){const A=analysis();if(!A.t.length||!A.ch){go("m1",true);return false;}
  const I=charInfo(A.ch),t=A.t,sum=summary3(A);
  const vq=c=>CAT[c]?VALS[VI[CAT[c]]].q:"none";
- const rest=S.rank.filter(c=>S.cards[c]===3).slice(5);
+ const rest=effRank().slice(5);
  const h=`<div class="reshead"><p class="kick">今のあなたの優先順位は</p>${cv(A.ch.i+"-"+A.ch.j,250,"alive")}
  <h1>${esc(I.name)}</h1><p class="ttl">${esc(I.title)}</p><p class="pair">${esc(I.pair)}${I.yure?`<span class="yure">ゆれ</span>`:""}</p></div>
  <div class="persona"><span class="lbl">こんな子</span><p>${esc(I.text)}</p></div>
@@ -362,15 +371,212 @@ function m1Result(){const A=analysis();if(!A.t.length||!A.ch){go("m1",true);retu
   <p class="small">このあとの「理想の職場」で、必須・歓迎・NGの条件に仕上げます。</p></div></details>
  <details class="acc"><summary>この結果の根拠と限界</summary><div class="in"><div class="twocol"><div class="g"><h4>わかっていること</h4><ul>${EVIDENCE.good.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div class="l"><h4>気をつけること</h4><ul>${EVIDENCE.limit.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div>
   <p class="small"><a href="${encodeURI(BOOK)}#page=6" target="_blank" rel="noopener">詳細資料へのリンク(第1章 p.6・第2章 p.10)↗</a></p></div></details>
- <div class="gorow"><button type="button" class="b wide" id="share">キャラを画像で保存・シェア</button>
- <a class="b sec wide" href="#/program">プログラムにもどる</a>
+ ${missionHTML(m1Missions(t))}
+ <div class="gorow">${nextBtn("m1")}<button type="button" class="b sec wide" id="share">キャラを画像で保存・シェア</button>
+ <a class="b sec wide" href="#/zukan">価値キャラ図鑑を見る</a>
  <button type="button" class="b sec wide" id="saveM1">結果を保存(テキスト/PDF)</button>
  <button type="button" class="linkb" id="redo">価値観診断をやり直す</button></div>`;
  return{html:h,title:"価値観診断の結果",bar:progBtn,after(){
-  $("#share").onclick=()=>shareImage(A,I);
+  bindMissions();$("#share").onclick=()=>shareImage(A,I);
   $("#saveM1").onclick=()=>openSave("m1");
   $("#redo").onclick=()=>{if(!confirm("価値観診断をやり直します。仕分けと順位は消えます(書いた文章は残ります)。よろしいですか?"))return;
    Object.keys(CAT).concat(S.custom).forEach(c=>delete S.cards[c]);S.rank=[];S.m1=Object.assign(fresh().m1,{short:S.tri[1]===0});S.done.m1=false;save();go("m1");};}};}
+
+/* ---------- 共通:つぎへ・ミッション・入力欄 ---------- */
+function nextBtn(cur){const P=S.prog;const nx=P?P.mods.find(m=>!S.done[m]&&m!==cur):null;
+ if(nx&&IMPL[nx])return `<a class="b wide" href="#/${nx}">つぎは ${esc(MODS[nx].n)}(${esc(MODS[nx].t)})</a><a class="b sec wide" href="#/program">プログラムにもどる</a>`;
+ return `<a class="b wide" href="#/program">プログラムにもどる</a>`;}
+function finishMod(m){if(!S.done[m]){S.done[m]=true;S.stampNew=m;}save();}
+function missionHTML(list){if(!list.length)return "";const all=list.every(x=>S.missions.some(y=>y.t===x.t));
+ return `<div class="card mis"><h3>今週のミッション(${list.length}つ)</h3><ul class="mislist">${list.map(x=>`<li>${esc(x.t)}</li>`).join("")}</ul>${all?`<p class="small">受け取り済み。プログラム画面でチェックできます。</p>`:`<button type="button" class="b small" id="takeMis" data-mis="${esc(JSON.stringify(list))}">ミッションを受け取る</button>`}</div>`;}
+function addMissions(list){let n=0;list.forEach(x=>{if(x.t&&!S.missions.some(y=>y.t===x.t)){S.missions.push({t:x.t,from:x.from,done:false});n++;}});save();return n;}
+function bindMissions(){const b=$("#takeMis");if(!b)return;b.onclick=()=>{let list=[];try{list=JSON.parse(b.dataset.mis);}catch(e){}addMissions(list);
+ const p=document.createElement("p");p.className="small";p.textContent="受け取りました。プログラム画面でチェックできます。";b.replaceWith(p);peek("ミッション、いってらっしゃい!","cheer");};}
+function m1Missions(t){return t.length?[{t:`1位「${t[0]}」が満たされた瞬間を、今週1回メモする`,from:"m1"},{t:"友だちや家族に「私が大事にしていそうなこと3つは?」と聞いてみる",from:"m1"}]:[];}
+// 入力欄:書くたびに保存。テキストエリアは内容に合わせて高さを伸ばす
+const grow=t=>{t.style.height="auto";t.style.height=Math.max(t.scrollHeight+4,t.dataset.ev!=null?64:90)+"px";};
+function bindText(root){
+ $$("[data-f]",root).forEach(el=>{el.value=S.f[el.dataset.f]||"";el.addEventListener("input",()=>{S.f[el.dataset.f]=el.value;save();if(el.tagName==="TEXTAREA")grow(el);});if(el.tagName==="TEXTAREA")grow(el);});
+ const obj=(store,k,field)=>{store[k]=Object.assign({},store[k]||{},field);};
+ $$("[data-ev]",root).forEach(el=>{const c=el.dataset.ev;el.value=(S.ev[c]&&S.ev[c].t)||"";el.addEventListener("input",()=>{obj(S.ev,c,{t:el.value});save();grow(el);el.dispatchEvent(new CustomEvent("changed",{bubbles:true}));});grow(el);});
+ $$("[data-dm]",root).forEach(el=>{const c=el.dataset.dm;el.value=(S.def[c]&&S.def[c].m)||"";el.addEventListener("input",()=>{obj(S.def,c,{m:el.value});save();});});
+ $$("[data-ds]",root).forEach(el=>{const c=el.dataset.ds;el.value=(S.def[c]&&S.def[c].s)||"";el.addEventListener("input",()=>{obj(S.def,c,{s:el.value});save();});});}
+const keepScroll=()=>{const y=window.scrollY;render();window.scrollTo(0,y);};
+function needM1(title){return{html:`${guideHTML("この診断は、価値観診断で決めたトップ5を使うよ。先に価値観診断をやってみよう","think")}<div class="btns"><a class="b wide" href="#/m1">価値観診断へ</a><a class="b sec wide" href="#/program">プログラムにもどる</a></div>`,title,bar:progBtn};}
+const myChar=(e,w,cls)=>{const ch=S.done.m1?charPick():null;return ch?`<span class="cv ${cls||""}" data-c="${ch.i}-${ch.j}" data-e="${e||"normal"}" data-w="${w}"></span>`:mascot(e==="worry"||e==="curious"?"think":e==="sparkle"?"wow":"cheer",w,cls);};
+const modHead=(name,step,total)=>`<div class="qhead">${esc(name)}${total?` ${step}/${total}<span class="dots">${[...Array(total)].map((_,k)=>`<i class="${k<step?"on":""}"></i>`).join("")}</span>`:""}</div>`;
+async function copyText(txt,msgEl){let ok=false;try{await navigator.clipboard.writeText(txt);ok=true;}catch(e){const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{ok=document.execCommand("copy");}catch(e2){}ta.remove();}
+ if(msgEl)msgEl.textContent=ok?"コピーしました。LINEやメールに貼り付けて送れます。":"自動でコピーできませんでした。文章を長押しして選択してください。";return ok;}
+
+/* ---------- M2 エピソード検証 ---------- */
+const epText=k=>String(S.f[k]||"").trim();
+const snip=(s,n)=>s.length>n?s.slice(0,n)+"…":s;
+function evVerdict(c){const e=S.ev[c]||{},src=(e.src||[]).filter(k=>epText(k)),txt=String(e.t||"").trim();
+ if(e.hold)return{k:"hold",l:"保留"};if(!src.length&&!txt)return{k:"none",l:"未確認"};
+ if(src.length&&!txt&&src.every(k=>k==="ep_anger"||k==="ep_envy"))return{k:"want",l:"採用・まだ満たされていない"};
+ return{k:"ok",l:"採用"};}
+const m2List=()=>effRank().filter(c=>!held(c)).slice(0,5);
+SCREENS.m2=(a)=>{if(!S.done.m1||!top5().length)return needM1("エピソード検証");
+ const sub=a[0];if(!sub){go(S.done.m2?"m2/result":(S.m2step||"m2/ep/1"),true);return false;}
+ S.m2step="m2/"+a.join("/");save();
+ if(sub==="ep")return m2Ep(Math.min(4,Math.max(1,+a[1]||1)));
+ if(sub==="check")return m2Check();if(sub==="words")return m2Words();if(sub==="result")return m2Result();
+ go("m2",true);return false;};
+function m2Ep(n){const E=EPIS[n-1];
+ const h=`${modHead("エピソード検証 ・ 出来事",n,4)}
+ ${n===1?guideHTML("大事な価値は、気持ちが強く動いた出来事に表れるよ。4つの出来事を短く書いてみよう。「なぜ?」より「何をしていた?」を書くのがコツ","normal"):""}
+ <p class="eptag">${esc(E.n)}<span>${esc(E.clue)}</span></p>
+ <h1 class="q">${esc(E.q)}</h1><p class="qhint">${esc(E.sub)}</p>
+ <textarea class="field" data-f="${E.k}" rows="4" placeholder="思いつくまま短くでOK" aria-label="${esc(E.q)}"></textarea>
+ <details class="acc"><summary>記入例を見る</summary><div class="in"><p class="hand" style="margin:0">${esc(E.ex)}</p></div></details>
+ <p class="small">大きな出来事でなくて大丈夫。この1週間で少しうれしかったこと、モヤッとしたことでもOK。</p>
+ <div class="btns"><button type="button" class="b wide" id="epNext"></button>${n>1?`<button type="button" class="linkb" id="epBack">← ひとつ前へ</button>`:""}</div>`;
+ return{html:h,title:"エピソード検証",bar:progBtn,after(m){bindText(m);const ta=$("textarea",m),nb=$("#epNext");
+  const lab=()=>{nb.textContent=ta.value.trim()?(n<4?"次の出来事へ":"トップ5と照らし合わせる"):"今は思いつかない(とばす)";};lab();ta.addEventListener("input",lab);
+  nb.onclick=()=>go(n<4?"m2/ep/"+(n+1):"m2/check");const bk=$("#epBack");if(bk)bk.onclick=()=>go("m2/ep/"+(n-1));}};}
+function m2Check(){const list=m2List(),hl=effRank().filter(held),eps=EPIS.filter(e=>epText(e.k));
+ const card=(c,i)=>{const e=S.ev[c]||{},src=e.src||[],v=evVerdict(c);
+  return `<div class="evcard" data-c="${esc(c)}"><div class="evh"><span class="no">${i+1}</span><b>${esc(c)}</b><span class="vtag ${v.k}">${esc(v.l)}</span></div>
+  <p class="small" style="margin:0 0 6px">${esc(EX[c]||"あなたが足したカード")}</p>
+  ${eps.length?`<p class="lbl">裏づける出来事をタップ</p><div class="srcs">${eps.map(E=>`<button type="button" class="src" data-src="${E.k}" aria-pressed="${src.includes(E.k)}"><b>${esc(E.n)}</b>${esc(snip(epText(E.k),26))}</button>`).join("")}</div>`:""}
+  <textarea class="field" data-ev="${esc(c)}" rows="2" placeholder="${eps.length?"ほかの体験があれば、ここに具体的に":"この価値を裏づける体験を具体的に(例:塾で生徒に合わせた教材を自作した)"}" aria-label="${esc(c)}を裏づける体験"></textarea>
+  ${i===0?`<p class="small">1位は体験を1つ結びつけてね(ここだけ必須)。どうしても見つからないときは、価値観診断の順位を見直してみよう。</p>`:`<button type="button" class="linkb" data-hold="1">思い当たる体験がない → 保留にする</button>`}</div>`;};
+ const h=`${modHead("エピソード検証 ・ 照らし合わせ",0,0)}
+ <h1 class="q">トップ5を、あなたの体験で確かめよう</h1>
+ ${guideHTML("体験で裏づけられない価値は、借りてきた言葉かもしれないよ。そういう価値は「保留」にして、6位の価値と入れ替えよう","think")}
+ ${list.map(card).join("")}
+ ${hl.length?`<div class="card"><h3>保留中の価値</h3><p class="small">捨てずにメモしておき、インターンやアルバイトで確かめよう。</p>${hl.map(c=>`<div class="heldrow"><b>${esc(c)}</b><button type="button" class="b sec small" data-unhold="${esc(c)}">保留を解除</button></div>`).join("")}</div>`:""}
+ <div class="btns"><button type="button" class="b wide" id="toWords">自分の言葉にする</button><button type="button" class="linkb" id="ckBack">← 出来事を書き直す</button></div>`;
+ return{html:h,title:"エピソード検証",bar:progBtn,after(m){bindText(m);
+  const upd=box=>{const c=box.dataset.c,v=evVerdict(c),tg=$(".vtag",box);tg.className="vtag "+v.k;tg.textContent=v.l;};
+  $$(".evcard",m).forEach(box=>{const c=box.dataset.c;
+   $$(".src",box).forEach(b=>b.onclick=()=>{const e=S.ev[c]=Object.assign({},S.ev[c]||{});const src=(e.src||[]).slice(),k=b.dataset.src,on=src.includes(k);
+    e.src=on?src.filter(x=>x!==k):src.concat(k);b.setAttribute("aria-pressed",String(!on));save();upd(box);});
+   box.addEventListener("changed",()=>upd(box));
+   const hb=$("[data-hold]",box);if(hb)hb.onclick=()=>{S.ev[c]=Object.assign({},S.ev[c]||{},{hold:true});save();toast(`「${c}」を保留にしました`);keepScroll();};});
+  $$("[data-unhold]",m).forEach(b=>b.onclick=()=>{const c=b.dataset.unhold;S.ev[c]=Object.assign({},S.ev[c]||{},{hold:false});save();keepScroll();});
+  $("#toWords").onclick=()=>{const c=list[0];if(evVerdict(c).k==="none"){toast(`1位の「${c}」に、体験を1つ結びつけてね`);$(".evcard textarea",m).focus();return;}go("m2/words");};
+  $("#ckBack").onclick=()=>go("m2/ep/1");}};}
+function affDraft(){const c=m2List()[0];if(!c)return "";const e=S.ev[c]||{};const ep=String(e.t||"").trim()||((e.src||[]).map(epText).find(Boolean))||"〇〇";
+ const d=(S.def[c]&&S.def[c].m)||EX[c]||"〇〇";
+ return `私は「${c}」を大切にしている。それは私にとって、${d.replace(/[。.]$/,"")}だ。「${snip(ep.replace(/\s+/g," "),60)}」という経験で、そのことを強く感じた。この価値は、進路や毎日の選択で迷ったとき、私の判断を支えている。結果がどうであれ、この価値に沿って行動した自分を誇りに思う。`;}
+function m2Words(){const list=m2List();
+ const h=`${modHead("エピソード検証 ・ 自分の言葉",0,0)}
+ <h1 class="q">あなたにとっての意味を、1文で</h1>
+ ${guideHTML("同じ「成長」でも、人によって意味が違うよ。自分の言葉にしておくと、会社の「成長できます」に流されにくくなる","normal")}
+ ${list.map((c,i)=>`<div class="evcard"><div class="evh"><span class="no">${i+1}</span><b>${esc(c)}</b></div>
+  <label class="lbl" for="dm${i}">私にとっての意味</label><input class="field" id="dm${i}" type="text" data-dm="${esc(c)}" maxlength="80" placeholder="${i===0?esc(DEF_EX.m):"1文で"}">
+  <label class="lbl" for="ds${i}">満たされているときの具体的な状態</label><input class="field" id="ds${i}" type="text" data-ds="${esc(c)}" maxlength="80" placeholder="${i===0?esc(DEF_EX.s):"どんな状態なら満たされている?"}"></div>`).join("")}
+ <p class="small">書けるところだけでOK。「満たされているときの具体的な状態」は、あとで職場の条件づくりに使います。</p>
+ <h2 class="h2s">お守りの文章(アファメーション)</h2>
+ <p class="small">1位の価値について、面接の前や落ち込んだときに読み返す文章です。大切な価値を書き出すと、プレッシャーの中で気持ちを支える効果が研究で確かめられています。</p>
+ <textarea class="field" data-f="affirm" rows="5" aria-label="アファメーション文"></textarea>
+ <button type="button" class="b sec small" id="draft">下書きを作る</button>
+ <div class="btns"><button type="button" class="b wide" id="toRes">結果を見る</button><button type="button" class="linkb" id="wBack">← 照らし合わせにもどる</button></div>`;
+ return{html:h,title:"エピソード検証",bar:progBtn,after(m){bindText(m);
+  $("#draft").onclick=()=>{const ta=$('[data-f="affirm"]',m);if(ta.value.trim()&&!confirm("今の文章を下書きで置き換えます。よろしいですか?"))return;ta.value=affDraft();S.f.affirm=ta.value;save();grow(ta);};
+  $("#toRes").onclick=()=>{finishMod("m2");go("m2/result");};$("#wBack").onclick=()=>go("m2/check");}};}
+function m2Mis(list,hl){const vs=list.map(c=>({c,v:evVerdict(c)})),mis=[];
+ hl.slice(0,1).forEach(c=>mis.push({t:`保留にした「${c}」を、インターンやバイトで確かめる`,from:"m2"}));
+ vs.filter(x=>x.v.k==="want").slice(0,1).forEach(x=>mis.push({t:`まだ満たされていない「${x.c}」を、少しだけ満たす行動を1つやってみる`,from:"m2"}));
+ mis.push({t:"お守りの文章を、面接や大事な場面の前に1回読み返す",from:"m2"});return mis;}
+function m2Result(){const list=m2List(),hl=effRank().filter(held);finishMod("m2");
+ const vs=list.map(c=>({c,v:evVerdict(c)})),ok=vs.filter(x=>x.v.k==="ok"||x.v.k==="want").length;
+ const h=`<div class="reshead"><p class="kick">エピソード検証の結果</p>${myChar(ok>=4?"happy":"gentle",170,"alive")}
+ <h1 style="font-size:28px">体験で確かめた価値 ${ok}/${list.length}</h1></div>
+ <ol class="ranks">${vs.map(({c,v},i)=>{const d=S.def[c]||{};return `<li><span class="no">${i+1}</span><span><b>${esc(c)}</b><br><span class="small">${esc(d.m||EX[c]||"")}</span></span><span class="vtag ${v.k}">${esc(v.l)}</span></li>`;}).join("")}</ol>
+ ${hl.length?`<p class="small">保留:${hl.map(esc).join("、")}(インターンやアルバイトで確かめよう)</p>`:""}
+ ${vs.some(x=>x.v.k==="want")?`<p class="small">「まだ満たされていない」は、怒りや羨望の体験だけで裏づけられた価値です。今の環境で満たされていない可能性が高く、職場選びで特に重視したい候補です。</p>`:""}
+ ${String(S.f.affirm||"").trim()?`<div class="memo"><h3>お守りの文章</h3><p style="margin:0">${esc(S.f.affirm).replace(/\n/g,"<br>")}</p></div>`:""}
+ ${missionHTML(m2Mis(list,hl))}
+ <div class="gorow">${nextBtn("m2")}<button type="button" class="b sec wide" id="save2">結果を保存(テキスト/PDF)</button><a class="linkb" href="#/m2/ep/1">書いた内容を直す</a></div>`;
+ return{html:h,title:"エピソード検証の結果",bar:progBtn,after(){bindMissions();$("#save2").onclick=()=>openSave("m2");}};}
+
+/* ---------- M3 自己認識チェック ---------- */
+function selfScore(){const a=S.m3;if(!Array.isArray(a)||SELF_Q.some((q,i)=>!a[i]))return null;
+ const avg=t=>{const v=SELF_Q.map((q,i)=>q.t===t?+a[i]:null).filter(x=>x!=null);return v.reduce((s,x)=>s+x,0)/v.length;};
+ const inn=avg("in"),ex=avg("ex"),hi=x=>x>=3.5;
+ return{inn,ex,type:hi(inn)?(hi(ex)?"aware":"intro"):(hi(ex)?"please":"seek")};}
+SCREENS.m3=(a)=>{const sub=a[0];
+ if(sub==="result"){if(!selfScore()){go("m3",true);return false;}return m3Result();}
+ if(sub==="q")return m3Q(Math.min(8,Math.max(1,+a[1]||1)));
+ const first=SELF_Q.findIndex((q,i)=>!S.m3[i]);go(first<0?"m3/result":"m3/q/"+(first+1),true);return false;};
+function m3Q(n){const Q=SELF_Q[n-1],cur=S.m3[n-1];
+ const h=`${modHead("自己認識チェック",n,8)}
+ ${n===1?guideHTML("自分のことを、どれくらい分かっているかのチェックだよ。直感で答えてね","normal"):""}
+ <h1 class="q">${esc(Q.q)}</h1><p class="qhint">いちばん近いものを1つ</p>
+ <div class="opts" role="group">${LIKERT.map((o,i)=>`<button type="button" class="opt" data-v="${5-i}" aria-pressed="${cur===5-i}">${esc(o)}${CIRC}</button>`).join("")}</div>
+ ${n>1?`<button type="button" class="linkb" id="qBack" style="margin-top:16px">← ひとつ前へ</button>`:""}`;
+ return{html:h,title:"自己認識チェック",bar:progBtn,after(){let busy=false;
+  $$(".opt").forEach(b=>b.onclick=()=>{if(busy)return;busy=true;$$(".opt").forEach(x=>{x.classList.remove("on");x.setAttribute("aria-pressed","false");});void b.offsetWidth;b.classList.add("on");b.setAttribute("aria-pressed","true");spark(b);
+   S.m3[n-1]=+b.dataset.v;save();later(()=>{if(n<8)go("m3/q/"+(n+1));else{finishMod("m3");go("m3/result");}},420);});
+  const bk=$("#qBack");if(bk)bk.onclick=()=>go("m3/q/"+(n-1));}};}
+function askMessage(){return "就活の自己分析で、身近な人に聞いてみるワークをしています。思ったままで大丈夫なので、答えてもらえるとうれしいです。\n\n"+ASK5.map((q,i)=>`${i+1}. ${q}`).join("\n");}
+function m3Result(){const R=selfScore(),T=SELF_T[R.type];finishMod("m3");
+ const cell=(k,label,sub)=>`<div class="tcell ${R.type===k?"on":""}">${R.type===k?myChar(T.e,54,"alive"):""}<b>${label}</b><span>${sub}</span></div>`;
+ const h=`<div class="reshead"><p class="kick">自己認識チェックの結果</p>${myChar(T.e,170,"alive")}<h1 style="font-size:32px">${esc(T.n)}</h1><p class="lead2">${esc(T.d)}</p></div>
+ <p class="small tlegend">たて:自分の内面の理解(上ほど高い) / よこ:周りからの見え方の理解(右ほど高い)</p><div class="tgrid" role="img" aria-label="4つのタイプのうち、あなたは${esc(T.n)}">
+ ${cell("intro","内省家","自分は分かる")}${cell("aware","自己認識者","両方分かる")}${cell("seek","探索者","探している途中")}${cell("please","迎合者","周りに合わせがち")}</div>
+ <div class="sbars"><div><span>自分の内面の理解</span><i><u style="width:${(R.inn-1)/4*100}%"></u></i><em>${R.inn.toFixed(1)}</em></div><div><span>周りからの見え方の理解</span><i><u style="width:${(R.ex-1)/4*100}%"></u></i><em>${R.ex.toFixed(1)}</em></div></div>
+ <div class="memo"><h3>ほくとからのアドバイス</h3><p style="margin:0">${esc(T.tip)}</p></div>
+ <details class="acc" open><summary>「なぜ?」を「何を?」に言い換える</summary><div class="in"><p class="small">「なぜ?」を繰り返すと、堂々めぐりや、もっともらしい作り話になりやすいことが分かっています。具体的な出来事を聞く問いに変えよう。</p>
+  <div class="ww">${WHY_WHAT.map(([a,b])=>`<div><s>${esc(a)}</s><b>→ ${esc(b)}</b></div>`).join("")}</div></div></details>
+ <details class="acc"><summary>身近な人に聞く5つの質問</summary><div class="in"><p class="small">自分をよく知る2〜3人(友だち、家族、ゼミの先生、バイト先の人など)に送ってみよう。答えには反論せず「ありがとう、もう少し教えて」とだけ返すのがコツ。</p>
+  <pre class="askmsg">${esc(askMessage())}</pre><div class="row" style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="b small" id="cpAsk">文章をコピー</button>${navigator.share?`<button type="button" class="b sec small" id="shAsk">送る</button>`:""}</div><p class="small" id="askMsg" role="status"></p>
+  <label class="lbl" for="fb">もらった答えのメモ</label><textarea class="field" id="fb" data-f="feedback" rows="3" placeholder="例:ゼミの友だち「納得いかないと引かない」"></textarea></div></details>
+ <p class="small">この診断は、自己認識の研究(Eurich)の考え方をもとにした簡易チェックで、研究用の尺度ではありません。目安として使ってください。</p>
+ ${missionHTML([{t:"2〜3人に「5つの質問」を送って、答えをメモする",from:"m3"},{t:"迷ったら「なぜ?」を「何を?」に言い換えて考える",from:"m3"}])}
+ <div class="gorow">${nextBtn("m3")}<button type="button" class="b sec wide" id="save3">結果を保存(テキスト/PDF)</button><a class="linkb" href="#/m3/q/1">答え直す</a></div>`;
+ return{html:h,title:"自己認識チェックの結果",bar:progBtn,after(m){bindText(m);bindMissions();$("#save3").onclick=()=>openSave("m3");
+  $("#cpAsk").onclick=()=>copyText(askMessage(),$("#askMsg"));const sh=$("#shAsk");if(sh)sh.onclick=async()=>{try{await navigator.share({text:askMessage()});}catch(e){}};}};}
+
+/* ---------- M4 ギャップ診断 ---------- */
+const gapOf=(c,i)=>{const g=S.gap[c];return Array.isArray(g)?[+g[0],+g[1],g[2]||""]:[Math.max(5,10-(i||0)),5,""];};
+SCREENS.m4=(a)=>{if(!S.done.m1||!top5().length)return needM1("ギャップ診断");if(a[0]==="result"){if(!S.done.m4){go("m4",true);return false;}return m4Result();}return m4Slide();};
+function m4Slide(){const t=top5();
+ const h=`${modHead("ギャップ診断",0,0)}<h1 class="q">大切さと、今の満たされ方</h1>
+ ${guideHTML("トップ5それぞれ、どれくらい大切か、今の生活でどれくらい満たされているかを0〜10で動かしてみて","normal")}
+ ${t.map((c,i)=>{const g=gapOf(c,i);return `<div class="evcard sl" data-c="${esc(c)}" data-i="${i}"><div class="evh"><span class="no">${i+1}</span><b>${esc(c)}</b><span class="gapv">差 <b>${g[0]-g[1]}</b></span></div>
+  <label class="rng"><span>大切さ</span><input type="range" min="0" max="10" step="1" value="${g[0]}" data-k="0" aria-label="${esc(c)}の大切さ"><em>${g[0]}</em></label>
+  <label class="rng"><span>今の満たされ方</span><input type="range" min="0" max="10" step="1" value="${g[1]}" data-k="1" aria-label="${esc(c)}の今の満たされ方"><em>${g[1]}</em></label></div>`;}).join("")}
+ <div class="btns"><button type="button" class="b wide" id="toRes">結果を見る</button></div>`;
+ return{html:h,title:"ギャップ診断",bar:progBtn,after(m){
+  $$(".sl",m).forEach(box=>{const c=box.dataset.c,i=+box.dataset.i;$$("input",box).forEach(r=>r.addEventListener("input",()=>{const g=gapOf(c,i);g[+r.dataset.k]=+r.value;S.gap[c]=g;r.nextElementSibling.textContent=r.value;$(".gapv b",box).textContent=g[0]-g[1];save();}));});
+  $("#toRes").onclick=()=>{t.forEach((c,i)=>{if(!Array.isArray(S.gap[c]))S.gap[c]=gapOf(c,i);});finishMod("m4");go("m4/result");};}};}
+function m4Rows(){const t=top5();return t.map((c,i)=>({c,i,g:gapOf(c,i)})).sort((a,b)=>(b.g[0]-b.g[1])-(a.g[0]-a.g[1]));}
+function m4Result(){const t=top5(),rows=m4Rows();
+ const col=d=>d>=4?"var(--tomato)":d>=2?"#D08F0A":"var(--mint)";
+ const big=rows.filter(r=>r.g[0]-r.g[1]>=2).slice(0,2),focus=big.length?big:rows.slice(0,1);
+ const h=`<div class="reshead"><p class="kick">ギャップ診断の結果</p>${myChar(rows[0].g[0]-rows[0].g[1]>=4?"fired":"calm",150,"alive")}<h1 style="font-size:26px">いちばん差が大きいのは<br>「${esc(rows[0].c)}」</h1></div>
+ <div class="gapbars">${rows.map(r=>{const d=r.g[0]-r.g[1];return `<div class="gb"><b>${esc(r.c)}</b><span class="tr"><u class="imp" style="width:${r.g[0]*10}%"></u><u class="real" style="width:${r.g[1]*10}%"></u></span><em style="color:${col(d)}">差 ${d}</em></div>`;}).join("")}</div>
+ <p class="small"><span class="key imp"></span>大切さ <span class="key real"></span>今の満たされ方(どちらも0〜10)。差が大きい価値は、今の環境で満たされにくい価値。職場選びで特に重視しよう。</p>
+ <h2 class="h2s">今週できる小さな行動</h2>
+ <p class="small">差の大きい価値を、少しだけ満たす行動を決めよう。やってみると「思ったより満たされない」「想像以上に満たされた」といった発見があり、マップの精度が上がります。</p>
+ ${focus.map(r=>{const k=CAT[r.c];return `<div class="evcard"><div class="evh"><b>${esc(r.c)}</b></div><input class="field" type="text" data-act="${esc(r.c)}" maxlength="80" placeholder="${esc(k?"例:"+ACT_EX[k]:"例:今週やってみること")}" aria-label="${esc(r.c)}のための行動">${k?`<button type="button" class="linkb" data-useex="${esc(r.c)}">例をそのまま使う</button>`:""}</div>`;}).join("")}
+ <button type="button" class="b sec wide" id="takeAct">行動をミッションにする</button>
+ <div class="gorow">${nextBtn("m4")}<button type="button" class="b sec wide" id="save4">結果を保存(テキスト/PDF)</button><a class="linkb" href="#/m4">スライダーを動かし直す</a></div>`;
+ return{html:h,title:"ギャップ診断の結果",bar:progBtn,after(m){
+  $$("[data-act]",m).forEach(el=>{const c=el.dataset.act;el.value=gapOf(c)[2]||"";el.addEventListener("input",()=>{const g=gapOf(c,t.indexOf(c));g[2]=el.value;S.gap[c]=g;save();});});
+  $$("[data-useex]",m).forEach(b=>b.onclick=()=>{const c=b.dataset.useex,el=$$("[data-act]",m).find(x=>x.dataset.act===c);el.value=ACT_EX[CAT[c]];el.dispatchEvent(new Event("input"));});
+  $("#takeAct").onclick=()=>{const list=focus.map(r=>{const v=String(gapOf(r.c)[2]||"").trim();return v?{t:`「${r.c}」のために:${v}`,from:"m4"}:null;}).filter(Boolean);
+   if(!list.length){toast("行動を1つ書いてね");return;}const n=addMissions(list);toast(n?`ミッションを${n}つ追加しました`:"もう受け取っています");if(n)peek("ミッション、いってらっしゃい!","cheer");};
+  $("#save4").onclick=()=>openSave("m4");}};}
+
+/* ---------- 価値キャラ図鑑 ---------- */
+SCREENS.zukan=(a)=>{const t=top5(),ch=S.done.m1?charPick():null;
+ const rk={};t.forEach((c,i)=>{const k=CAT[c];if(k&&rk[k]==null)rk[k]=i+1;});
+ const sel=a[0]!=null&&/^\d$/.test(a[0])?+a[0]:(ch?ch.i:0);
+ const v=CH.V[sel],V2=VALS[sel];
+ const h=`<h1 class="q" style="margin-top:6px">価値キャラ図鑑</h1>
+ <p class="small">10の価値には、それぞれキャラがいるよ。${ch?"あなたのトップ5に入っている価値だけ、色がついています。":"価値観診断を終えると、あなたのトップ5の価値に色がつきます。"}タップすると説明が見られます。</p>
+ ${ch?`<div class="card tilt mychar">${cv(ch.i+"-"+ch.j,90,"alive")}<div><span class="small">あなたのキャラ</span><br><b>${esc(charInfo(ch).name)}</b><br><span class="small">${esc(charInfo(ch).pair)}</span></div></div>`:""}
+ <div class="zgrid">${CH.V.map((w,i)=>`<button type="button" class="zc ${!ch||rk[w.k]?"":"gray"} ${i===sel?"sel":""}" data-z="${i}" aria-pressed="${i===sel}">${rk[w.k]?`<span class="rk">${rk[w.k]}位</span>`:""}${cv(i+"-"+i+"x",62)}<b>${esc(w.a)}</b><span>${esc(w.k)}</span></button>`).join("")}</div>
+ <div class="card" id="zinfo"><div class="zhead">${cv(sel+"-"+sel+"x",86,"alive")}<div><b>${esc(v.k)}の${esc(v.a)}</b><br><span class="qchip ${V2.q}">${esc(V2.q==="hed"?"開放性と自己高揚の境目":QN[V2.q])}</span>${rk[v.k]?` <span class="tag go">あなたの${rk[v.k]}位</span>`:""}</div></div>
+  <p class="hand" style="margin:10px 0 4px">${esc(v.g)}</p><p style="margin:4px 0"><b>どんな価値?</b> ${esc(V2.d)}</p><p style="margin:4px 0"><b>仕事では:</b>${esc(V2.w)}</p>
+  <p class="small" style="margin:6px 0 0">なかまのカード:${CARDS[V2.n].map(c=>esc(c[0])).join("、")}</p>
+  <p class="small" style="margin:6px 0 0">トップ1なら「${esc(v.role)}」、トップ2なら持ち物が「${esc(v.it)}」になるよ。</p></div>
+ <div class="btns">${S.done.m1?`<a class="b sec wide" href="#/m1/result">価値観診断の結果にもどる</a>`:`<a class="b wide" href="#/m1">価値観診断をする</a>`}</div>`;
+ return{html:h,title:"価値キャラ図鑑",bar:S.prog?progBtn:`<a class="iconb" href="#/">トップ</a>`,after(){$$("[data-z]").forEach(b=>b.onclick=()=>{go("zukan/"+b.dataset.z,true);const z=$("#zinfo");if(z&&z.scrollIntoView)z.scrollIntoView({behavior:reduce?"auto":"smooth",block:"nearest"});});}};};
 
 /* ---------- キャラを画像にする(友達と共有する用) ---------- */
 function loadImg(src){return new Promise((ok,ng)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=ng;im.src=src;});}
@@ -409,13 +615,15 @@ const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.g
 const cell=s=>String(s==null?"":s).replace(/\r?\n+/g," / ").replace(/\|/g,"｜").trim()||"(未記入)";
 const mdTable=(head,rows)=>[`| ${head.map(cell).join(" | ")} |`,`|${head.map(()=>"---").join("|")}|`,...rows.map(r=>`| ${r.map(cell).join(" | ")} |`)].join("\n");
 const LV={3:"とても大事",2:"重要",1:"重要でない"};
+const quoteMd=s=>{s=String(s||"").trim();return s?s.split(/\r?\n/).map(l=>"> "+l).join("\n"):"> (未記入)";};
+const rpText=s=>{s=String(s||"").trim();return s?`<p class="rp-txt">${esc(s).replace(/\n/g,"<br>")}</p>`:`<p class="rp-txt small">(未記入)</p>`;};
 const SEC={
  m1:{title:"価値観診断の結果",file:"価値観診断",
   md(){const A=analysis(),L=[];if(!A.ch)return["(まだ結果がありません)"];const I=charInfo(A.ch);
    L.push(`## 価値観キャラ:${I.name}`,[`- 肩書き:${I.title}`,`- トップ1 × トップ2:${I.pair}${I.yure?"(ゆれ:円環の向かい側どうし)":""}`,`- こんな子:${I.text}`].join("\n"));
    L.push("## 3行まとめ",summary3(A).map((l,i)=>`${i+1}. ${l}`).join("\n"));
    L.push("## トップ5",mdTable(["順位","価値","満たされている状態","Schwartzの分類"],A.t.map((c,i)=>[i+1,c,EX[c]||"(自分で足したカード)",CAT[c]||"円環外"])));
-   const rest=S.rank.filter(c=>S.cards[c]===3).slice(5);if(rest.length)L.push(`6位以下:${rest.join("、")}`);
+   const rest=effRank().slice(5);if(rest.length)L.push(`6位以下:${rest.join("、")}`);
    L.push("## 円環での読み取り",[`- 重心:${A.center}`,`- 空いているグループ:${A.zero.length?A.zero.join("、"):"なし(バランス型)"}`,`- 葛藤軸:${A.conf.length?A.conf.map(c=>`${c[0]} ⇄ ${c[1]}(${c[2]})`).join("/"):"大きな対立なし"}`].join("\n"));
    L.push("## カードの仕分け",[3,2,1].map(s=>{const cs=allCards().filter(c=>S.cards[c]===s);return `- ${LV[s]}(${cs.length}枚):${cs.length?cs.join("、"):"なし"}`;}).join("\n"));
    return L;},
@@ -424,7 +632,30 @@ const SEC={
    <div class="rp-box" style="background:#FFF2C2"><b>3行まとめ</b><ol style="margin:4px 0 0">${summary3(A).map(l=>`<li>${esc(l)}</li>`).join("")}</ol></div>
    <h3>トップ5</h3><table><tr><th>順位</th><th>価値</th><th>満たされている状態</th><th>分類</th></tr>${A.t.map((c,i)=>`<tr><td>${i+1}</td><td><b>${esc(c)}</b></td><td>${esc(EX[c]||"(自分で足したカード)")}</td><td>${esc(CAT[c]||"円環外")}</td></tr>`).join("")}</table>
    <h3>円環での読み取り</h3><div style="display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:center;break-inside:avoid"><div>${wheelSVG(A.hl)}</div><div><p><b>重心:</b>${esc(A.center)}</p><p><b>空いているグループ:</b>${A.zero.length?esc(A.zero.join("、")):"なし(バランス型)"}</p><p><b>葛藤軸:</b>${A.conf.length?A.conf.map(c=>esc(`${c[0]} ⇄ ${c[1]}(${c[2]})`)).join("<br>"):"大きな対立なし"}</p></div></div>
-   <h3>カードの仕分け</h3>${[3,2,1].map(s=>{const cs=allCards().filter(c=>S.cards[c]===s);return `<p><b>${LV[s]}(${cs.length}枚)</b> ${cs.length?esc(cs.join("、")):"なし"}</p>`;}).join("")}`;}}};
+   <h3>カードの仕分け</h3>${[3,2,1].map(s=>{const cs=allCards().filter(c=>S.cards[c]===s);return `<p><b>${LV[s]}(${cs.length}枚)</b> ${cs.length?esc(cs.join("、")):"なし"}</p>`;}).join("")}`;}},
+ m2:{title:"エピソード検証の結果",file:"エピソード検証",
+  md(){const list=m2List(),hl=effRank().filter(held),L=[];
+   L.push("## 感情が動いた出来事",EPIS.map(E=>`### ${E.n}(${E.clue})\n${quoteMd(S.f[E.k])}`).join("\n\n"));
+   L.push("## トップ5の検証",mdTable(["順位","価値","判定","裏づける出来事","私にとっての意味","満たされているときの状態"],list.map((c,i)=>{const e=S.ev[c]||{},d=S.def[c]||{};return[i+1,c,evVerdict(c).l,[...(e.src||[]).filter(epText).map(k=>EPIS.find(E=>E.k===k).n),e.t].filter(Boolean).join(" / "),d.m,d.s];})));
+   if(hl.length)L.push(`保留:${hl.join("、")}`);
+   L.push("## お守りの文章(アファメーション)",quoteMd(S.f.affirm));return L;},
+  html(){const list=m2List(),hl=effRank().filter(held);
+   return `<h3>感情が動いた出来事</h3>${EPIS.map(E=>`<div class="rp-box"><b>${esc(E.n)}</b> <span class="small">${esc(E.clue)}</span>${rpText(S.f[E.k])}</div>`).join("")}
+   <h3>トップ5の検証</h3><table><tr><th>価値</th><th>判定</th><th>裏づける出来事</th><th>私にとっての意味 / 満たされている状態</th></tr>${list.map((c,i)=>{const e=S.ev[c]||{},d=S.def[c]||{};return `<tr><td><b>${i+1}. ${esc(c)}</b></td><td>${esc(evVerdict(c).l)}</td><td>${esc([...(e.src||[]).filter(epText).map(k=>EPIS.find(E=>E.k===k).n),e.t].filter(Boolean).join(" / ")||"—")}</td><td>${esc(d.m||"—")}<br><span class="small">${esc(d.s||"")}</span></td></tr>`;}).join("")}</table>
+   ${hl.length?`<p>保留:${esc(hl.join("、"))}</p>`:""}<h3>お守りの文章(アファメーション)</h3>${rpText(S.f.affirm)}`;}},
+ m3:{title:"自己認識チェックの結果",file:"自己認識チェック",
+  md(){const R=selfScore();if(!R)return["(まだ結果がありません)"];const T=SELF_T[R.type];
+   return[`## タイプ:${T.n}`,[`- 自分の内面の理解:${R.inn.toFixed(1)} / 5`,`- 周りからの見え方の理解:${R.ex.toFixed(1)} / 5`,`- ${T.d}`,`- アドバイス:${T.tip}`].join("\n"),
+    "## 回答",mdTable(["質問","種類","回答"],SELF_Q.map((q,i)=>[q.q,q.t==="in"?"内面":"見え方",LIKERT[5-S.m3[i]]])),
+    "## 身近な人に聞く5つの質問",ASK5.map((q,i)=>`${i+1}. ${q}`).join("\n"),"## もらった答えのメモ",quoteMd(S.f.feedback)];},
+  html(){const R=selfScore();if(!R)return `<p>(まだ結果がありません)</p>`;const T=SELF_T[R.type];
+   return `<div class="rp-char">${myChar(T.e,150)}<div><h2>${esc(T.n)}</h2><p style="margin:4px 0">${esc(T.d)}</p><p class="small" style="margin:0">自分の内面の理解 ${R.inn.toFixed(1)} / 周りからの見え方の理解 ${R.ex.toFixed(1)}(5点満点)</p></div></div>
+   <div class="rp-box" style="background:#FFF2C2"><b>アドバイス</b><p style="margin:2px 0 0">${esc(T.tip)}</p></div>
+   <h3>「なぜ?」を「何を?」に言い換える</h3><table>${WHY_WHAT.map(([a,b])=>`<tr><td>${esc(a)}</td><td><b>${esc(b)}</b></td></tr>`).join("")}</table>
+   <h3>身近な人に聞く5つの質問</h3><ol>${ASK5.map(q=>`<li>${esc(q)}</li>`).join("")}</ol><h3>もらった答えのメモ</h3>${rpText(S.f.feedback)}`;}},
+ m4:{title:"ギャップ診断の結果",file:"ギャップ診断",
+  md(){if(!S.done.m4)return["(まだ結果がありません)"];return["## 大切さと今の満たされ方(0〜10)",mdTable(["価値","大切さ","今の満たされ方","差","今週できる小さな行動"],m4Rows().map(r=>[r.c,r.g[0],r.g[1],r.g[0]-r.g[1],r.g[2]]))];},
+  html(){if(!S.done.m4)return `<p>(まだ結果がありません)</p>`;return `<table><tr><th>価値</th><th>大切さ</th><th>今の満たされ方</th><th>差</th><th>今週できる小さな行動</th></tr>${m4Rows().map(r=>`<tr><td><b>${esc(r.c)}</b></td><td>${r.g[0]}</td><td>${r.g[1]}</td><td><b>${r.g[0]-r.g[1]}</b></td><td>${esc(r.g[2]||"—")}</td></tr>`).join("")}</table><p class="small">差が大きい価値は、今の環境で満たされにくい価値。職場選びで特に重視する。</p>`;}}};
 const fileBase=k=>(SEC[k].file+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
 function buildMD(k){return[`# ${SEC[k].title}`,`> 出力日:${today()} / 価値観マップ診断`,...SEC[k].md()].join("\n\n")+"\n";}
 function buildReport(k){return `<header class="rp-head"><h1>${esc(SEC[k].title)}</h1><p class="small" style="margin:0">出力日 ${today()} ・ 価値観マップ診断</p></header><section class="rp-sec">${SEC[k].html()}</section>`;}
