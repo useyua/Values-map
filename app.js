@@ -252,7 +252,7 @@ function m1Sort(){const M=S.m1;if(M.phase!=="sort"||!Array.isArray(M.order)||M.o
 function m1Pick(){const M=S.m1;if(!M.phase){M.phase="pick";M.short=true;save();}
  const short=M.short;
  const star=()=>allCards().filter(c=>S.cards[c]===3);
- const chip=c=>{const k=CAT[c],q=k?VALS[VI[k]].q:"";return `<button type="button" class="chip ${q?"q-"+q:""}" data-c="${esc(c)}" aria-pressed="${S.cards[c]===3}">${esc(c)}</button>`;};
+ const chip=c=>{const k=CAT[c],q=k?VALS[VI[k]].q:"";return `<button type="button" class="chip ${q?"q-"+q:""}" data-c="${esc(c)}" aria-pressed="${S.cards[c]===3}"><b>${esc(c)}</b><small>${esc(EX[c]||"あなたが足したカード")}</small></button>`;};
  function body(){const n=star().length;
   let h="";
   if(short){h+=guideHTML(esc(HOKUTO.short),"normal");

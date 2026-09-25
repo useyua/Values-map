@@ -176,11 +176,14 @@ main:focus,main:focus-visible{outline:none;box-shadow:none}
 /* ---------- 選び直し(ピック) ---------- */
 .picksec{margin:18px 0}
 .picksec h3{font-size:16px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
-.chipset{display:flex;flex-wrap:wrap;gap:8px}
-.chip{border:2px solid var(--outline);background:var(--card);border-radius:12px;padding:8px 12px;min-height:44px;font:700 14px/1.35 var(--round);cursor:pointer;box-shadow:0 3px 0 var(--shadow);transition:transform .09s,box-shadow .09s,background .15s;color:var(--ink);text-align:left}
+.chipset{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.chip{border:2px solid var(--outline);background:var(--card);border-radius:12px;padding:8px 10px;min-height:44px;font:700 14px/1.35 var(--round);cursor:pointer;display:flex;flex-direction:column;gap:2px;box-shadow:0 3px 0 var(--shadow);transition:transform .09s,box-shadow .09s,background .15s;color:var(--ink);text-align:left}
 .chip:active{transform:translateY(2px);box-shadow:0 1px 0 var(--shadow)}
 .chip[aria-pressed="true"]{background:var(--lemon)}
-.chip[aria-pressed="true"]::before{content:"★ ";color:var(--tomato)}
+.chip b{font-size:15px}
+.chip small{font:500 12px/1.5 var(--sans);color:var(--sub)}
+.chip[aria-pressed="true"] small{color:var(--ink)}
+.chip[aria-pressed="true"] b::before{content:"★ ";color:var(--tomato)}
 .chip.q-open{border-left-width:7px;border-left-color:#8EC4EA}
 .chip.q-enh{border-left-width:7px;border-left-color:#F2B45E}
 .chip.q-cons{border-left-width:7px;border-left-color:#84CBA2}
@@ -246,7 +249,6 @@ main:focus,main:focus-visible{outline:none;box-shadow:none}
 .persona .lbl{font:700 12px/1.4 var(--round);color:var(--sub);display:block;margin-bottom:2px}
 .ranks{list-style:none;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:8px}
 .ranks li{display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;background:var(--card);border:2px solid var(--outline);border-radius:14px;padding:8px 12px}
-.ranks li:nth-child(1){margin-right:18px}.ranks li:nth-child(2){margin-left:10px}
 .ranks .no{font:900 20px/1 var(--round);text-align:center}
 .ranks li:first-child .no{color:var(--tomato)}
 .ranks b{font-family:var(--round);font-size:16px}
