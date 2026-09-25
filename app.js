@@ -7,7 +7,6 @@ const $=(s,r)=>(r||document).querySelector(s),$$=(s,r)=>Array.from((r||document)
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const reduce=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
 const KEY="vmap-shindan-v2",OLD="vmap-visual-v1";
-const IMPL={m1:true,m2:true,m3:true,m4:true,m5:true,m6:true,m7:true,m8:true};// 実装済みの診断
 
 /* ---------- カードの辞書 ---------- */
 const CAT={},EX={};
@@ -142,7 +141,7 @@ SCREENS.top=()=>{const rs=resumeText();
  ${S.done.m1?`<p><a href="#/zukan">価値キャラ図鑑</a></p>`:""}${S.cos.length?`<p><a href="#/file">候補ファイル</a></p>`:""}<button type="button" class="linkb" id="resetAll">入力をすべて消す</button></div>`;
  return{html:h,after(){
   const mo=$("#migOk");if(mo)mo.onclick=()=>{S.migSeen=true;save();mo.closest(".card").remove();};
-  const re=$("#resume");if(re)re.onclick=()=>{const m=nextMod();go(m&&IMPL[m]?m:"program");};
+  const re=$("#resume");if(re)re.onclick=()=>{const m=nextMod();go(m?m:S.done.m1?"report":"program");};
   const rt=$("#redoTri");if(rt)rt.onclick=()=>go("q/1");
   $("#resetAll").onclick=()=>{if(!confirm("入力した内容をすべて消します。よろしいですか?"))return;S=fresh();S.migSeen=true;saveNow();go("",true);toast("入力を消しました");};}};};
 
@@ -176,29 +175,25 @@ SCREENS.program=()=>{if(!S.prog){go("q/1",true);return false;}
  const doneN=P.mods.filter(m=>S.done[m]).length;
  const slot=(label,sub,state,inner,href)=>`<button type="button" class="slot ${state}" ${href?`data-go="${href}"`:"disabled"}><span class="ring">${inner}</span>${esc(label)}<small>${esc(sub)}</small></button>`;
  let g=slot("入口の質問","クリア","done",stampSVG("クリア",isNew==="tri"),"q/1");
- P.mods.forEach(m=>{const d=S.done[m],impl=IMPL[m];
+ P.mods.forEach(m=>{const d=S.done[m];
   if(d){const ch=m==="m1"?charPick():null;g+=slot(MODS[m].n,"クリア","done",ch?`${cv(ch.i+"-"+ch.j,52)}`+`<span class="ministamp">${stampSVG("済",isNew===m)}</span>`:stampSVG("クリア",isNew===m),m);}
-  else if(!impl)g+=slot(MODS[m].n,MODS[m].t,"soon","準備中",null);
   else g+=slot(MODS[m].n,MODS[m].t,m===nx?"now":"",m===nx?"次":"",m);});
- g+=slot("最終レポート","すべて終えたら","soon","★",null);
- const nxImpl=nx&&IMPL[nx];
- const h=`<p class="small" style="margin:6px 0 0">あなたのプログラム</p><h1 class="prog-title">${esc(P.title)}</h1>
+ {const all=P.mods.every(m=>S.done[m]);g+=S.done.m1?slot("最終レポート",all?"できた!":"途中でも見られる",all?(S.done.report?"done":"now"):"",S.done.report?stampSVG("完成",isNew==="report"):"★","report"):slot("最終レポート","すべて終えたら","soon","★",null);}
+  const h=`<p class="small" style="margin:6px 0 0">あなたのプログラム</p><h1 class="prog-title">${esc(P.title)}</h1>
  <p class="prog-meta">${doneN}/${P.mods.length}クリア${mins?` ・ 残り約${mins}分`:""}</p>
  <div class="stampcard"><div class="stampgrid">${g}</div></div>
  <p class="today">今日は${P.today}つ押せたら十分!</p>
- <div class="btns">${nx?(nxImpl?`<a class="b wide" href="#/${nx}">${esc(MODS[nx].n)}を${nx==="m1"&&S.m1.phase?"つづける":"はじめる"}</a>`:`<button type="button" class="b wide" aria-disabled="true" id="nxSoon">${esc(MODS[nx].n)}は準備中</button>`):""}
+ <div class="btns">${!nx&&S.done.m1?`<a class="b wide" href="#/report">最終レポートを見る</a>`:""}${nx?`<a class="b wide" href="#/${nx}">${esc(MODS[nx].n)}を${nx==="m1"&&S.m1.phase?"つづける":"はじめる"}</a>`:""}
  ${S.done.m1?`<a class="b sec wide" href="#/m1/result">価値観診断の結果を見る</a>`:""}</div>
- ${nx&&!nxImpl?`<p class="soon-note">この診断は次の段階で作ります。いまは価値観診断まで遊べます</p>`:""}
  ${misBox()}
  ${S.done.m1?`<a class="b sec wide" href="#/zukan" style="margin-top:4px">価値キャラ図鑑</a>`:""}${S.cos.length?`<a class="b sec wide" href="#/file" style="margin-top:14px">候補ファイル(${S.cos.length}社)</a>`:""}
  <h2 style="font-size:18px;margin:28px 0 6px">このプログラムの診断</h2>
- <div class="modlist">${P.mods.map(m=>`<div class="moditem"><b>${esc(MODS[m].n)}</b><span class="tag ${S.done[m]?"ok":IMPL[m]?"go":"soon"}">${S.done[m]?"クリア":IMPL[m]?MODS[m].t:"準備中"}</span><span class="small">${esc(MODS[m].d)}</span></div>`).join("")}</div>
- ${P.later.length?`<details class="acc"><summary>ほかの診断(あとでできる)</summary><div class="in"><div class="modlist">${P.later.map(m=>`<div class="moditem"><b>${esc(MODS[m].n)}</b><span class="tag soon">${IMPL[m]?MODS[m].t:"準備中"}</span><span class="small">${esc(MODS[m].d)}</span></div>`).join("")}</div></div></details>`:""}
+ <div class="modlist">${P.mods.map(m=>`<a class="moditem" href="#/${m}"><b>${esc(MODS[m].n)}</b><span class="tag ${S.done[m]?"ok":"go"}">${S.done[m]?"クリア":MODS[m].t}</span><span class="small">${esc(MODS[m].d)}</span></a>`).join("")}</div>
+ ${P.later.length?`<details class="acc"><summary>ほかの診断(あとでできる)</summary><div class="in"><div class="modlist">${P.later.map(m=>`<a class="moditem" href="#/${m}"><b>${esc(MODS[m].n)}</b><span class="tag ${S.done[m]?"ok":"soon"}">${S.done[m]?"クリア":MODS[m].t}</span><span class="small">${esc(MODS[m].d)}</span></a>`).join("")}</div></div></details>`:""}
  <button type="button" class="linkb" id="redoTri">入口の質問をやり直す</button>`;
  S.stampNew=null;save();
  return{html:h,title:"あなたのプログラム",bar:`<a class="iconb" href="#/">トップ</a>`,after(){
-  $$("[data-go]").forEach(b=>b.onclick=()=>{const m=b.dataset.go;if(m.startsWith("m")&&!IMPL[m])return toast("次の段階で作ります");go(m);});
-  const ns=$("#nxSoon");if(ns)ns.onclick=()=>toast("次の段階で作ります");
+  $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
   bindMisBox();$("#redoTri").onclick=()=>go("q/1");}};};
 function misBox(){const L=S.missions;if(!L.length)return "";const d=L.filter(x=>x.done).length;
  return `<div class="card mis" id="misBox"><h3>今週のミッション <span class="small">${d}/${L.length} 完了</span></h3><div class="misl">${L.map((x,i)=>`<button type="button" class="misi" data-mi="${i}" aria-pressed="${!!x.done}"><i aria-hidden="true"></i><span>${esc(x.t)}</span></button>`).join("")}</div>${d?`<button type="button" class="linkb" id="misClr">終わったミッションを片づける</button>`:""}</div>`;}
@@ -350,7 +345,7 @@ function m1Reveal(){const ch=charPick();if(!ch){go("m1",true);return false;}
  <div id="after" hidden style="text-align:center"><p class="small" style="margin:0">${esc(I.title)}</p><h1 style="font-size:32px;margin:0">${esc(I.name)}</h1></div>
  <div class="btns"><button type="button" class="b wide" id="toRes" hidden>結果を見る</button><button type="button" class="linkb" id="quick">すぐ見る</button></div>`;
  return{html:h,title:"結果の開封",after(){const st=$("#stk");let opened=false;
-  const finish=()=>{if(!S.done.m1){S.done.m1=true;S.stampNew="m1";}S.m1.phase="done";save();};
+  const finish=()=>{if(!S.done.m1){S.done.m1=true;S.stampNew="m1";}if(!isObj(S.doneAt))S.doneAt={};S.doneAt.m1=today();S.m1.phase="done";save();};
   const open=()=>{if(opened)return;opened=true;finish();st.classList.add("gone");$("#pw").classList.add("open");confetti($("#conf"));
    later(()=>{$("#after").hidden=false;$("#toRes").hidden=false;$("#quick").hidden=true;$("#toRes").focus();},reduce?0:900);};
   st.onclick=open;let sy=null;st.addEventListener("pointerdown",e=>{sy=e.clientY;});st.addEventListener("pointermove",e=>{if(sy!=null&&sy-e.clientY>30)open();});
@@ -395,9 +390,9 @@ function m1Result(){const A=analysis();if(!A.t.length||!A.ch){go("m1",true);retu
 const GUIDE_CH={m1:1,m2:4,m3:3,m4:4,m5:5,m6:6,m7:8,m8:9};
 const whyLink=m=>GUIDE_CH[m]!=null?`<a class="linkb why2" href="guide.html#/c/${GUIDE_CH[m]}">なぜそう言える?図解ガイドで読む →</a>`:"";
 function nextBtn(cur){const P=S.prog;const nx=P?P.mods.find(m=>!S.done[m]&&m!==cur):null;
- if(nx&&IMPL[nx])return `<a class="b wide" href="#/${nx}">つぎは ${esc(MODS[nx].n)}(${esc(MODS[nx].t)})</a><a class="b sec wide" href="#/program">プログラムにもどる</a>`+whyLink(cur);
+ if(nx)return `<a class="b wide" href="#/${nx}">つぎは ${esc(MODS[nx].n)}(${esc(MODS[nx].t)})</a><a class="b sec wide" href="#/program">プログラムにもどる</a>`+whyLink(cur);
  return `<a class="b wide" href="#/program">プログラムにもどる</a>`+whyLink(cur);}
-function finishMod(m){if(!S.done[m]){S.done[m]=true;S.stampNew=m;}save();}
+function finishMod(m){if(!S.done[m]){S.done[m]=true;S.stampNew=m;}if(!isObj(S.doneAt))S.doneAt={};S.doneAt[m]=today();save();}
 function missionHTML(list){if(!list.length)return "";const all=list.every(x=>S.missions.some(y=>y.t===x.t));
  return `<div class="card mis"><h3>今週のミッション(${list.length}つ)</h3><ul class="mislist">${list.map(x=>`<li>${esc(x.t)}</li>`).join("")}</ul>${all?`<p class="small">受け取り済み。プログラム画面でチェックできます。</p>`:`<button type="button" class="b small" id="takeMis" data-mis="${esc(JSON.stringify(list))}">ミッションを受け取る</button>`}</div>`;}
 function addMissions(list){let n=0;list.forEach(x=>{if(x.t&&!S.missions.some(y=>y.t===x.t)){S.missions.push({t:x.t,from:x.from,done:false});n++;}});save();return n;}
@@ -852,6 +847,42 @@ SCREENS.file=()=>{const h=`<h1 class="q" style="margin-top:6px">候補ファイ�
  ${addCoHTML()}`;
  return{html:h,title:"候補ファイル",bar:S.prog?progBtn:`<a class="iconb" href="#/">トップ</a>`,after(){bindAddCo(()=>keepScroll());}};};
 
+/* ---------- 最終レポート ---------- */
+const SCHEDULE=[["1〜2年生","価値観マップの初版を作る。バイト・サークル・ゼミを小さな行動実験の場にする"],["3年生 4〜6月","身近な人に聞いてマップを完成。興味検査。職場の条件と職種の方向を決める"],["3年生 夏","候補を広く集める。夏のインターンで生の情報を集める"],["3年生 秋冬","マップを更新。地雷で候補を絞る。秋冬インターン、OB・OG訪問"],["3年生 2〜3月","候補の点数をつけて比べる。エントリーシート"],["4年生 春夏","面接。気になる会社ごとに1社検証"],["内定後","複数の内定を比べ、承諾を判断する"],["入社後","年1回の見直し。仕事の工夫(ジョブ・クラフティング)"]];
+const QUIT=[["地雷(長時間労働やハラスメントなど)があり、心身の不調がある","健康を最優先に、早めに対処する。まず医療機関や社内外の相談窓口に相談する(「こころの耳」や総合労働相談コーナーも使える)"],["地雷はないが、価値観との大きなずれがある","仕事の工夫(ジョブ・クラフティング)や異動で埋められるかを先に試す。1〜2年試しても埋まらなければ、転職を検討する"],["なんとなく不満だが、理由がはっきりしない","エピソード検証と1社検証で原因を特定する。「隣の芝生」の可能性もある"]];
+const addYear=d=>{const m=String(d||"").match(/^(\d{4})-(\d{2})/);return m?`${+m[1]+1}年${+m[2]}月`:"";};
+function nextSteps(){const L=[],P=S.prog,nx=P?P.mods.find(m=>!S.done[m]):null;
+ if(nx)L.push({t:`${MODS[nx].n}をやる(${MODS[nx].t})`,h:"#/"+nx});
+ const open=S.missions.filter(x=>!x.done);if(open.length)L.push({t:`今週のミッション:${open[0].t}`,h:"#/program"});
+ if(S.done.m5&&!S.cos.length)L.push({t:"候補の会社を集める(しょくばらぼ、認定企業の一覧、業界地図)",h:"#/m7"});
+ const unk=S.cos.filter(c=>c.verdict==="hold"||c.verdict==="mid");if(unk.length)L.push({t:`${unk[0].n}について「次に聞くこと」をOB・OG訪問で確かめる`,h:`#/m8/${unk[0].id}/result`});
+ if(S.done.m3)L.push({t:"身近な人2〜3人に「5つの質問」を送る",h:"#/m3/result"});
+ L.push({t:"年に1回、価値観診断をやり直してマップを更新する",h:"#/m1/result"});
+ return L.slice(0,4);}
+SCREENS.report=()=>{if(!S.done.m1){return{html:`${guideHTML("最終レポートは、価値観診断を終えると作れるよ","think")}<div class="btns"><a class="b wide" href="#/m1">価値観診断へ</a></div>`,title:"最終レポート",bar:progBtn};}
+ const A=analysis(),I=charInfo(A.ch),P=S.prog,all=P&&P.mods.every(m=>S.done[m]);
+ if(all&&!S.done.report){S.done.report=true;S.stampNew="report";save();}
+ const box=(m,body,link)=>`<div class="rbox"><div class="rh"><b>${esc(MODS[m].n)}</b>${S.done[m]?`<a href="#/${link||m+"/result"}">くわしく →</a>`:`<a href="#/${m}" class="todo">まだ(${esc(MODS[m].t)})→</a>`}</div>${S.done[m]?body():""}</div>`;
+ const R3=S.done.m3?selfScore():null,rows4=S.done.m4?m4Rows():[],L6=S.done.m6?m6Lists():null,R7=S.done.m7?m7Results():null;
+ const h=`<div class="reshead"><p class="kick">最終レポート</p>${cv(A.ch.i+"-"+A.ch.j,170,"alive sway")}<h1 style="font-size:28px">あなたの職場選びの物差し</h1><p class="ttl">${esc(I.name)} ・ ${esc(I.title)}</p></div>
+ ${all?`<div class="card tilt" style="text-align:center">${stampSVG("完成",S.stampNew==="report")}<p style="margin:4px 0 0;font-weight:700">プログラムを全部クリア!おつかれさま</p></div>`:""}
+ <div class="rgrid">
+ ${box("m1",()=>`<ol class="rtop">${A.t.map(c=>`<li>${esc(c)}</li>`).join("")}</ol>`)}
+ ${box("m2",()=>{const l=m2List(),ok=l.filter(c=>["ok","want"].includes(evVerdict(c).k)).length;return `<p>体験で確かめた価値 <b>${ok}/${l.length}</b></p>${String(S.f.affirm||"").trim()?`<p class="hand small">${esc(snip(String(S.f.affirm),70))}</p>`:""}`;})}
+ ${box("m3",()=>R3?`<p><b>${esc(SELF_T[R3.type].n)}</b></p><p class="small">${esc(SELF_T[R3.type].tip)}</p>`:"")}
+ ${box("m4",()=>rows4[0]?`<p>差がいちばん大きい:<b>${esc(rows4[0].c)}</b>(${rows4[0].g[0]-rows4[0].g[1]})</p>${rows4[0].g[2]?`<p class="small">今週の行動:${esc(rows4[0].g[2])}</p>`:""}`:"")}
+ ${box("m5",()=>`<div class="rchips">${m5NG().map(x=>`<span class="ng">× ${esc(x)}</span>`).join("")}</div>`)}
+ ${box("m6",()=>`<div class="rchips">${L6.must.map(C=>`<span class="mu">◎ ${esc(C.n)}</span>`).join("")}${L6.want.slice(0,4).map(C=>`<span>○ ${esc(C.n)}</span>`).join("")}${L6.want.length>4?`<span>ほか${L6.want.length-4}つ</span>`:""}</div>${riCode()?`<p class="small">興味:<b>${riCode()}</b></p>`:""}`)}
+ ${box("m7",()=>R7&&R7.res.length?`<p>${esc(R7.msg)}</p>`:"",`m7/result`)}
+ ${box("m8",()=>`<div class="rchips">${S.cos.filter(c=>c.verdict).map(c=>`<span class="st ${c.verdict}">${esc(c.n)}:${esc(VERDICT[c.verdict].n)}</span>`).join("")||`<span>まだ判定した会社がありません</span>`}</div>`,"file")}
+ </div>
+ <h2 class="h2s">次の一手</h2><ol class="nexts">${nextSteps().map(x=>`<li><a href="${x.h}">${esc(x.t)}</a></li>`).join("")}</ol>
+ <h2 class="h2s">マップの更新</h2><p class="small" style="margin-top:0">価値観は、就職・引っ越し・大きな出来事で順位が入れ替わることがあります。${S.doneAt&&S.doneAt.m1?`価値観診断は${esc(S.doneAt.m1)}に作成。次の見直しの目安は<b>${addYear(S.doneAt.m1)}</b>ごろです。`:"年に1回は見直そう。"}</p>
+ <details class="acc"><summary>いつ何をする?(時期ごとの予定)</summary><div class="in">${SCHEDULE.map(([a,b])=>`<div class="cond"><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join("")}<p class="small">スケジュールは年度や業界で変わります。大学のキャリアセンターで最新情報を確かめてください。</p></div></details>
+ ${P&&P.q1===4?`<details class="acc" open><summary>辞めるべきか迷ったとき</summary><div class="in">${QUIT.map(([a,b])=>`<p style="margin:8px 0 2px"><b>${esc(a)}</b></p><p class="small" style="margin:0">${esc(b)}</p>`).join("")}</div></details>`:""}
+ <div class="gorow"><button type="button" class="b wide" id="saveAll">レポートを保存(テキスト/PDF)</button><button type="button" class="b sec wide" id="share">キャラを画像で保存・シェア</button><a class="b sec wide" href="#/program">プログラムにもどる</a><a class="linkb why2" href="guide.html#/c/10">日本の就活での使い方を図解ガイドで読む →</a></div>`;
+ return{html:h,title:"最終レポート",bar:progBtn,after(){$("#saveAll").onclick=()=>openSave("all");$("#share").onclick=()=>shareImage(A,I);}};};
+
 /* ---------- キャラを画像にする(友達と共有する用) ---------- */
 function loadImg(src){return new Promise((ok,ng)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=ng;im.src=src;});}
 async function shareImage(A,I){const W=900,H=1200,cv2=document.createElement("canvas");cv2.width=W;cv2.height=H;const g=cv2.getContext("2d");
@@ -966,16 +997,25 @@ const SEC={
    <h3>B4 価値のずれ(会社−あなた)</h3><p>${VALS.map(v=>{const d=(B.b4[v.n]||3)-imp[v.n];return `${esc(v.n)} <b>${d>0?"+":""}${d}</b>`;}).join(" / ")}</p>
    <h3>B5 3年後に後悔するとしたら</h3>${rpText(B.pre)}<h3>B6 親友へのアドバイス</h3>${rpText(B.friend)}
    <h3>次に聞くこと</h3><ol>${m8Asks(c).map(q=>`<li>${esc(q)}</li>`).join("")}</ol>`;}}};
-const fileBase=k=>(SEC[k].file+(k==="m8"&&coById(S.m8cur)?"_"+coById(S.m8cur).n:"")+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
-function buildMD(k){return[`# ${SEC[k].title}`,`> 出力日:${today()} / 価値観マップ診断`,...SEC[k].md()].join("\n\n")+"\n";}
-function buildReport(k){return `<header class="rp-head"><h1>${esc(SEC[k].title)}</h1><p class="small" style="margin:0">出力日 ${today()} ・ 価値観マップ診断</p></header><section class="rp-sec">${SEC[k].html()}</section>`;}
+const fileBase=k=>k==="all"?("価値観マップ_最終レポート_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_"):(SEC[k].file+(k==="m8"&&coById(S.m8cur)?"_"+coById(S.m8cur).n:"")+"_"+today()).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,80);
+const doneSecs=()=>Object.keys(SEC).filter(k=>S.done[k]&&(k!=="m8"||S.cos.some(c=>c.verdict)));
+function buildMD(k){if(k==="all"){const L=[`# 価値観マップ 最終レポート`,`> 出力日:${today()} / 価値観マップ診断`];
+  doneSecs().forEach(s=>{if(s==="m8")S.cos.filter(c=>c.verdict).forEach(c=>{S.m8cur=c.id;L.push(`# ${SEC.m8.title}:${c.n}`,...SEC.m8.md().map(x=>x.replace(/^## /gm,"### ")));});
+   else L.push(`# ${SEC[s].title}`,...SEC[s].md().map(x=>x.replace(/^## /gm,"### ")));});
+  L.push("# 次の一手",nextSteps().map((x,i)=>`${i+1}. ${x.t}`).join("\n"));return L.join("\n\n")+"\n";}
+ return[`# ${SEC[k].title}`,`> 出力日:${today()} / 価値観マップ診断`,...SEC[k].md()].join("\n\n")+"\n";}
+function buildReport(k){if(k==="all"){let h=`<header class="rp-head"><h1>価値観マップ 最終レポート</h1><p class="small" style="margin:0">出力日 ${today()} ・ 価値観マップ診断</p></header>`;
+  doneSecs().forEach(s=>{if(s==="m8")S.cos.filter(c=>c.verdict).forEach(c=>{S.m8cur=c.id;h+=`<section class="rp-sec rp-page"><h2>${esc(SEC.m8.title)}:${esc(c.n)}</h2>${SEC.m8.html()}</section>`;});
+   else h+=`<section class="rp-sec rp-page"><h2>${esc(SEC[s].title)}</h2>${SEC[s].html()}</section>`;});
+  return h+`<section class="rp-sec"><h2>次の一手</h2><ol>${nextSteps().map(x=>`<li>${esc(x.t)}</li>`).join("")}</ol></section>`;}
+ return `<header class="rp-head"><h1>${esc(SEC[k].title)}</h1><p class="small" style="margin:0">出力日 ${today()} ・ 価値観マップ診断</p></header><section class="rp-sec">${SEC[k].html()}</section>`;}
 let saveKey="m1",reportMode=false,titleBak=null,scrollBak=0;
 const dlg=$("#saveDlg");
 const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 const RP_HINT=!isIOS?"「印刷・PDFに保存」を押し、送信先(プリンター)で「PDFに保存」を選んでください。"
  :/CriOS|FxiOS|EdgiOS|GSA\//.test(navigator.userAgent)?"印刷画面が開かないときは、ブラウザの共有ボタン(□に↑)から「プリント」を選んでください。プリントオプション上部の共有ボタンから「\"ファイル\"に保存」でPDFになります。"
  :"「印刷・PDFに保存」→ プリントオプション上部の共有ボタン(□に↑)→「\"ファイル\"に保存」でPDFになります。";
-function openSave(k){saveKey=k;$("#saveTitle").textContent=`「${SEC[k].title}」を保存`;$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";
+function openSave(k){saveKey=k;$("#saveTitle").textContent=`「${k==="all"?"最終レポート(すべての結果)":SEC[k].title}」を保存`;$("#saveChoose").hidden=false;$("#saveText").hidden=true;$("#mdMsg").textContent="";
  if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");}
 function closeSave(){if(dlg.close)dlg.close();else dlg.removeAttribute("open");}
 $("#dlgClose").onclick=closeSave;
