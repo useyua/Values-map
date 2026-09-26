@@ -598,6 +598,12 @@ details.vd .vdin{display:flex;gap:10px;align-items:center;background:var(--groun
 .rc.bad{background:var(--tomato-soft)}.rc.good{background:var(--mint-soft)}.rc.unk{background:var(--lemon-soft)}
 .fivedots{letter-spacing:2px;color:var(--tomato);font-size:15px}
 
+.steplinks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 4px}
+.steplinks a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);background:var(--card);border:2px solid var(--hair);border-radius:12px;padding:8px 10px;min-height:44px;font:700 13.5px/1.35 var(--round)}
+.steplinks a span{flex:none;font:900 11px/1 var(--round);color:var(--tomato);border:1.5px solid var(--tomato);border-radius:6px;padding:3px 4px}
+.steplinks a::after{content:"→";margin-left:auto;color:var(--sub)}
+.steplinks a:active{background:var(--ground)}
+
 /* ---------- 保存ダイアログ ---------- */
 dialog.dlg{border:2px solid var(--outline);border-radius:20px;background:var(--card);color:var(--ink);padding:18px;width:min(460px,calc(100% - 32px));box-shadow:0 6px 0 var(--shadow)}
 dialog.dlg::backdrop{background:rgba(21,32,51,.45)}

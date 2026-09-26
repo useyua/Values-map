@@ -823,7 +823,8 @@ function m8Step(c,st){const B=m8Of(c),i=M8STEPS.indexOf(st),t=top5(),imp=selfImp
   <textarea class="field" id="pre" rows="6" placeholder="例:配属先で裁量がなく、指示待ちの仕事しかなかった → 配属の決まり方をOB訪問で聞く → 社内公募制度があるか確かめる"></textarea>
   <p class="small">理由ごとに「確かめる方法」と「起きたときの対処」も書いておこう。</p>`;
  if(st==="b6")body=`${m8Recap(c)}<h1 class="q">親友がこのまとめを持って「この会社に行くべき?」と相談してきたら、何と言う?</h1><p class="qhint">自分のことより、人のことのほうが賢く判断できる(ソロモンのパラドックス)</p>
-  <textarea class="field" id="fr" rows="5" placeholder="例:安定と家族の面は良い。でも一番大事な自律が満たされにくいなら、配属と社内公募を確かめてから決めたほうがいい"></textarea>`;
+  <textarea class="field" id="fr" rows="5" placeholder="例:安定と家族の面は良い。でも一番大事な自律が満たされにくいなら、配属と社内公募を確かめてから決めたほうがいい"></textarea>
+  <nav class="steplinks" aria-label="これまでの質問">${M8STEPS.slice(0,6).map((k,j)=>`<a href="#/m8/${c.id}/${k}"><span>${k.toUpperCase()}</span>${esc(M8T[k])}</a>`).join("")}</nav>`;
  const h=`${modHead(`1社検証 ・ ${M8T[st]}`,i+1,7)}<p class="coname">${esc(c.n)}</p>${body}
  <div class="btns"><button type="button" class="b wide" id="nx">${i<6?"次へ":"判定を見る"}</button>${i>0?`<button type="button" class="linkb" id="bk">← ひとつ前へ</button>`:`<a class="linkb" href="#/m8">← 会社を選び直す</a>`}</div>`;
  return{html:h,title:"1社検証",bar:progBtn,after(m){
