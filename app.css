@@ -588,15 +588,6 @@ details.vd>summary{list-style:none;display:flex;align-items:center;gap:10px;curs
 details.vd>summary::-webkit-details-marker{display:none}
 details.vd>summary b{font:900 18px/1.35 var(--round);flex:1;text-decoration:underline dotted var(--hair);text-underline-offset:5px}
 details.vd .vdin{display:flex;gap:10px;align-items:center;background:var(--ground);border-radius:12px;padding:8px 10px;margin:6px 0;font-size:13.5px;line-height:1.55}
-/* 1社検証:ここまでのまとめ */
-.recap{background:var(--card);border:2px solid var(--outline);border-radius:18px;padding:12px 14px;margin:14px 0;box-shadow:0 4px 0 var(--shadow);transform:rotate(-.4deg)}
-.recap h3{margin:0 0 6px;font-size:15px}
-.recap .rr{display:grid;grid-template-columns:6.5em 1fr;gap:8px;align-items:center;padding:6px 0;border-top:2px dashed var(--hair);font-size:14px}
-.recap .rr:first-of-type{border-top:none}
-.recap .rr>b{font:700 12.5px/1.35 var(--round);color:var(--sub)}
-.rc{display:inline-block;font:700 12.5px/1.4 var(--round);border:1.5px solid var(--outline);border-radius:8px;padding:2px 8px;margin:2px 4px 2px 0;background:var(--ground)}
-.rc.bad{background:var(--tomato-soft)}.rc.good{background:var(--mint-soft)}.rc.unk{background:var(--lemon-soft)}
-.fivedots{letter-spacing:2px;color:var(--tomato);font-size:15px}
 
 .steplinks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 4px}
 .steplinks a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);background:var(--card);border:2px solid var(--hair);border-radius:12px;padding:8px 10px;min-height:44px;font:700 13.5px/1.35 var(--round)}

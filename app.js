@@ -822,7 +822,7 @@ function m8Step(c,st){const B=m8Of(c),i=M8STEPS.indexOf(st),t=top5(),imp=selfImp
  if(st==="b5")body=`<h1 class="q">3年後、この会社を辞めて後悔している。なぜ?</h1><p class="qhint">あえて失敗した未来を想像すると、見落としていたリスクが見つかりやすい(事前検死)</p>
   <textarea class="field" id="pre" rows="6" placeholder="例:配属先で裁量がなく、指示待ちの仕事しかなかった → 配属の決まり方をOB訪問で聞く → 社内公募制度があるか確かめる"></textarea>
   <p class="small">理由ごとに「確かめる方法」と「起きたときの対処」も書いておこう。</p>`;
- if(st==="b6")body=`${m8Recap(c)}<h1 class="q">親友がこのまとめを持って「この会社に行くべき?」と相談してきたら、何と言う?</h1><p class="qhint">自分のことより、人のことのほうが賢く判断できる(ソロモンのパラドックス)</p>
+ if(st==="b6")body=`<h1 class="q">親友がここまでの答えを持って「この会社に行くべき?」と相談してきたら、何と言う?</h1><p class="qhint">自分のことより、人のことのほうが賢く判断できる(ソロモンのパラドックス)</p>
   <textarea class="field" id="fr" rows="5" placeholder="例:安定と家族の面は良い。でも一番大事な自律が満たされにくいなら、配属と社内公募を確かめてから決めたほうがいい"></textarea>
   <nav class="steplinks" aria-label="これまでの質問">${M8STEPS.slice(0,6).map((k,j)=>`<a href="#/m8/${c.id}/${k}"><span>${k.toUpperCase()}</span>${esc(M8T[k])}</a>`).join("")}</nav>`;
  const h=`${modHead(`1社検証 ・ ${M8T[st]}`,i+1,7)}<p class="coname">${esc(c.n)}</p>${body}
@@ -838,20 +838,6 @@ function m8Step(c,st){const B=m8Of(c),i=M8STEPS.indexOf(st),t=top5(),imp=selfImp
   const fr=$("#fr");if(fr){fr.value=B.friend||"";grow(fr);fr.addEventListener("input",()=>{B.friend=fr.value;save();grow(fr);});}
   $("#nx").onclick=()=>{if(i<6)go(`m8/${c.id}/${M8STEPS[i+1]}`);else{c.verdict=m8Verdict(c).k;finishMod("m8");go(`m8/${c.id}/result`);}};
   const bk=$("#bk");if(bk)bk.onclick=()=>go(`m8/${c.id}/${M8STEPS[i-1]}`);}};}
-function m8Recap(c){const B=m8Of(c),t=top5(),imp=selfImp();
- const g=[0,1,2].map(gi=>B.b0.filter(k=>k[0]===String(gi)).length);
- const yes=B.mines.filter(x=>x===2).length,unkM=B.mines.filter(x=>x!==0&&x!==2).length;
- const low=AX.filter((x,k)=>B.ax[k]!=null&&B.ax[k]<=2).map(x=>x.n),unkA=B.ax.filter(x=>x==null).length;
- const ok=t.filter(v=>B.b3[v]&&B.b3[v].ok).length;
- const gap=VALS.filter(v=>(B.b4[v.n]||3)-imp[v.n]<=-2).map(v=>v.n);
- const pre=String(B.pre||"").trim().split(/\n/)[0];
- return `<div class="recap"><h3>ここまでのまとめ</h3>
- <div class="rr"><b>惹かれた理由</b><span><span class="rc">表面 ${g[0]}</span><span class="rc">選考体験 ${g[1]}</span><span class="rc good">日々の体験 ${g[2]}</span></span></div>
- <div class="rr"><b>地雷</b><span>${yes?`<span class="rc bad">あり ${yes}</span>`:""}${unkM?`<span class="rc unk">不明 ${unkM}</span>`:""}${!yes&&!unkM?`<span class="rc good">なし</span>`:""}</span></div>
- <div class="rr"><b>12の軸</b><span>${low.map(n=>`<span class="rc bad">${esc(n)}</span>`).join("")}${unkA?`<span class="rc unk">? ${unkA}</span>`:""}${!low.length&&!unkA?`<span class="rc good">低い軸なし</span>`:""}</span></div>
- <div class="rr"><b>トップ5の根拠</b><span class="fivedots" aria-label="${ok}/5">${"●".repeat(ok)}${"○".repeat(Math.max(0,5-ok))}</span></div>
- <div class="rr"><b>大きなずれ</b><span>${gap.map(n=>`<span class="rc bad">${esc(n)}</span>`).join("")||`<span class="rc good">なし</span>`}</span></div>
- ${pre?`<div class="rr"><b>3年後の後悔</b><span>${esc(snip(pre,40))}</span></div>`:""}</div>`;}
 const diffCol=d=>d<=-2?"var(--tomato)":d>=2?"#C77F00":"var(--mint)";
 function m8Asks(c){const B=m8Of(c),L=[];B.mines.forEach((x,k)=>{if(x!==0&&x!==2)L.push(`【${MINES[k].n}】${MINES[k].look[0]}を確かめる`);});B.ax.forEach((x,k)=>{if(x==null)L.push(`【${AX[k].n}】${AX[k].q}`);});return L;}
 function m8Result(c){const V=m8Verdict(c);c.verdict=V.k;save();const T=VERDICT[V.k],B=m8Of(c),asks=m8Asks(c);S.m8cur=c.id;
